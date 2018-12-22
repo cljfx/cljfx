@@ -1,0 +1,15 @@
+{:deps {org.clojure/clojure {:mvn/version "1.10.0"}
+        org.openjfx/javafx-controls {:mvn/version "11"
+                                     :classifier ["mac" "linux" "win" "sources"]}
+        org.openjfx/javafx-base {:mvn/version "11"
+                                 :classifier ["mac" "linux" "win" "sources"]}
+        org.openjfx/javafx-graphics {:mvn/version "11"
+                                     :classifier ["mac" "linux" "win" "sources"]}
+        org.openjfx/javafx-swing {:mvn/version "11"
+                                  :classifier ["mac" "linux" "win" "sources"]}
+        org.openjfx/javafx-media {:mvn/version "11"
+                                  :classifier ["mac" "linux" "win" "sources"]}
+        org.openjfx/javafx-web {:mvn/version "11"
+                                :classifier ["mac" "linux" "win" "sources"]}}
+ :aliases {:examples {:extra-paths ["examples"]}
+           :dev {:extra-paths ["dev"]}}}

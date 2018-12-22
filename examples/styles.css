@@ -1,0 +1,25 @@
+VBox {
+    -fx-background-color: #666a;
+}
+Label {
+    -fx-text-fill: white;
+}
+TextField {
+    -fx-text-fill: white;
+    -fx-background-color: #666;
+    -fx-background-radius: 4 4 0 0;
+    -fx-border-color: #333;
+    -fx-border-width: 0 0 4 0;
+}
+TextField:focused {
+    -fx-border-color: #f9a527;
+}
+
+* {
+    -fx-font-family: monospace;
+    -fx-padding: 6;
+}
+.root {
+    -fx-padding: 10;
+    -fx-background-radius: 10;
+}
