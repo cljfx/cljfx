@@ -32,16 +32,19 @@
           (f tag)))
     f))
 
+(defn- prepend-opt-value [f args]
+  (apply vector f (::value impl/*opts*) args))
+
 (def ^:private exposed-value-fn-lifecycle
   (with-meta
-    {}
+    [::lifecycle/exposed-value-fn]
     {`lifecycle/create
      (fn [_ [f & args]]
-       (lifecycle/create lifecycle.fn/component (apply vector f (::value impl/*opts*) args)))
+       (lifecycle/create lifecycle.fn/component (prepend-opt-value f args)))
 
      `lifecycle/advance
      (fn [_ component [f & args]]
-       (lifecycle/advance lifecycle.fn/component component (apply vector f (::value impl/*opts*) args)))
+       (lifecycle/advance lifecycle.fn/component component (prepend-opt-value f args)))
 
      `lifecycle/delete
      (fn [_ component]

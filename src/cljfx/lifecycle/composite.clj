@@ -22,8 +22,7 @@
     (keys props-desc)))
 
 (defn- create-composite-component [this desc]
-  (let [tag (first desc)
-        props-desc (desc->props-desc desc this)
+  (let [props-desc (desc->props-desc desc this)
         props-config (:props this)
         props (create-props props-desc props-config)
         args (:args this)
@@ -36,11 +35,9 @@
     (doseq [[k v] sorted-props
             :when (not (contains? arg-set k))]
       (prop/assign (get props-config k) instance v))
-    (with-meta {:tag tag
-                :props props
+    (with-meta {:props props
                 :instance instance}
-               {`component/tag :tag
-                `component/instance :instance})))
+               {`component/instance :instance})))
 
 (defn- advance-composite-component [this component new-desc]
   (let [props-desc (desc->props-desc new-desc this)

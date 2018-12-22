@@ -17,14 +17,11 @@
 (extend-protocol lifecycle/Lifecycle
   nil
   (create [_ desc]
-    (let [tag (first desc)
-          ret (-> tag
-                  tag->component-lifecycle
-                  (lifecycle/create desc)
-                  (vary-meta assoc :cljfx/desc desc))]
-      (when-let [f (:cljfx/on-create (meta desc))]
-        (f ret))
-      ret))
+    (let [lifecycle (-> desc first tag->component-lifecycle)]
+      (vary-meta (lifecycle/create lifecycle desc)
+                 assoc
+                 :cljfx/desc desc
+                 `component/lifecycle (constantly lifecycle))))
   (advance [this component new-desc]
     (cond
       (and (nil? component) (nil? new-desc))
@@ -36,19 +33,17 @@
       (nil? new-desc)
       (lifecycle/delete this component)
 
-      (not= (component/tag component) (first new-desc))
+      (not (identical? (component/lifecycle component)
+                       (tag->component-lifecycle (first new-desc))))
       (do (lifecycle/delete this component)
           (lifecycle/create this new-desc))
 
       :else
-      (let [tag (first new-desc)]
-        (-> tag
-            tag->component-lifecycle
-            (lifecycle/advance component new-desc)
-            (vary-meta assoc :cljfx/desc new-desc)))))
+      (let [lifecycle (component/lifecycle component)]
+        (vary-meta (lifecycle/advance lifecycle component new-desc)
+                   assoc :cljfx/desc new-desc))))
   (delete [_ component]
-    (-> component component/tag tag->component-lifecycle (lifecycle/delete component))
-    nil))
+    (lifecycle/delete (component/lifecycle component) component)))
 
 (defmacro with-opts [opts & body]
   `(binding [impl/*opts* ~opts]

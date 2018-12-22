@@ -3,7 +3,7 @@
             [cljfx.lifecycle :as lifecycle]))
 
 (def component
-  (with-meta {}
+  (with-meta [:cljfx.lifecycle/fn]
              {`lifecycle/create
               (fn [_ [f & args]]
                 (let [ret (apply f args)]
@@ -11,8 +11,7 @@
                               :args args
                               :ret ret
                               :child (lifecycle/create-component ret)}
-                             {`component/tag :f
-                              `component/instance #(component/instance (:child %))})))
+                             {`component/instance #(component/instance (:child %))})))
 
               `lifecycle/advance
               (fn [_ component [f & args]]
