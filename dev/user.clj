@@ -39,7 +39,7 @@
                       (concat
                         [:setter]
                         (case parameter-type-sym
-                          double ['prop/scalar :coerce 'double]
+                          double ['prop/scalar :coerce 'coerce/as-double]
                           boolean ['prop/scalar]
                           java.lang.Object ['prop/scalar]
                           java.lang.String ['prop/scalar]
@@ -53,7 +53,7 @@
                                                        :coerce 'coerce/rectangle-2d]
                           javafx.scene.paint.Paint ['prop/scalar :coerce 'coerce/paint]
                           javafx.scene.image.Image ['prop/scalar :coerce 'coerce/image]
-                          int ['prop/scalar :coerce 'int]
+                          int ['prop/scalar :coerce 'coerce/as-int]
                           (cond
                             (and (class? (resolve parameter-type-sym))
                                  (.isEnum ^Class (resolve parameter-type-sym)))

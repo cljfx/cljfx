@@ -51,81 +51,99 @@
 
 (defn enum
   ([enum-type]
-   #(enum enum-type %))
+   (fn [x _] (enum enum-type x)))
   ([enum-type x]
    (cond
      (instance? enum-type x) x
      (keyword? x) (Enum/valueOf enum-type (kw->screaming-caps x))
      :else (fail enum-type x))))
 
-(defn color [x]
-  (cond
-    (instance? Color x) x
-    (keyword? x) (Color/valueOf (name x))
-    (string? x) (Color/valueOf ^String x)
-    :else (fail Color x)))
+(defn color
+  ([x _]
+   (color x))
+  ([x]
+   (cond
+     (instance? Color x) x
+     (keyword? x) (Color/valueOf (name x))
+     (string? x) (Color/valueOf ^String x)
+     :else (fail Color x))))
 
 (defn- stop [[offset x]]
   (Stop. (double offset)
          (color x)))
 
-(defn- map->linear-gradient [m]
-  (LinearGradient. ^double (:start-x m)
-                   ^double (:start-y m)
-                   ^double (:end-x m)
-                   ^double (:end-y m)
-                   ^boolean (:proportional m)
-                   ^CycleMethod (enum CycleMethod (:cycle-method m))
-                   ^List (map stop (:stops m))))
+(defn- map->linear-gradient
+  ([m _]
+   (map->linear-gradient m))
+  ([m]
+   (LinearGradient. ^double (:start-x m)
+                    ^double (:start-y m)
+                    ^double (:end-x m)
+                    ^double (:end-y m)
+                    ^boolean (:proportional m)
+                    ^CycleMethod (enum CycleMethod (:cycle-method m))
+                    ^List (map stop (:stops m)))))
 
-(defn- map->radial-gradient [m]
-  (RadialGradient. ^double (:focus-angle m)
-                   ^double (:focus-distance m)
-                   ^double (:center-x m)
-                   ^double (:center-y m)
-                   ^double (:radius m)
-                   ^boolean (:proportional m)
-                   ^CycleMethod (enum CycleMethod (:cycle-method m))
-                   ^List (map stop (:stops m))))
+(defn- map->radial-gradient
+  ([m _]
+   (map->radial-gradient m))
+  ([m]
+   (RadialGradient. ^double (:focus-angle m)
+                    ^double (:focus-distance m)
+                    ^double (:center-x m)
+                    ^double (:center-y m)
+                    ^double (:radius m)
+                    ^boolean (:proportional m)
+                    ^CycleMethod (enum CycleMethod (:cycle-method m))
+                    ^List (map stop (:stops m)))))
 
-(defn image [x]
-  (cond
-    (instance? Image x) x
-    (string? x) (Image. ^String x)
-    :else (fail Image x)))
+(defn image
+  ([x _]
+   (image x))
+  ([x]
+   (cond
+     (instance? Image x) x
+     (string? x) (Image. ^String x)
+     :else (fail Image x))))
 
-(defn map->image-pattern [m]
-  (ImagePattern. (image (:image m))
-                 ^double (:x m 0.0)
-                 ^double (:y m 0.0)
-                 ^double (:width m 1.0)
-                 ^double (:height m 1.0)
-                 ^boolean (:proportional m true)))
+(defn map->image-pattern
+  ([m _]
+   (map->image-pattern m))
+  ([m]
+   (ImagePattern. (image (:image m))
+                  ^double (:x m 0.0)
+                  ^double (:y m 0.0)
+                  ^double (:width m 1.0)
+                  ^double (:height m 1.0)
+                  ^boolean (:proportional m true))))
 
-(defn paint [x]
-  (cond
-    (instance? Paint x) x
-    (keyword? x) (Color/valueOf (name x))
-    (string? x) (Color/valueOf ^String x)
-    (and (vector? x) (= :linear-gradient (first x))) (map->linear-gradient (second x))
-    (and (vector? x) (= :radial-gradient (first x))) (map->radial-gradient (second x))
-    (and (vector? x) (= :image-pattern (first x))) (map->image-pattern (second x))
-    :else (fail Paint x)))
+(defn paint
+  ([x _]
+   (paint x))
+  ([x]
+   (cond
+     (instance? Paint x) x
+     (keyword? x) (Color/valueOf (name x))
+     (string? x) (Color/valueOf ^String x)
+     (and (vector? x) (= :linear-gradient (first x))) (map->linear-gradient (second x))
+     (and (vector? x) (= :radial-gradient (first x))) (map->radial-gradient (second x))
+     (and (vector? x) (= :image-pattern (first x))) (map->image-pattern (second x))
+     :else (fail Paint x))))
 
-(defn cursor [x]
+(defn cursor [x _]
   (cond
     (instance? Cursor x) x
     (keyword? x) (Cursor/cursor (kw->screaming-caps x))
     (string? x) (Cursor/cursor x)
     :else (fail Cursor x)))
 
-(defn event-handler [x]
+(defn event-handler [x opts]
   (cond
     (instance? EventHandler x)
     x
 
     (map? x)
-    (let [handler (event/map-event-handler x)]
+    (let [handler (event/map-event-handler x opts)]
       (reify EventHandler
         (handle [_ event]
           (handler (event/datafy event)))))
@@ -138,13 +156,13 @@
     :else
     (throw (fail EventHandler x))))
 
-(defn runnable [x]
+(defn runnable [x opts]
   (cond
     (fn? x)
     x
 
     (map? x)
-    (let [handler (event/map-event-handler x)]
+    (let [handler (event/map-event-handler x opts)]
       (fn []
         (handler nil)))
 
@@ -160,13 +178,13 @@
       (.setSamples ret x y s0 s1))
     ret))
 
-(defn float-map [x]
+(defn float-map [x _]
   (cond
     (instance? FloatMap x) x
     (map? x) (map->float-map x)
     :else (fail FloatMap x)))
 
-(defn point-3d [x]
+(defn point-3d [x _]
   (cond
     (instance? Point3D x) x
     (map? x) (Point3D. (:x x) (:y x) (:z x))
@@ -196,13 +214,13 @@
                    (stringify-style-value value))))
        (str/join "; ")))
 
-(defn style [x]
+(defn style [x _]
   (cond
     (string? x) x
     (map? x) (map->style x)
     :else (fail "style" x)))
 
-(defn rectangle-2d [x]
+(defn rectangle-2d [x _]
   (cond
     (instance? Rectangle2D x) x
     (map? x) (Rectangle2D. (:min-x x) (:min-y x) (:width x) (:height x))
@@ -216,14 +234,14 @@
           :magnitudes (into [] magnitudes)
           :phases (into [] phases)}))))
 
-(defn audio-spectrum-listener [x]
+(defn audio-spectrum-listener [x opts]
   (cond
     (instance? AudioSpectrumListener x) x
-    (map? x) (reify-audio-spectrum-listener (event/map-event-handler x))
+    (map? x) (reify-audio-spectrum-listener (event/map-event-handler x opts))
     (fn? x) (reify-audio-spectrum-listener x)
     :else (fail AudioSpectrumListener x)))
 
-(defn duration [x]
+(defn duration [x _]
   (cond
     (instance? Duration x) x
     (= :zero x) Duration/ZERO
@@ -239,7 +257,7 @@
                   (:hours :hour :h) (Duration/hours (double (first x))))
     :else (fail Duration x)))
 
-(defn font [x]
+(defn font [x _]
   (cond
     (instance? Font x) x
     (= :default x) (Font/getDefault)
@@ -263,43 +281,49 @@
                  (Font/font ^String family)))
     :else (fail Font x)))
 
-(defn vertex-format [x]
+(defn vertex-format [x _]
   (cond
     (instance? VertexFormat x) x
     (= :point-texcoord x) VertexFormat/POINT_TEXCOORD
     (= :point-normal-texcoord) VertexFormat/POINT_NORMAL_TEXCOORD
     :else (fail VertexFormat x)))
 
-(defn corner-radii [x]
-  (cond
-    (instance? CornerRadii x) x
-    (= :empty x) CornerRadii/EMPTY
-    (number? x) (CornerRadii. (double x))
-    (map? x) (let [{:keys [radius
-                           as-percent
-                           top-left
-                           top-right
-                           bottom-right
-                           bottom-left]} x]
-               (CornerRadii. (double (or top-left radius))
-                             (double (or top-right radius))
-                             (double (or bottom-right radius))
-                             (double (or bottom-left radius))
-                             (boolean as-percent)))
-    :else (fail CornerRadii x)))
+(defn corner-radii
+  ([x _]
+   (corner-radii x))
+  ([x]
+   (cond
+     (instance? CornerRadii x) x
+     (= :empty x) CornerRadii/EMPTY
+     (number? x) (CornerRadii. (double x))
+     (map? x) (let [{:keys [radius
+                            as-percent
+                            top-left
+                            top-right
+                            bottom-right
+                            bottom-left]} x]
+                (CornerRadii. (double (or top-left radius))
+                              (double (or top-right radius))
+                              (double (or bottom-right radius))
+                              (double (or bottom-left radius))
+                              (boolean as-percent)))
+     :else (fail CornerRadii x))))
 
-(defn insets [x]
-  (cond
-    (instance? Insets x) x
-    (= :empty x) Insets/EMPTY
-    (number? x) (Insets. (double x))
-    (map? x) (Insets. (double (:top x 0))
-                      (double (:right x 0))
-                      (double (:bottom x 0))
-                      (double (:left x 0)))
-    :else (fail Insets x)))
+(defn insets
+  ([x _]
+   (insets x))
+  ([x]
+   (cond
+     (instance? Insets x) x
+     (= :empty x) Insets/EMPTY
+     (number? x) (Insets. (double x))
+     (map? x) (Insets. (double (:top x 0))
+                       (double (:right x 0))
+                       (double (:bottom x 0))
+                       (double (:left x 0)))
+     :else (fail Insets x))))
 
-(defn background-fill [x]
+(defn- background-fill [x]
   (cond
     (instance? BackgroundFill x) x
     (map? x) (BackgroundFill. (some-> x :fill paint)
@@ -307,13 +331,13 @@
                               (some-> x :insets insets))
     :else (fail BackgroundFill x)))
 
-(def background-repeat
-  (enum BackgroundRepeat))
+(def ^:private background-repeat
+  #(enum BackgroundRepeat %))
 
-(def side
-  (enum Side))
+(def ^:private side
+  #(enum Side %))
 
-(defn background-position [x]
+(defn- background-position [x]
   (cond
     (instance? BackgroundPosition x) x
     (= :center x) BackgroundPosition/CENTER
@@ -326,7 +350,7 @@
                                   (-> x :vertical :as-percentage boolean))
     :else (fail BackgroundPosition x)))
 
-(defn background-size [x]
+(defn- background-size [x]
   (cond
     (instance? BackgroundSize x) x
     (= :auto x) BackgroundSize/AUTO
@@ -339,7 +363,7 @@
                               (-> x :cover boolean))
     :else (fail BackgroundSize x)))
 
-(defn background-image [x]
+(defn- background-image [x]
   (cond
     (instance? BackgroundImage x) x
     (string? x) (BackgroundImage. (image x) nil nil nil nil)
@@ -350,7 +374,7 @@
                                (some-> x :size background-size))
     :else (fail BackgroundImage x)))
 
-(defn background [x]
+(defn background [x _]
   (cond
     (instance? Background x) x
     (map? x) (Background. ^List (map background-fill (:fills x))
@@ -358,15 +382,15 @@
     :else (fail Background x)))
 
 (def stroke-type
-  (enum StrokeType))
+  #(enum StrokeType %))
 
 (def stroke-line-join
-  (enum StrokeLineJoin))
+  #(enum StrokeLineJoin %))
 
 (def stroke-line-cap
-  (enum StrokeLineCap))
+  #(enum StrokeLineCap %))
 
-(defn border-stroke-style [x]
+(defn- border-stroke-style [x]
   (cond
     (instance? BorderStrokeStyle x) x
     (= :dashed x) BorderStrokeStyle/DASHED
@@ -381,7 +405,7 @@
                                  (map double (:dash-array x)))
     :else (fail BorderStrokeStyle x)))
 
-(defn border-widths [x]
+(defn- border-widths [x]
   (cond
     (instance? BorderWidths x) x
     (= :auto x) BorderWidths/AUTO
@@ -423,9 +447,9 @@
     :else (fail BorderWidths x)))
 
 (def border-repeat
-  (enum BorderRepeat))
+  #(enum BorderRepeat %))
 
-(defn border-stroke [x]
+(defn- border-stroke [x]
   (cond
     (instance? BorderStroke x) x
     (map? x) (BorderStroke. (some-> x :stroke paint)
@@ -435,7 +459,7 @@
                             (some-> x :insets insets))
     :else (fail BorderStroke x)))
 
-(defn border-image [x]
+(defn- border-image [x]
   (cond
     (instance? BorderImage x) x
     (map? x) (BorderImage. (-> x :image image)
@@ -447,7 +471,7 @@
                            (some-> x :repeat-y border-repeat))
     :else (fail BorderImage x)))
 
-(defn border [x]
+(defn border [x _]
   (cond
     (instance? Border x) x
     (= :empty x) Border/EMPTY
@@ -455,7 +479,7 @@
                       ^List (map border-image (:images x)))
     :else (fail Border x)))
 
-(defn string-converter [x]
+(defn string-converter [x _]
   (cond
     (instance? StringConverter x)
     x
@@ -481,7 +505,7 @@
             :short (ShortStringConverter.)
             (fail StringConverter x))))
 
-(defn key-combination [x]
+(defn key-combination [x _]
   (cond
     (instance? KeyCombination x)
     x
@@ -503,12 +527,12 @@
     :else
     (fail KeyCombination x)))
 
-(defn cell-factory [x]
+(defn cell-factory [x _]
   (cond
     (instance? Callback x) x
     :else (fail Callback x)))
 
-(defn page-factory [x]
+(defn page-factory [x opts]
   (cond
     (instance? Callback x)
     x
@@ -516,12 +540,12 @@
     (fn? x)
     (reify Callback
       (call [_ param]
-        (component/instance (lifecycle/create-component (x param)))))
+        (component/instance (lifecycle/create-component (x param) opts))))
 
     :else
     (fail Callback x)))
 
-(defn chronology [x]
+(defn chronology [x _]
   (if (instance? Chronology x)
     x
     (case x
@@ -532,7 +556,7 @@
       :thai-buddhist ThaiBuddhistChronology/INSTANCE
       (fail Chronology x))))
 
-(defn bounds [x]
+(defn bounds [x _]
   (cond
     (instance? Bounds x)
     x
@@ -551,13 +575,13 @@
     :else
     (fail Bounds x)))
 
-(defn observable-list [x]
+(defn observable-list [x _]
   (cond
     (instance? ObservableList x) x
     (instance? Collection x) (FXCollections/observableArrayList ^Collection x)
     :else (fail ObservableList x)))
 
-(defn table-resize-policy [x]
+(defn table-resize-policy [x _]
   (cond
     (instance? Callback x) x
     (= :unconstrained x) TableView/UNCONSTRAINED_RESIZE_POLICY
@@ -567,20 +591,20 @@
                 (x param)))
     :else (fail Callback x)))
 
-(defn tree-table-resize-policy [x]
+(defn tree-table-resize-policy [x _]
   (cond
     (instance? Callback x) x
     (= :unconstrained x) TreeTableView/UNCONSTRAINED_RESIZE_POLICY
     (= :constrained x) TreeTableView/CONSTRAINED_RESIZE_POLICY
     :else (fail Callback "x")))
 
-(defn table-sort-policy [x]
+(defn table-sort-policy [x _]
   (cond
     (instance? Callback x) x
     (= :default x) TableView/DEFAULT_SORT_POLICY
     :else (fail Callback x)))
 
-(defn tree-table-sort-policy [x]
+(defn tree-table-sort-policy [x _]
   (cond
     (instance? Callback x) x
     (= :default x) TreeTableView/DEFAULT_SORT_POLICY
@@ -595,7 +619,7 @@
     (^void addListener [_ ^InvalidationListener _])
     (^void removeListener [_ ^InvalidationListener _])))
 
-(defn table-cell-value-factory [x]
+(defn table-cell-value-factory [x _]
   (cond
     (instance? Callback x) x
     (fn? x) (reify Callback
@@ -604,7 +628,7 @@
                   (constant-observable-value (x (.getValue features))))))
     :else (fail Callback x)))
 
-(defn tree-table-cell-value-factory [x]
+(defn tree-table-cell-value-factory [x _]
   (cond
     (instance? Callback x) x
     (fn? x) (reify Callback
@@ -613,7 +637,16 @@
                   (constant-observable-value (x (.getValue (.getValue features)))))))
     :else (fail Callback x)))
 
-(defn text-formatter [x]
+(defn text-formatter [x _]
   (cond
     (instance? TextFormatter x) x
     :else (fail TextFormatter x)))
+
+(defn as-double [x _]
+  (double x))
+
+(defn as-int [x _]
+  (int x))
+
+(defn style-class [x _]
+  (if (string? x) [x] x))

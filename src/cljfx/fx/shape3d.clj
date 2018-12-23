@@ -37,16 +37,16 @@
   (lifecycle.composite/describe Box
     :ctor []
     :extends [shape3d]
-    :props {:depth [:setter prop/scalar :coerce double :default 2.0]
-            :height [:setter prop/scalar :coerce double :default 2.0]
-            :width [:setter prop/scalar :coerce double :default 2.0]}))
+    :props {:depth [:setter prop/scalar :coerce coerce/as-double :default 2.0]
+            :height [:setter prop/scalar :coerce coerce/as-double :default 2.0]
+            :width [:setter prop/scalar :coerce coerce/as-double :default 2.0]}))
 
 (def cylinder
   (lifecycle.composite/describe Cylinder
     :ctor []
     :extends [shape3d]
-    :props {:height [:setter prop/scalar :coerce double :default 2.0]
-            :radius [:setter prop/scalar :coerce double :default 1.0]}))
+    :props {:height [:setter prop/scalar :coerce coerce/as-double :default 2.0]
+            :radius [:setter prop/scalar :coerce coerce/as-double :default 1.0]}))
 
 (def mesh-view
   (lifecycle.composite/describe MeshView
@@ -59,18 +59,18 @@
   (lifecycle.composite/describe TriangleMesh
     :ctor []
     :props {:vertex-format [:setter prop/scalar :coerce coerce/vertex-format]
-            :faces [:list prop/scalar :coerce #(map int %)]
-            :face-smoothing-groups [:list prop/scalar :coerce #(map int %)]
-            :normals [:list prop/scalar :coerce #(map float %)]
-            :points [:list prop/scalar :coerce #(map float %)]
-            :tex-coords [:list prop/scalar :coerce #(map float %)]}))
+            :faces [:list prop/scalar :coerce (fn [x _] (map int x))]
+            :face-smoothing-groups [:list prop/scalar :coerce (fn [x _] (map int x))]
+            :normals [:list prop/scalar :coerce (fn [x _] (map float x))]
+            :points [:list prop/scalar :coerce (fn [x _] (map float x))]
+            :tex-coords [:list prop/scalar :coerce (fn [x _] (map float x))]}))
 
 (def sphere
   (lifecycle.composite/describe Sphere
     :ctor []
     :extends [shape3d]
     :default-prop [:radius prop/extract-single]
-    :props {:radius [:setter prop/scalar :coerce double :default 1.0]}))
+    :props {:radius [:setter prop/scalar :coerce coerce/as-double :default 1.0]}))
 
 (def phong-material
   (lifecycle.composite/describe PhongMaterial
@@ -81,7 +81,7 @@
             :self-illumination-map [:setter prop/scalar :coerce coerce/image]
             :specular-color [:setter prop/scalar :coerce coerce/color]
             :specular-map [:setter prop/scalar :coerce coerce/image]
-            :specular-power [:setter prop/scalar :coerce double :default 32.0]}))
+            :specular-power [:setter prop/scalar :coerce coerce/as-double :default 32.0]}))
 
 (def tag->lifecycle
   {:box box

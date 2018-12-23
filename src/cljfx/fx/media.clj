@@ -27,14 +27,14 @@
                                     :stopped (.stop ^MediaPlayer %1)))
                     prop/scalar
                     :default :stopped]
-            :audio-spectrum-interval [:setter prop/scalar :coerce double :default 0.1]
+            :audio-spectrum-interval [:setter prop/scalar :coerce coerce/as-double :default 0.1]
             :audio-spectrum-listener [:setter prop/scalar
                                       :coerce coerce/audio-spectrum-listener]
-            :audio-spectrum-num-bands [:setter prop/scalar :coerce int :default 128]
-            :audio-spectrum-threshold [:setter prop/scalar :coerce int :default -60]
+            :audio-spectrum-num-bands [:setter prop/scalar :coerce coerce/as-int :default 128]
+            :audio-spectrum-threshold [:setter prop/scalar :coerce coerce/as-int :default -60]
             :auto-play [:setter prop/scalar :default false]
-            :balance [:setter prop/scalar :coerce double :default 0]
-            :cycle-count [:setter prop/scalar :coerce int :default 1]
+            :balance [:setter prop/scalar :coerce coerce/as-double :default 0]
+            :cycle-count [:setter prop/scalar :coerce coerce/as-int :default 1]
             :mute [:setter prop/scalar :default false]
             :on-end-of-media [:setter prop/scalar :coerce coerce/runnable]
             :on-error [:setter prop/scalar :coerce coerce/runnable]
@@ -46,13 +46,13 @@
             :on-repeat [:setter prop/scalar :coerce coerce/runnable]
             :on-stalled [:setter prop/scalar :coerce coerce/runnable]
             :on-stopped [:setter prop/scalar :coerce coerce/runnable]
-            :rate [:setter prop/scalar :coerce double :default 1]
+            :rate [:setter prop/scalar :coerce coerce/as-double :default 1]
             :start-time [:setter prop/scalar
                          :coerce coerce/duration :default :zero]
             :stop-time [:setter prop/component
                         :coerce coerce/duration
                         :default :indefinite]
-            :volume [:setter prop/scalar :coerce double :default 1]}))
+            :volume [:setter prop/scalar :coerce coerce/as-double :default 1]}))
 
 (def media-view
   (lifecycle.composite/describe MediaView
@@ -63,10 +63,10 @@
             :on-error [:setter prop/scalar :coerce coerce/event-handler]
             :preserve-ratio [:setter prop/scalar :default true]
             :smooth [:setter prop/scalar :default ImageView/SMOOTH_DEFAULT]
-            :x [:setter prop/scalar :coerce double :default 0.0]
-            :y [:setter prop/scalar :coerce double :default 0.0]
-            :fit-width [:setter prop/scalar :coerce double :default 0.0]
-            :fit-height [:setter prop/scalar :coerce double :default 0.0]
+            :x [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :y [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :fit-width [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :fit-height [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :viewport [:setter prop/scalar :coerce coerce/rectangle-2d]}))
 
 (def tag->lifecycle

@@ -1,7 +1,6 @@
 (ns cljfx.middleware
   (:require [cljfx.lifecycle :as lifecycle]
-            [cljfx.lifecycle.fn :as lifecycle.fn]
-            [cljfx.impl :as impl]))
+            [cljfx.lifecycle.fn :as lifecycle.fn]))
 
 (defn map-value [f]
   (fn [render-fn]
@@ -32,23 +31,26 @@
           (f tag)))
     f))
 
-(defn- prepend-opt-value [f args]
-  (apply vector f (::value impl/*opts*) args))
+(defn- prepend-opt-value [f args opts]
+  (apply vector f (::value opts) args))
 
 (def ^:private exposed-value-fn-lifecycle
   (with-meta
     [::lifecycle/exposed-value-fn]
     {`lifecycle/create
-     (fn [_ [f & args]]
-       (lifecycle/create lifecycle.fn/component (prepend-opt-value f args)))
+     (fn [_ [f & args] opts]
+       (lifecycle/create lifecycle.fn/component (prepend-opt-value f args opts) opts))
 
      `lifecycle/advance
-     (fn [_ component [f & args]]
-       (lifecycle/advance lifecycle.fn/component component (prepend-opt-value f args)))
+     (fn [_ component [f & args] opts]
+       (lifecycle/advance lifecycle.fn/component
+                          component
+                          (prepend-opt-value f args opts)
+                          opts))
 
      `lifecycle/delete
-     (fn [_ component]
-       (lifecycle/delete lifecycle.fn/component component))}))
+     (fn [_ component opts]
+       (lifecycle/delete lifecycle.fn/component component opts))}))
 
 (defn expose-value []
   (fn [render-fn]

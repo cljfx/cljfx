@@ -18,23 +18,23 @@
             :label [:setter prop/scalar]
             :tick-mark-visible [:setter prop/scalar :default true]
             :tick-labels-visible [:setter prop/scalar :default true]
-            :tick-length [:setter prop/scalar :coerce double :default 8]
+            :tick-length [:setter prop/scalar :coerce coerce/as-double :default 8]
             :auto-ranging [:setter prop/scalar :default true]
             :tick-label-font [:setter prop/scalar :coerce coerce/font
                               :default {:family "System" :size 8}]
             :tick-label-fill [:setter prop/scalar :coerce coerce/paint :default :black]
-            :tick-label-gap [:setter prop/scalar :coerce double :default 3]
+            :tick-label-gap [:setter prop/scalar :coerce coerce/as-double :default 3]
             :animated [:setter prop/scalar :default true]
-            :tick-label-rotation [:setter prop/scalar :coerce double :default 0]}))
+            :tick-label-rotation [:setter prop/scalar :coerce coerce/as-double :default 0]}))
 
 (def value-axis
   (lifecycle.composite/describe ValueAxis
     :extends [axis]
     :props {:minor-tick-visible [:setter prop/scalar :default true]
-            :lower-bound [:setter prop/scalar :coerce double :default 0]
-            :upper-bound [:setter prop/scalar :coerce double :default 100]
-            :minor-tick-count [:setter prop/scalar :coerce int :default 5]
-            :minor-tick-length [:setter prop/scalar :coerce double :default 5]
+            :lower-bound [:setter prop/scalar :coerce coerce/as-double :default 0]
+            :upper-bound [:setter prop/scalar :coerce coerce/as-double :default 100]
+            :minor-tick-count [:setter prop/scalar :coerce coerce/as-int :default 5]
+            :minor-tick-length [:setter prop/scalar :coerce coerce/as-double :default 5]
             :tick-label-formatter [:setter prop/scalar :coerce coerce/string-converter]}))
 
 (def chart
@@ -65,8 +65,8 @@
     :extends [axis]
     :default-prop [:categories prop/extract-all]
     :props {:categories [:list prop/scalar]
-            :start-margin [:setter prop/scalar :coerce double :default 5.0]
-            :end-margin [:setter prop/scalar :coerce double :default 5.0]
+            :start-margin [:setter prop/scalar :coerce coerce/as-double :default 5.0]
+            :end-margin [:setter prop/scalar :coerce coerce/as-double :default 5.0]
             :gap-start-and-end [:setter prop/scalar :default true]}))
 
 (def number-axis
@@ -74,7 +74,7 @@
     :ctor []
     :extends [value-axis]
     :props {:force-zero-in-range [:setter prop/scalar :default true]
-            :tick-unit [:setter prop/scalar :coerce double :default 5.0]}))
+            :tick-unit [:setter prop/scalar :coerce coerce/as-double :default 5.0]}))
 
 (def pie-chart
   (lifecycle.composite/describe PieChart
@@ -82,15 +82,15 @@
     :extends [chart]
     :props {:clockwise [:setter prop/scalar :default true]
             :data [:list prop/component-vec]
-            :label-line-length [:setter prop/scalar :coerce double :default 20.0]
+            :label-line-length [:setter prop/scalar :coerce coerce/as-double :default 20.0]
             :labels-visible [:setter prop/scalar :default true]
-            :start-angle [:setter prop/scalar :coerce double :default 0.0]}))
+            :start-angle [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def pie-chart-data
   (lifecycle.composite/describe PieChart$Data
     :ctor [:name :pie-value]
     :props {:name [:setter prop/scalar]
-            :pie-value [:setter prop/scalar :coerce double :default 0]}))
+            :pie-value [:setter prop/scalar :coerce coerce/as-double :default 0]}))
 
 (def xy-chart-data
   (lifecycle.composite/describe XYChart$Data
@@ -120,8 +120,8 @@
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
     :default-prop [:data prop/extract-all]
-    :props {:bar-gap [:setter prop/scalar :coerce double :default 4]
-            :category-gap [:setter prop/scalar :coerce double :default 10]}))
+    :props {:bar-gap [:setter prop/scalar :coerce coerce/as-double :default 4]
+            :category-gap [:setter prop/scalar :coerce coerce/as-double :default 10]}))
 
 (def bubble-chart
   (lifecycle.composite/describe BubbleChart
@@ -157,7 +157,7 @@
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
     :default-prop [:data prop/extract-all]
-    :props {:category-gap [:setter prop/scalar :coerce double :default 10]}))
+    :props {:category-gap [:setter prop/scalar :coerce coerce/as-double :default 10]}))
 
 (def tag->lifecycle
   {:chart.axis/category category-axis

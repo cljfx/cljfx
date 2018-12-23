@@ -42,13 +42,13 @@
     :props {:alignment [:setter prop/scalar :coerce (coerce/enum Pos) :default :top-left]
             :column-halignment [:setter prop/scalar :coerce (coerce/enum HPos)
                                 :default :left]
-            :hgap [:setter prop/scalar :coerce double :default 0.0]
+            :hgap [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :orientation [:setter prop/scalar :coerce (coerce/enum Orientation)
                           :default :horizontal]
-            :pref-wrap-length [:setter prop/scalar :coerce double :default 400.0]
+            :pref-wrap-length [:setter prop/scalar :coerce coerce/as-double :default 400.0]
             :row-valignment [:setter prop/scalar :coerce (coerce/enum VPos)
                              :default :center]
-            :vgap [:setter prop/scalar :coerce double :default 0.0]}))
+            :vgap [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def grid-pane
   (lifecycle.composite/describe GridPane
@@ -58,9 +58,9 @@
     :props {:alignment [:setter prop/scalar :coerce (coerce/enum Pos) :default :top-left]
             :column-constraints [:list prop/component-vec]
             :grid-lines-visible [:setter prop/scalar :default false]
-            :hgap [:setter prop/scalar :coerce double :default 0.0]
+            :hgap [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :row-constraints [:list prop/component-vec]
-            :vgap [:setter prop/scalar :coerce double :default 0.0]}))
+            :vgap [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def column-constraints
   (lifecycle.composite/describe ColumnConstraints
@@ -68,19 +68,19 @@
     :props {:fill-width [:setter prop/scalar :default true]
             :halignment [:setter prop/scalar :coerce (coerce/enum HPos)]
             :hgrow [:setter prop/scalar :coerce (coerce/enum Priority)]
-            :max-width [:setter prop/scalar :coerce double :default -1.0]
-            :min-width [:setter prop/scalar :coerce double :default -1.0]
-            :percent-width [:setter prop/scalar :coerce double :default -1.0]
-            :pref-width [:setter prop/scalar :coerce double :default -1.0]}))
+            :max-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :min-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :percent-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :pref-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]}))
 
 (def row-constraints
   (lifecycle.composite/describe RowConstraints
     :ctor []
     :props {:fill-height [:setter prop/scalar :default true]
-            :max-height [:setter prop/scalar :coerce double :default -1.0]
-            :min-height [:setter prop/scalar :coerce double :default -1.0]
-            :percent-height [:setter prop/scalar :coerce double :default -1.0]
-            :pref-height [:setter prop/scalar :coerce double :default -1.0]
+            :max-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :min-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :percent-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :pref-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :valignment [:setter prop/scalar :coerce (coerce/enum VPos)]
             :vgrow [:setter prop/scalar :coerce (coerce/enum Priority)]}))
 
@@ -91,7 +91,7 @@
     :default-prop [:children prop/extract-all]
     :props {:alignment [:setter prop/scalar :coerce (coerce/enum Pos) :default :top-left]
             :fill-height [:setter prop/scalar :default true]
-            :spacing [:setter prop/scalar :coerce double :default 0.0]}))
+            :spacing [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def stack-pane
   (lifecycle.composite/describe StackPane
@@ -105,7 +105,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:line-spacing [:setter prop/scalar :coerce double :default 0.0]
+    :props {:line-spacing [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :text-alignment [:setter prop/scalar :coerce (coerce/enum TextAlignment)
                              :default :left]}))
 
@@ -115,16 +115,16 @@
     :extends [pane]
     :default-prop [:children prop/extract-all]
     :props {:alignment [:setter prop/scalar :coerce (coerce/enum Pos) :default :top-left]
-            :hgap [:setter prop/scalar :coerce double :default 0.0]
+            :hgap [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :orientation [:setter prop/scalar :coerce (coerce/enum Orientation)
                           :default :horizontal]
-            :pref-columns [:setter prop/scalar :coerce int :default 5]
-            :pref-rows [:setter prop/scalar :coerce int :default 5]
-            :pref-tile-height [:setter prop/scalar :coerce double :default -1.0]
-            :pref-tile-width [:setter prop/scalar :coerce double :default -1.0]
+            :pref-columns [:setter prop/scalar :coerce coerce/as-int :default 5]
+            :pref-rows [:setter prop/scalar :coerce coerce/as-int :default 5]
+            :pref-tile-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :pref-tile-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :tile-alignment [:setter prop/scalar :coerce (coerce/enum Pos)
                              :default :center]
-            :vgap [:setter prop/scalar :coerce double :default 0.0]}))
+            :vgap [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def v-box
   (lifecycle.composite/describe VBox
@@ -133,7 +133,7 @@
     :default-prop [:children prop/extract-all]
     :props {:alignment [:setter prop/scalar :coerce (coerce/enum Pos) :default :top-left]
             :fill-width [:setter prop/scalar :default true]
-            :spacing [:setter prop/scalar :coerce double :default 0.0]}))
+            :spacing [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def tag->lifecycle
   {:pane pane

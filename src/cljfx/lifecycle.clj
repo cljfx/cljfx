@@ -2,15 +2,15 @@
 
 (defprotocol Lifecycle
   :extend-via-metadata true
-  (create [this desc] "Creates component or prop")
-  (advance [this value new-desc] "Advances component or prop")
-  (delete [this value] "Deletes component or prop"))
+  (create [this desc opts] "Creates component or prop")
+  (advance [this value new-desc opts] "Advances component or prop")
+  (delete [this value opts] "Deletes component or prop"))
 
-(defn create-component [desc]
-  (create nil desc))
+(defn create-component [desc opts]
+  (create nil desc opts))
 
-(defn advance-component [component desc]
-  (advance nil component desc))
+(defn advance-component [component desc opts]
+  (advance nil component desc opts))
 
-(defn delete-component [component]
-  (delete nil component))
+(defn delete-component [component opts]
+  (delete nil component opts))

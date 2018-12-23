@@ -17,13 +17,9 @@
   - is it possible to inject components/lifecycles into cells? they are a bit different
   (triggered via updateItem), and instances are created for us, but otherwise it's just a node
   and we have props for them
-- [ ] rethink `*opts*`:
+- big app with everything in it to check if/how it works
+- [ ] rethink `props`:
   - advance does not recreate map event handlers if :cljfx.opt/map-event-handler changed
-  - advance does not recreate components if :cljfx.opt/tag->component-lifecycle changed
-  - get rid of `*opts*`, pass them instead?
-
-  components probably should have lifecycle on them (maybe implement lifecycle?) if I want
-  to recreate components when tag->component-lifecycle changes. Should compare by `identical?`
 
 - [ ] app is all advance instead of create/advance/delete
 - [ ] `:on-delete` should not be a part of composite lifecycle, instead composite lifecycle should be composed

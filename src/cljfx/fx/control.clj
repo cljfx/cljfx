@@ -35,14 +35,14 @@
     :ctor []
     :extends [fx.stage/popup-window]
     :props {:id [:setter prop/scalar]
-            :max-height [:setter prop/scalar :coerce double :default -1.0]
-            :max-width [:setter prop/scalar :coerce double :default -1.0]
-            :min-height [:setter prop/scalar :coerce double :default -1.0]
-            :min-width [:setter prop/scalar :coerce double :default -1.0]
-            :pref-height [:setter prop/scalar :coerce double :default -1.0]
-            :pref-width [:setter prop/scalar :coerce double :default -1.0]
+            :max-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :max-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :min-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :min-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :pref-height [:setter prop/scalar :coerce coerce/as-double :default -1.0]
+            :pref-width [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :style [:setter prop/scalar :coerce coerce/style :default ""]
-            :style-class [:list prop/scalar :coerce #(if (string? %) [%] %)]}))
+            :style-class [:list prop/scalar :coerce coerce/style-class]}))
 
 (def context-menu
   (lifecycle.composite/describe ContextMenu
@@ -73,7 +73,7 @@
             :on-action [:setter prop/scalar :coerce coerce/event-handler]
             :on-menu-validation [:setter prop/scalar :coerce coerce/event-handler]
             :style [:setter prop/scalar :coerce coerce/style :default ""]
-            :style-class [:list prop/scalar :coerce #(if (string? %) [%] %)]
+            :style-class [:list prop/scalar :coerce coerce/style-class]
             :text [:setter prop/scalar]
             :user-data [:setter prop/scalar]
             :visible [:setter prop/scalar :default true]}))
@@ -87,8 +87,8 @@
             :ellipsis-string [:setter prop/scalar :default "..."]
             :font [:setter prop/scalar :coerce coerce/font :default :default]
             :graphic [:setter prop/component]
-            :graphic-text-gap [:setter prop/scalar :coerce double :default 4]
-            :line-spacing [:setter prop/scalar :coerce double :default 0]
+            :graphic-text-gap [:setter prop/scalar :coerce coerce/as-double :default 4]
+            :line-spacing [:setter prop/scalar :coerce coerce/as-double :default 0]
             :mnemonic-parsing [:setter prop/scalar :default false]
             :text [:setter prop/scalar :default ""]
             :text-alignment [:setter prop/scalar :coerce (coerce/enum TextAlignment)
@@ -151,7 +151,7 @@
     :props {:content-display [:setter prop/scalar :coerce (coerce/enum ContentDisplay) :default :left]
             :font [:setter prop/scalar :coerce coerce/font :default :default]
             :graphic [:setter prop/component]
-            :graphic-text-gap [:setter prop/scalar :coerce double :default 4.0]
+            :graphic-text-gap [:setter prop/scalar :coerce coerce/as-double :default 4.0]
             :hide-delay [:setter prop/scalar :coerce coerce/duration :default [200 :ms]]
             :show-delay [:setter prop/scalar :coerce coerce/duration :default [1 :second]]
             :show-duration [:setter prop/scalar :coerce coerce/duration :default [5 :seconds]]
@@ -182,7 +182,7 @@
     :ctor []
     :extends [control]
     :default-prop [:buttons prop/extract-all]
-    :props {:button-min-width [:setter prop/scalar :coerce double]
+    :props {:button-min-width [:setter prop/scalar :coerce coerce/as-double]
             :button-order [:setter prop/scalar]
             :buttons [:list prop/component-vec]}))
 
@@ -206,7 +206,7 @@
     :extends [combo-box-base]
     :default-prop [:value prop/extract-single]
     :props {:value [:setter prop/scalar :coerce coerce/color]
-            :custom-colors [:list prop/scalar :coerce #(map coerce/color %)]}))
+            :custom-colors [:list prop/scalar :coerce (fn [x _] (map coerce/color x))]}))
 
 (def combo-box
   (lifecycle.composite/describe ComboBox
@@ -219,7 +219,7 @@
                         :default :default]
             :items [:list prop/scalar]
             :placeholder [:setter prop/component]
-            :visible-row-count [:setter prop/scalar :coerce int :default 10]}))
+            :visible-row-count [:setter prop/scalar :coerce coerce/as-int :default 10]}))
 
 (def date-picker
   (lifecycle.composite/describe DatePicker
@@ -303,7 +303,7 @@
     :default-prop [:items prop/extract-all]
     :props {:cell-factory [:setter prop/scalar]
             :editable [:setter prop/scalar :default false]
-            :fixed-cell-size [:setter prop/scalar :coerce double :default -1.0]
+            :fixed-cell-size [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :items [:list prop/scalar]
             :on-edit-cancel [:setter prop/scalar :coerce coerce/event-handler]
             :on-edit-commit [:setter prop/scalar :coerce coerce/event-handler]
@@ -330,9 +330,9 @@
   (lifecycle.composite/describe Pagination
     :ctor []
     :extends [control]
-    :props {:current-page-index [:setter prop/scalar :coerce int :default 0]
-            :max-page-indicator-count [:setter prop/scalar :coerce int :default 10]
-            :page-count [:setter prop/scalar :coerce int :default Integer/MAX_VALUE]
+    :props {:current-page-index [:setter prop/scalar :coerce coerce/as-int :default 0]
+            :max-page-indicator-count [:setter prop/scalar :coerce coerce/as-int :default 10]
+            :page-count [:setter prop/scalar :coerce coerce/as-int :default Integer/MAX_VALUE]
             :page-factory [:setter prop/scalar :coerce coerce/page-factory]}))
 
 (def progress-indicator
@@ -340,19 +340,19 @@
     :ctor []
     :extends [control]
     :default-prop [:progress prop/extract-single]
-    :props {:progress [:setter prop/scalar :coerce double :default -1.0]}))
+    :props {:progress [:setter prop/scalar :coerce coerce/as-double :default -1.0]}))
 
 (def scroll-bar
   (lifecycle.composite/describe ScrollBar
     :ctor []
     :extends [control]
-    :props {:block-increment [:setter prop/scalar :coerce double :default 10.0]
-            :max [:setter prop/scalar :coerce double :default 100.0]
-            :min [:setter prop/scalar :coerce double :default 0.0]
+    :props {:block-increment [:setter prop/scalar :coerce coerce/as-double :default 10.0]
+            :max [:setter prop/scalar :coerce coerce/as-double :default 100.0]
+            :min [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :orientation [:setter prop/scalar :coerce (coerce/enum Orientation) :default :horizontal]
-            :unit-increment [:setter prop/scalar :coerce double :default 1.0]
-            :value [:setter prop/scalar :coerce double :default 0.0]
-            :visible-amount [:setter prop/scalar :coerce double :default 15.0]}))
+            :unit-increment [:setter prop/scalar :coerce coerce/as-double :default 1.0]
+            :value [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :visible-amount [:setter prop/scalar :coerce coerce/as-double :default 15.0]}))
 
 (def scroll-pane
   (lifecycle.composite/describe ScrollPane
@@ -365,21 +365,21 @@
             :hbar-policy [:setter prop/scalar
                           :coerce (coerce/enum ScrollPane$ScrollBarPolicy)
                           :default :as-needed]
-            :hmax [:setter prop/scalar :coerce double :default 1.0]
-            :hmin [:setter prop/scalar :coerce double :default 0.0]
-            :hvalue [:setter prop/scalar :coerce double :default 0.0]
-            :min-viewport-height [:setter prop/scalar :coerce double :default 0.0]
-            :min-viewport-width [:setter prop/scalar :coerce double :default 0.0]
+            :hmax [:setter prop/scalar :coerce coerce/as-double :default 1.0]
+            :hmin [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :hvalue [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :min-viewport-height [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :min-viewport-width [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :pannable [:setter prop/scalar :default false]
-            :pref-viewport-height [:setter prop/scalar :coerce double :default 0.0]
-            :pref-viewport-width [:setter prop/scalar :coerce double :default 0.0]
+            :pref-viewport-height [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :pref-viewport-width [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :vbar-policy [:setter prop/scalar
                           :coerce (coerce/enum ScrollPane$ScrollBarPolicy)
                           :default :as-needed]
             :viewport-bounds [:setter prop/scalar :coerce coerce/bounds :default 0]
-            :vmax [:setter prop/scalar :coerce double :default 1.0]
-            :vmin [:setter prop/scalar :coerce double :default 0.0]
-            :vvalue [:setter prop/scalar :coerce double :default 0.0]}))
+            :vmax [:setter prop/scalar :coerce coerce/as-double :default 1.0]
+            :vmin [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :vvalue [:setter prop/scalar :coerce coerce/as-double :default 0.0]}))
 
 (def separator
   (lifecycle.composite/describe Separator
@@ -394,18 +394,18 @@
   (lifecycle.composite/describe Slider
     :ctor []
     :extends [control]
-    :props {:block-increment [:setter prop/scalar :coerce double :default 10.0]
+    :props {:block-increment [:setter prop/scalar :coerce coerce/as-double :default 10.0]
             :label-formatter [:setter prop/scalar :coerce coerce/string-converter]
-            :major-tick-unit [:setter prop/scalar :coerce double :default 25.0]
-            :max [:setter prop/scalar :coerce double :default 100.0]
-            :min [:setter prop/scalar :coerce double :default 0.0]
-            :minor-tick-count [:setter prop/scalar :coerce int :default 3]
+            :major-tick-unit [:setter prop/scalar :coerce coerce/as-double :default 25.0]
+            :max [:setter prop/scalar :coerce coerce/as-double :default 100.0]
+            :min [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :minor-tick-count [:setter prop/scalar :coerce coerce/as-int :default 3]
             :orientation [:setter prop/scalar :coerce (coerce/enum Orientation)
                           :default :horizontal]
             :show-tick-labels [:setter prop/scalar :default false]
             :show-tick-marks [:setter prop/scalar :default false]
             :snap-to-ticks [:setter prop/scalar :default false]
-            :value [:setter prop/scalar :coerce double :default 0.0]
+            :value [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :value-changing [:setter prop/scalar :default false]}))
 
 (def spinner
@@ -428,19 +428,19 @@
   (lifecycle.composite/describe SpinnerValueFactory$IntegerSpinnerValueFactory
     :ctor [:min :max]
     :extends [spinner-value-factory]
-    :props {:amount-to-step-by [:setter prop/scalar :coerce int :default 1]
-            :value [:setter prop/scalar :coerce int]
-            :max [:setter prop/scalar :coerce int :default 100]
-            :min [:setter prop/scalar :coerce int :default 0]}))
+    :props {:amount-to-step-by [:setter prop/scalar :coerce coerce/as-int :default 1]
+            :value [:setter prop/scalar :coerce coerce/as-int]
+            :max [:setter prop/scalar :coerce coerce/as-int :default 100]
+            :min [:setter prop/scalar :coerce coerce/as-int :default 0]}))
 
 (def double-spinner-value-factory
   (lifecycle.composite/describe SpinnerValueFactory$DoubleSpinnerValueFactory
     :ctor [:min :max]
     :extends [spinner-value-factory]
-    :props {:amount-to-step-by [:setter prop/scalar :coerce double :default 1]
-            :value [:setter prop/scalar :coerce double]
-            :max [:setter prop/scalar :coerce double :default 100]
-            :min [:setter prop/scalar :coerce double :default 0]}))
+    :props {:amount-to-step-by [:setter prop/scalar :coerce coerce/as-double :default 1]
+            :value [:setter prop/scalar :coerce coerce/as-double]
+            :max [:setter prop/scalar :coerce coerce/as-double :default 100]
+            :min [:setter prop/scalar :coerce coerce/as-double :default 0]}))
 
 (def list-spinner-value-factory
   (lifecycle.composite/describe SpinnerValueFactory$ListSpinnerValueFactory
@@ -453,7 +453,8 @@
     :ctor []
     :extends [control]
     :default-prop [:items prop/extract-all]
-    :props {:divider-positions [:setter prop/scalar :coerce #(into-array Double/TYPE %)
+    :props {:divider-positions [:setter prop/scalar
+                                :coerce (fn [x _] (into-array Double/TYPE x))
                                 :default []]
             :items [:list prop/component-vec]
             :orientation [:setter prop/scalar :coerce (coerce/enum Orientation)
@@ -467,7 +468,7 @@
                                    :default :unconstrained]
             :columns [:list prop/component-vec]
             :editable [:setter prop/scalar :default false]
-            :fixed-cell-size [:setter prop/scalar :coerce double :default -1.0]
+            :fixed-cell-size [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :items [:list prop/scalar]
             :on-scroll-to [:setter prop/scalar :coerce coerce/event-handler]
             :on-scroll-to-column [:setter prop/scalar :coerce coerce/event-handler]
@@ -493,15 +494,15 @@
             :editable [:setter prop/scalar :default true]
             :graphic [:setter prop/component]
             :id [:setter prop/scalar]
-            :max-width [:setter prop/scalar :coerce double :default 5000]
-            :min-width [:setter prop/scalar :coerce double :default 10]
-            :pref-width [:setter prop/scalar :coerce double :default 80]
+            :max-width [:setter prop/scalar :coerce coerce/as-double :default 5000]
+            :min-width [:setter prop/scalar :coerce coerce/as-double :default 10]
+            :pref-width [:setter prop/scalar :coerce coerce/as-double :default 80]
             :reorderable [:setter prop/scalar :default true]
             :resizable [:setter prop/scalar :default true]
             :sort-node [:setter prop/component]
             :sortable [:setter prop/scalar :default true]
             :style [:setter prop/scalar :coerce coerce/style :default ""]
-            :style-class [:list prop/scalar :coerce #(if (string? %) [%] %)]
+            :style-class [:list prop/scalar :coerce coerce/style-class]
             :text [:setter prop/scalar :default ""]
             :user-data [:setter prop/scalar]
             :visible [:setter prop/scalar :default true]}))
@@ -530,10 +531,10 @@
                                  :default :selected-tab]
             :tab-drag-policy [:setter prop/scalar
                               :coerce (coerce/enum TabPane$TabDragPolicy) :default :fixed]
-            :tab-max-height [:setter prop/scalar :coerce double :default Double/MAX_VALUE]
-            :tab-max-width [:setter prop/scalar :coerce double :default Double/MAX_VALUE]
-            :tab-min-height [:setter prop/scalar :coerce double :default 0.0]
-            :tab-min-width [:setter prop/scalar :coerce double :default 0.0]
+            :tab-max-height [:setter prop/scalar :coerce coerce/as-double :default Double/MAX_VALUE]
+            :tab-max-width [:setter prop/scalar :coerce coerce/as-double :default Double/MAX_VALUE]
+            :tab-min-height [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :tab-min-width [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :tabs [:list prop/component-vec]}))
 
 (def tab
@@ -549,7 +550,7 @@
             :on-closed [:setter prop/scalar :coerce coerce/event-handler]
             :on-selection-changed [:setter prop/scalar :coerce coerce/event-handler]
             :style [:setter prop/scalar :coerce coerce/style]
-            :style-class [:list prop/scalar :coerce #(if (string? %) [%] %)]
+            :style-class [:list prop/scalar :coerce coerce/style-class]
             :text [:setter prop/scalar]
             :tooltip [:setter prop/component]
             :user-data [:setter prop/scalar]}))
@@ -572,10 +573,10 @@
     :ctor []
     :extends [text-input-control]
     :default-prop [:text prop/extract-single]
-    :props {:pref-column-count [:setter prop/scalar :coerce int :default 40]
-            :pref-row-count [:setter prop/scalar :coerce int :default 10]
-            :scroll-left [:setter prop/scalar :coerce double :default 0.0]
-            :scroll-top [:setter prop/scalar :coerce double :default 0.0]
+    :props {:pref-column-count [:setter prop/scalar :coerce coerce/as-int :default 40]
+            :pref-row-count [:setter prop/scalar :coerce coerce/as-int :default 10]
+            :scroll-left [:setter prop/scalar :coerce coerce/as-double :default 0.0]
+            :scroll-top [:setter prop/scalar :coerce coerce/as-double :default 0.0]
             :wrap-text [:setter prop/scalar :default false]}))
 
 (def text-field
@@ -585,7 +586,7 @@
     :default-prop [:text prop/extract-single]
     :props {:alignment [:setter prop/scalar :coerce (coerce/enum Pos) :default :center-left]
             :on-action [:setter prop/scalar :coerce coerce/event-handler]
-            :pref-column-count [:setter prop/scalar :coerce int :default 12]}))
+            :pref-column-count [:setter prop/scalar :coerce coerce/as-int :default 12]}))
 
 (def password-field
   (lifecycle.composite/describe PasswordField
@@ -613,7 +614,7 @@
                                    :default :unconstrained]
             :columns [:list prop/component-vec]
             :editable [:setter prop/scalar :default false]
-            :fixed-cell-size [:setter prop/scalar :coerce double :default -1.0]
+            :fixed-cell-size [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :on-scroll-to [:setter prop/scalar :coerce coerce/event-handler]
             :on-scroll-to-column [:setter prop/scalar :coerce coerce/event-handler]
             :on-sort [:setter prop/scalar :coerce coerce/event-handler]
@@ -663,7 +664,7 @@
     :default-prop [:root prop/extract-single]
     :props {:cell-factory [:setter prop/scalar]
             :editable [:setter prop/scalar :default false]
-            :fixed-cell-size [:setter prop/scalar :coerce double :default -1.0]
+            :fixed-cell-size [:setter prop/scalar :coerce coerce/as-double :default -1.0]
             :on-edit-cancel [:setter prop/scalar :coerce coerce/event-handler]
             :on-edit-commit [:setter prop/scalar :coerce coerce/event-handler]
             :on-edit-start [:setter prop/scalar :coerce coerce/event-handler]
