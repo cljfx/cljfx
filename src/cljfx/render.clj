@@ -22,25 +22,12 @@
                  :cljfx/desc desc
                  `component/lifecycle (constantly lifecycle))))
   (advance [this component new-desc opts]
-    (cond
-      (and (nil? component) (nil? new-desc))
-      nil
-
-      (nil? component)
-      (lifecycle/create this new-desc opts)
-
-      (nil? new-desc)
-      (lifecycle/delete this component opts)
-
-      (not (identical? (component/lifecycle component)
-                       (tag->component-lifecycle (first new-desc) opts)))
-      (do (lifecycle/delete this component opts)
-          (lifecycle/create this new-desc opts))
-
-      :else
-      (let [lifecycle (component/lifecycle component)]
+    (let [lifecycle (component/lifecycle component)]
+      (if (identical? lifecycle (tag->component-lifecycle (first new-desc) opts))
         (vary-meta (lifecycle/advance lifecycle component new-desc opts)
-                   assoc :cljfx/desc new-desc))))
+                   assoc :cljfx/desc new-desc)
+        (do (lifecycle/delete this component opts)
+            (lifecycle/create this new-desc opts)))))
   (delete [_ component opts]
     (lifecycle/delete (component/lifecycle component) component opts)))
 

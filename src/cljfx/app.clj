@@ -20,9 +20,27 @@
     (when-not (:request-rendering old)
       (platform/on-fx-thread (perform-render *app)))))
 
+(defn- advance-app-component
+  "Advance rendered component with special semantics for nil (meaning absence)
+
+  This allows to create, advance and delete components in single function"
+  [component desc opts]
+  (cond
+    (and (nil? component) (nil? desc))
+    nil
+
+    (nil? component)
+    (render/create desc opts)
+
+    (nil? desc)
+    (do (render/delete component opts) nil)
+
+    :else
+    (render/advance component desc opts)))
+
 (defn create [middleware]
   (let [*app (atom {:*component (volatile! nil)
-                    :render-fn (middleware render/advance)
+                    :render-fn (middleware advance-app-component)
                     :request-rendering false})]
     (fn [desc]
       (request-render *app desc)
