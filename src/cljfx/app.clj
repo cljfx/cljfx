@@ -1,6 +1,6 @@
 (ns cljfx.app
-  (:require [cljfx.platform :as platform]
-            [cljfx.render :as render]))
+  (:require [cljfx.lifecycle :as lifecycle]
+            [cljfx.platform :as platform]))
 
 (defn- perform-render
   "Re-renders app on fx thread
@@ -10,7 +10,7 @@
   immediately re-render app to always view it's actual state"
   [*app]
   (let [{:keys [desc *component render-fn]} @*app
-        _ (vreset! *component (render-fn @*component desc {}))
+        _ (vreset! *component (render-fn @*component desc))
         new-app (swap! *app #(assoc % :request-rendering (not= desc (:desc %))))]
     (when (:request-rendering new-app)
       (recur *app))))
@@ -30,17 +30,18 @@
     nil
 
     (nil? component)
-    (render/create desc opts)
+    (lifecycle/create lifecycle/dynamic-hiccup desc opts)
 
     (nil? desc)
-    (do (render/delete component opts) nil)
+    (do (lifecycle/delete lifecycle/dynamic-hiccup component opts) nil)
 
     :else
-    (render/advance component desc opts)))
+    (lifecycle/advance lifecycle/dynamic-hiccup component desc opts)))
 
-(defn create [middleware]
-  (let [*app (atom {:*component (volatile! nil)
-                    :render-fn (middleware advance-app-component)
+(defn create [middleware opts]
+  (let [advance-fn (middleware advance-app-component)
+        *app (atom {:*component (volatile! nil)
+                    :render-fn #(advance-fn %1 %2 opts)
                     :request-rendering false})]
     (fn [desc]
       (request-render *app desc)

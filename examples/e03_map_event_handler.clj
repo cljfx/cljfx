@@ -9,17 +9,20 @@
           :showing true}
          [:scene
           {:fill :transparent
-           :on-key-pressed {:event :event/scene-key-press}
+           :on-key-pressed {:event/type :event/scene-key-press}
            :stylesheets #{"styles.css"}}
           [:v-box
            [:label "Hi! What's your name?"]
            [:text-field]]]]))
 
+(defn map-event-handler [e]
+  (when (and (= :event/scene-key-press (:event/type e))
+             (= KeyCode/ESCAPE (-> e :cljfx/event :code)))
+    (reset! *state nil)))
+
 (def app
   (cljfx/create-app
-    (cljfx/wrap-add-map-event-handler
-      #(when (and (= :event/scene-key-press (:event %))
-                  (= KeyCode/ESCAPE (-> % :cljfx/event :code)))
-         (reset! *state nil)))))
+    :opts {:cljfx.opt/tag->lifecycle cljfx/default-tag->lifecycle
+           :cljfx.opt/map-event-handler map-event-handler}))
 
 (cljfx/mount-app *state app)

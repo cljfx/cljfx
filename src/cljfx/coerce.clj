@@ -540,7 +540,7 @@
     (fn? x)
     (reify Callback
       (call [_ param]
-        (component/instance (lifecycle/create-component (x param) opts))))
+        (component/instance (lifecycle/create lifecycle/dynamic-hiccup (x param) opts))))
 
     :else
     (fail Callback x)))

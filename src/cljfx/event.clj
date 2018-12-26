@@ -8,9 +8,6 @@
 
 (set! *warn-on-reflection* true)
 
-(defn- default-map-event-handler [event]
-  (prn ::unhandled-map-event event))
-
 (defn- screaming-case->keyword [str]
   (-> str str/lower-case (str/replace "_" "-") keyword))
 
@@ -172,7 +169,7 @@
   (datafy [e] e))
 
 (defn map-event-handler [m opts]
-  (let [f (:cljfx.opt/map-event-handler opts default-map-event-handler)]
+  (let [f (:cljfx.opt/map-event-handler opts)]
     #(f (assoc m :cljfx/event %))))
 
 (defn make-change-listener ^ChangeListener [x opts]

@@ -1,6 +1,5 @@
 (ns cljfx.middleware
-  (:require [cljfx.lifecycle :as lifecycle]
-            [cljfx.lifecycle.fn :as lifecycle.fn]))
+  (:require [cljfx.lifecycle :as lifecycle]))
 
 (defn map-value [f]
   (fn [render-fn]
@@ -12,25 +11,6 @@
     (fn [component value opts]
       (render-fn component value (f opts)))))
 
-(defn add-map-event-handler [handler]
-  (fn [render-fn]
-    (fn [component value opts]
-      (render-fn component value (update opts
-                                         :cljfx.opt/map-event-handler
-                                         (fn [f]
-                                           (if (some? f)
-                                             (fn [e]
-                                               (f e)
-                                               (handler e))
-                                             handler)))))))
-
-(defn add-tag->component-lifecycle-fn [existing f]
-  (if (some? existing)
-    (fn [tag]
-      (or (existing tag)
-          (f tag)))
-    f))
-
 (defn- prepend-opt-value [f args opts]
   (apply vector f (::value opts) args))
 
@@ -39,26 +19,23 @@
     [::lifecycle/exposed-value-fn]
     {`lifecycle/create
      (fn [_ [f & args] opts]
-       (lifecycle/create lifecycle.fn/component (prepend-opt-value f args opts) opts))
+       (lifecycle/create lifecycle/fn-dynamic-hiccup (prepend-opt-value f args opts) opts))
 
      `lifecycle/advance
      (fn [_ component [f & args] opts]
-       (lifecycle/advance lifecycle.fn/component
+       (lifecycle/advance lifecycle/fn-dynamic-hiccup
                           component
                           (prepend-opt-value f args opts)
                           opts))
 
      `lifecycle/delete
      (fn [_ component opts]
-       (lifecycle/delete lifecycle.fn/component component opts))}))
+       (lifecycle/delete lifecycle/fn-dynamic-hiccup component opts))}))
+
+(defn fn-tag->exposed-lifecycle [tag]
+  (when (fn? tag) exposed-value-fn-lifecycle))
 
 (defn expose-value []
   (fn [render-fn]
     (fn [component value opts]
-      (render-fn component
-                 value
-                 (-> opts
-                     (assoc ::value value)
-                     (update :cljfx.opt/tag->component-lifecycle
-                             add-tag->component-lifecycle-fn
-                             #(when (fn? %) exposed-value-fn-lifecycle)))))))
+      (render-fn component value (assoc opts ::value value)))))

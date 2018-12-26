@@ -23,8 +23,11 @@
 
 (def app
   (cljfx/create-app
-    (comp
-      (cljfx/wrap-expose-value)
-      (cljfx/wrap-map-value (constantly [root])))))
+    :middleware (comp
+                  (cljfx/wrap-expose-value)
+                  (cljfx/wrap-map-value (constantly [root])))
+    :opts {:cljfx.opt/tag->lifecycle #(or (cljfx/fx-tag->lifecycle %)
+                                          (cljfx/fn-tag->exposed-lifecycle %))
+           :cljfx.opt/map-event-handler cljfx/default-map-event-handler}))
 
 (cljfx/mount-app *state app)

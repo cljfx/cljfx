@@ -116,11 +116,11 @@
 
 (def component
   {`lifecycle/create (fn [_ desc opts]
-                       (lifecycle/create-component desc opts))
+                       (lifecycle/create lifecycle/dynamic-hiccup desc opts))
    `lifecycle/advance (fn [_ component new-desc opts]
-                        (lifecycle/advance-component component new-desc opts))
+                        (lifecycle/advance lifecycle/dynamic-hiccup component new-desc opts))
    `lifecycle/delete (fn [_ component opts]
-                       (lifecycle/delete-component component opts))
+                       (lifecycle/delete lifecycle/dynamic-hiccup component opts))
    `ident (fn [_ component]
             (component/instance component))
    `coerce (fn [_ component _]
@@ -166,18 +166,15 @@
   (-> desc meta (get :key ::no-key)))
 
 (defn- component->key [component]
-  (-> component meta :cljfx/desc desc->key))
+  (-> component component/description desc->key))
 
 (defn- component-vec->instances [component-vec]
-  (into []
-        (comp (map component/instance)
-              (remove nil?))
-        (:components component-vec)))
+  (mapv component/instance (:components component-vec)))
 
 (def component-vec
   {`lifecycle/create
    (fn [_ descs opts]
-     (let [components (mapv #(lifecycle/create-component % opts) descs)
+     (let [components (mapv #(lifecycle/create lifecycle/dynamic-hiccup % opts) descs)
            [_ key->component] (ordered-keys+key->component components component->key)]
        {:components components
         :key->component key->component}))
@@ -192,19 +189,19 @@
                                         new-e (find key->descs key)]
                                     (cond
                                       (and (some? old-e) (some? new-e))
-                                      (assoc acc key (lifecycle/advance-component
-                                                       (val old-e)
-                                                       (val new-e)
-                                                       opts))
+                                      (assoc acc key (lifecycle/advance lifecycle/dynamic-hiccup
+                                                                        (val old-e)
+                                                                        (val new-e)
+                                                                        opts))
 
                                       (some? old-e)
-                                      (do (lifecycle/delete-component (val old-e) opts)
+                                      (do (lifecycle/delete lifecycle/dynamic-hiccup (val old-e) opts)
                                           (dissoc acc key))
 
                                       :else
-                                      (assoc acc key (lifecycle/create-component
-                                                       (val new-e)
-                                                       opts)))))
+                                      (assoc acc key (lifecycle/create lifecycle/dynamic-hiccup
+                                                                       (val new-e)
+                                                                       opts)))))
                                 key->component
                                 (set (concat (keys key->component) (keys key->descs))))]
        {:components (mapv new-key->component ordered-keys)
@@ -213,7 +210,7 @@
    `lifecycle/delete
    (fn [_ component-vec opts]
      (doseq [x (:components component-vec)]
-       (lifecycle/delete-component x opts)))
+       (lifecycle/delete lifecycle/dynamic-hiccup x opts)))
 
    `coerce
    (fn [_ value _]
