@@ -334,7 +334,8 @@
     :props {:current-page-index [:setter lifecycle/scalar :coerce int :default 0]
             :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
             :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
-            :page-factory [:setter lifecycle/scalar :coerce coerce/page-factory]}))
+            :page-factory [:setter ((lifecycle/wrap-factory) lifecycle/dynamic-hiccup)
+                           :coerce coerce/page-factory]}))
 
 (def progress-indicator
   (lifecycle.composite/describe ProgressIndicator

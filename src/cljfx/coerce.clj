@@ -1,8 +1,6 @@
 (ns cljfx.coerce
   (:require [clojure.string :as str]
-            [cljfx.event :as event]
-            [cljfx.lifecycle :as lifecycle]
-            [cljfx.component :as component])
+            [cljfx.event :as event])
   (:import [java.util List Collection]
            [javafx.event EventHandler]
            [javafx.scene Cursor]
@@ -499,7 +497,7 @@
     (instance? Callback x) x
     :else (fail Callback x)))
 
-(defn page-factory [x opts] ;; TODO
+(defn page-factory [x]
   (cond
     (instance? Callback x)
     x
@@ -507,7 +505,7 @@
     (fn? x)
     (reify Callback
       (call [_ param]
-        (component/instance (lifecycle/create lifecycle/dynamic-hiccup (x param) opts))))
+        (x param)))
 
     :else
     (fail Callback x)))

@@ -122,6 +122,26 @@
                   (create-event-handler-component desc opts)))
      `delete (fn [_ _ _])}))
 
+(defn wrap-factory []
+  (fn [lifecycle]
+    (with-meta
+      [::factory lifecycle]
+      {`create (fn [_ desc opts]
+                 (with-meta
+                   {:desc desc
+                    :opts opts
+                    :value (if (fn? desc)
+                             #(component/instance (create lifecycle (desc %) opts))
+                             desc)}
+                   {`component/description :desc
+                    `component/instance :value}))
+       `advance (fn [this component desc opts]
+                  (if (and (= desc (:desc component))
+                           (= opts (:opts opts)))
+                    component
+                    (create this desc opts)))
+       `delete (fn [_ _ _])})))
+
 (defn- ordered-keys+key->val
   "Return a vec of ordered calculated keys and a map of calculated keys to components
 
