@@ -1,6 +1,7 @@
 (ns cljfx.lifecycle.composite
   (:require [cljfx.component :as component]
             [cljfx.lifecycle :as lifecycle]
+            [cljfx.mutator :as mutator]
             [cljfx.prop :as prop]
             [clojure.string :as str]))
 
@@ -17,7 +18,9 @@
 (defn- create-props [props-desc props-config opts]
   (reduce
     (fn [acc k]
-      (assoc acc k (lifecycle/create (get props-config k) (get props-desc k) opts)))
+      (assoc acc k (lifecycle/create (prop/lifecycle (get props-config k))
+                                     (get props-desc k)
+                                     opts)))
     props-desc
     (keys props-desc)))
 
@@ -26,7 +29,7 @@
         props-config (:props this)
         props (create-props props-desc props-config opts)
         args (:args this)
-        instance (apply (:ctor this) (map #(prop/coerce (props-config %) (props %) opts) args))
+        instance (apply (:ctor this) (map #(prop/coerce (props-config %) (props %)) args))
         arg-set (set args)
         sorted-props (if-let [prop-order (:prop-order this)]
                        (sort-by #(get prop-order (key %) 0)
@@ -34,56 +37,62 @@
                        props)]
     (doseq [[k v] sorted-props
             :when (not (contains? arg-set k))]
-      (prop/assign (get props-config k) instance v opts))
+      (prop/assign! (get props-config k) instance v))
     (with-meta {:props props
+                :desc desc
                 :instance instance}
-               {`component/instance :instance})))
+               {`component/instance :instance
+                `component/description :desc})))
 
-(defn- advance-composite-component [this component new-desc opts]
-  (let [props-desc (desc->props-desc new-desc this)
+(defn- advance-composite-component [this component desc opts]
+  (let [props-desc (desc->props-desc desc this)
         props-config (:props this)
         instance (component/instance component)]
-    (update
-      component
-      :props
-      (fn [props]
-        (let [prop-keys (set (concat (keys props) (keys props-desc)))
-              sorted-prop-keys (if-let [prop-order (:prop-order this)]
-                                 (sort-by #(get prop-order % 0) prop-keys)
-                                 prop-keys)]
-          (reduce (fn [acc k]
-                    (let [old-e (find props k)
-                          new-e (find props-desc k)]
-                      (cond
-                        (and (some? old-e) (some? new-e))
-                        (let [old-value (val old-e)
-                              new-value-desc (val new-e)
-                              prop-config (get props-config k)
-                              new-value (lifecycle/advance prop-config
-                                                           old-value
-                                                           new-value-desc
-                                                           opts)]
-                          (prop/replace prop-config instance old-value new-value opts)
-                          (assoc acc k new-value))
+    (-> component
+        (assoc :desc desc)
+        (update
+          :props
+          (fn [props]
+            (let [prop-keys (set (concat (keys props) (keys props-desc)))
+                  sorted-prop-keys (if-let [prop-order (:prop-order this)]
+                                     (sort-by #(get prop-order % 0) prop-keys)
+                                     prop-keys)]
+              (reduce
+                (fn [acc k]
+                  (let [old-e (find props k)
+                        new-e (find props-desc k)]
+                    (cond
+                      (and (some? old-e) (some? new-e))
+                      (let [old-component (val old-e)
+                            desc (val new-e)
+                            prop-config (get props-config k)
+                            new-component (lifecycle/advance (prop/lifecycle prop-config)
+                                                             old-component
+                                                             desc
+                                                             opts)]
+                        (prop/replace! prop-config instance old-component new-component)
+                        (assoc acc k new-component))
 
-                        (some? old-e)
-                        (let [prop-config (get props-config k)]
-                          (prop/retract prop-config instance (val old-e) opts)
-                          (lifecycle/delete prop-config (val old-e) opts)
-                          (dissoc acc k))
+                      (some? old-e)
+                      (let [prop-config (get props-config k)]
+                        (prop/retract! prop-config instance (val old-e))
+                        (lifecycle/delete (prop/lifecycle prop-config) (val old-e) opts)
+                        (dissoc acc k))
 
-                        :else
-                        (let [prop-config (get props-config k)
-                              new-value (lifecycle/create prop-config (val new-e) opts)]
-                          (prop/assign prop-config instance new-value opts)
-                          (assoc acc k new-value)))))
-                  props
-                  sorted-prop-keys))))))
+                      :else
+                      (let [prop-config (get props-config k)
+                            component (lifecycle/create (prop/lifecycle prop-config)
+                                                        (val new-e)
+                                                        opts)]
+                        (prop/assign! prop-config instance component)
+                        (assoc acc k component)))))
+                props
+                sorted-prop-keys)))))))
 
 (defn- delete-composite-component [this component opts]
   (let [props-config (:props this)]
     (doseq [[k v] (:props component)]
-      (lifecycle/delete (get props-config k) v opts))
+      (lifecycle/delete (prop/lifecycle (get props-config k)) v opts))
     (when-let [on-delete (:on-delete this)]
       (on-delete (component/instance component)))))
 
@@ -122,14 +131,13 @@
                 (when-not (vector? v)
                   (throw (ex-info "Prop description should be a vector"
                                   {:k k :v v})))
-                (let [[mut & args] v
-                      prop `(prop/prop
-                              ~(if (list? mut)
-                                 mut
-                                 (case mut
-                                   :setter `(prop/setter (setter ~type-expr ~k))
-                                   :list `(prop/observable-list
-                                            (observable-list ~type-expr ~k))))
+                (let [[mutator & args] v
+                      prop `(prop/make
+                              ~(case mutator
+                                 :setter `(mutator/setter (setter ~type-expr ~k))
+                                 :list `(mutator/observable-list
+                                          (observable-list ~type-expr ~k))
+                                 mutator)
                               ~@args)]
                   [k prop]))))))
 

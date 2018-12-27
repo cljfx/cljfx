@@ -39,30 +39,30 @@
                       (concat
                         [:setter]
                         (case parameter-type-sym
-                          double ['prop/scalar :coerce 'coerce/as-double]
-                          boolean ['prop/scalar]
-                          java.lang.Object ['prop/scalar]
-                          java.lang.String ['prop/scalar]
-                          javafx.scene.Node ['prop/component]
-                          javafx.scene.paint.Color ['prop/scalar :coerce 'coerce/color]
-                          javafx.event.EventHandler ['prop/scalar
+                          double ['lifecycle/scalar :coerce 'double]
+                          boolean ['lifecycle/scalar]
+                          java.lang.Object ['lifecycle/scalar]
+                          java.lang.String ['lifecycle/scalar]
+                          javafx.scene.Node ['lifecycle/dynamic-hiccup]
+                          javafx.scene.paint.Color ['lifecycle/scalar :coerce 'coerce/color]
+                          javafx.event.EventHandler ['lifecycle/scalar
                                                      :coerce 'coerce/event-handler]
-                          java.lang.Runnable ['prop/scalar :coerce 'coerce/runnable]
-                          javafx.geometry.Point3D ['prop/scalar :coerce 'coerce/point-3d]
-                          javafx.geometry.Rectangle2D ['prop/scalar
+                          java.lang.Runnable ['lifecycle/scalar :coerce 'coerce/runnable]
+                          javafx.geometry.Point3D ['lifecycle/scalar :coerce 'coerce/point-3d]
+                          javafx.geometry.Rectangle2D ['lifecycle/scalar
                                                        :coerce 'coerce/rectangle-2d]
-                          javafx.scene.paint.Paint ['prop/scalar :coerce 'coerce/paint]
-                          javafx.scene.image.Image ['prop/scalar :coerce 'coerce/image]
-                          int ['prop/scalar :coerce 'coerce/as-int]
+                          javafx.scene.paint.Paint ['lifecycle/scalar :coerce 'coerce/paint]
+                          javafx.scene.image.Image ['lifecycle/scalar :coerce 'coerce/image]
+                          int ['lifecycle/scalar :coerce 'int]
                           (cond
                             (and (class? (resolve parameter-type-sym))
                                  (.isEnum ^Class (resolve parameter-type-sym)))
-                            ['prop/scalar :coerce (list 'coerce/enum
-                                                        (-> parameter-type-sym
-                                                            name
-                                                            (str/split #"\.")
-                                                            last
-                                                            symbol))]
+                            ['lifecycle/scalar :coerce (list 'coerce/enum
+                                                             (-> parameter-type-sym
+                                                                 name
+                                                                 (str/split #"\.")
+                                                                 last
+                                                                 symbol))]
                             :else [parameter-type-sym]))
                         (when-not (nil? default-value)
                           [:default

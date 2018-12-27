@@ -18,6 +18,13 @@
   - is it possible to inject components/lifecycles into cells? they are a bit different
   (triggered via updateItem), and instances are created for us, but otherwise it's just a node
   and we have props for them
+  - prop in composite lifecycle may be a map or a function taking
+  instance and returning prop!
+- progress:
+  - make observable map
+  - make special wrappers for panes using :properties
+  - remove observable map
+
 - big app with everything in it to check if/how it works (generative tests maybe?)
 - rethink `props`:
   - advance does not recreate map event handlers if :cljfx.opt/map-event-handler changed

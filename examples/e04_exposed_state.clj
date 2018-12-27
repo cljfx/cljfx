@@ -9,8 +9,8 @@
   [:v-box
    [:label label-text]
    [:text-field
-    {:on-text-changed #(swap! *state assoc key %)}
-    (get state key)]])
+    {:on-text-changed #(swap! *state assoc key %)
+     :text (get state key)}]])
 
 (defn root [state]
   [:stage
@@ -27,7 +27,6 @@
                   (cljfx/wrap-expose-value)
                   (cljfx/wrap-map-value (constantly [root])))
     :opts {:cljfx.opt/tag->lifecycle #(or (cljfx/fx-tag->lifecycle %)
-                                          (cljfx/fn-tag->exposed-lifecycle %))
-           :cljfx.opt/map-event-handler cljfx/default-map-event-handler}))
+                                          (cljfx/fn-tag->exposed-lifecycle %))}))
 
 (cljfx/mount-app *state app)

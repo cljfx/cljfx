@@ -2,7 +2,8 @@
   (:require [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.fx.scene :as fx.scene]
-            [cljfx.lifecycle.composite :as lifecycle.composite])
+            [cljfx.lifecycle.composite :as lifecycle.composite]
+            [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.shape DrawMode CullFace Shape3D TriangleMesh Sphere MeshView
                                Cylinder Box]
            [javafx.scene LightBase PointLight AmbientLight]
@@ -13,8 +14,8 @@
 (def light-base
   (lifecycle.composite/describe LightBase
     :extends [fx.scene/node]
-    :props {:color [:setter prop/scalar :coerce coerce/color]
-            :light-on [:setter prop/scalar :default true]}))
+    :props {:color [:setter lifecycle/scalar :coerce coerce/color]
+            :light-on [:setter lifecycle/scalar :default true]}))
 
 (def ambient-light
   (lifecycle.composite/describe AmbientLight
@@ -29,59 +30,59 @@
 (def shape3d
   (lifecycle.composite/describe Shape3D
     :extends [fx.scene/node]
-    :props {:cull-face [:setter prop/scalar :coerce (coerce/enum CullFace) :default :back]
-            :draw-mode [:setter prop/scalar :coerce (coerce/enum DrawMode) :default :fill]
-            :material [:setter prop/component]}))
+    :props {:cull-face [:setter lifecycle/scalar :coerce (coerce/enum CullFace) :default :back]
+            :draw-mode [:setter lifecycle/scalar :coerce (coerce/enum DrawMode) :default :fill]
+            :material [:setter lifecycle/dynamic-hiccup]}))
 
 (def box
   (lifecycle.composite/describe Box
     :ctor []
     :extends [shape3d]
-    :props {:depth [:setter prop/scalar :coerce coerce/as-double :default 2.0]
-            :height [:setter prop/scalar :coerce coerce/as-double :default 2.0]
-            :width [:setter prop/scalar :coerce coerce/as-double :default 2.0]}))
+    :props {:depth [:setter lifecycle/scalar :coerce double :default 2.0]
+            :height [:setter lifecycle/scalar :coerce double :default 2.0]
+            :width [:setter lifecycle/scalar :coerce double :default 2.0]}))
 
 (def cylinder
   (lifecycle.composite/describe Cylinder
     :ctor []
     :extends [shape3d]
-    :props {:height [:setter prop/scalar :coerce coerce/as-double :default 2.0]
-            :radius [:setter prop/scalar :coerce coerce/as-double :default 1.0]}))
+    :props {:height [:setter lifecycle/scalar :coerce double :default 2.0]
+            :radius [:setter lifecycle/scalar :coerce double :default 1.0]}))
 
 (def mesh-view
   (lifecycle.composite/describe MeshView
     :ctor []
     :extends [shape3d]
     :default-prop [:mesh prop/extract-single]
-    :props {:mesh [:setter prop/component]}))
+    :props {:mesh [:setter lifecycle/dynamic-hiccup]}))
 
 (def triangle-mesh
   (lifecycle.composite/describe TriangleMesh
     :ctor []
-    :props {:vertex-format [:setter prop/scalar :coerce coerce/vertex-format]
-            :faces [:list prop/scalar :coerce (fn [x _] (map int x))]
-            :face-smoothing-groups [:list prop/scalar :coerce (fn [x _] (map int x))]
-            :normals [:list prop/scalar :coerce (fn [x _] (map float x))]
-            :points [:list prop/scalar :coerce (fn [x _] (map float x))]
-            :tex-coords [:list prop/scalar :coerce (fn [x _] (map float x))]}))
+    :props {:vertex-format [:setter lifecycle/scalar :coerce coerce/vertex-format]
+            :faces [:list lifecycle/scalar :coerce (fn [x _] (map int x))]
+            :face-smoothing-groups [:list lifecycle/scalar :coerce (fn [x _] (map int x))]
+            :normals [:list lifecycle/scalar :coerce (fn [x _] (map float x))]
+            :points [:list lifecycle/scalar :coerce (fn [x _] (map float x))]
+            :tex-coords [:list lifecycle/scalar :coerce (fn [x _] (map float x))]}))
 
 (def sphere
   (lifecycle.composite/describe Sphere
     :ctor []
     :extends [shape3d]
     :default-prop [:radius prop/extract-single]
-    :props {:radius [:setter prop/scalar :coerce coerce/as-double :default 1.0]}))
+    :props {:radius [:setter lifecycle/scalar :coerce double :default 1.0]}))
 
 (def phong-material
   (lifecycle.composite/describe PhongMaterial
     :ctor []
-    :props {:bump-map [:setter prop/scalar :coerce coerce/image]
-            :diffuse-color [:setter prop/scalar :coerce coerce/color :default :white]
-            :diffuse-map [:setter prop/scalar :coerce coerce/image]
-            :self-illumination-map [:setter prop/scalar :coerce coerce/image]
-            :specular-color [:setter prop/scalar :coerce coerce/color]
-            :specular-map [:setter prop/scalar :coerce coerce/image]
-            :specular-power [:setter prop/scalar :coerce coerce/as-double :default 32.0]}))
+    :props {:bump-map [:setter lifecycle/scalar :coerce coerce/image]
+            :diffuse-color [:setter lifecycle/scalar :coerce coerce/color :default :white]
+            :diffuse-map [:setter lifecycle/scalar :coerce coerce/image]
+            :self-illumination-map [:setter lifecycle/scalar :coerce coerce/image]
+            :specular-color [:setter lifecycle/scalar :coerce coerce/color]
+            :specular-map [:setter lifecycle/scalar :coerce coerce/image]
+            :specular-power [:setter lifecycle/scalar :coerce double :default 32.0]}))
 
 (def tag->lifecycle
   {:box box

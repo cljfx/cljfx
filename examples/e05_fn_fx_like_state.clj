@@ -9,7 +9,7 @@
   [:v-box
    [:label label]
    [:text-field
-    {:on-text-changed #(swap! *state assoc key %)
+    {:on-text-changed {:key key}
      :text value}]])
 
 (defn root [{:keys [first-name last-name]}]
@@ -25,8 +25,12 @@
      [text-input "First Name" first-name :first-name]
      [text-input "Last Name" last-name :last-name]]]])
 
+(defn map-event-handler [event]
+  (swap! *state assoc (:key event) (:cljfx/event event)))
+
 (def app
   (cljfx/create-app
+    :opts {:cljfx.opt/map-event-handler map-event-handler}
     :middleware (cljfx/wrap-map-value root)))
 
 (cljfx/mount-app *state app)

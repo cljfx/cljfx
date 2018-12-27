@@ -1,7 +1,6 @@
 (ns cljfx.event
   (:require [clojure.string :as str])
-  (:import [javafx.beans.value ChangeListener]
-           [javafx.scene.input KeyEvent MouseEvent MouseDragEvent RotateEvent ScrollEvent
+  (:import [javafx.scene.input KeyEvent MouseEvent MouseDragEvent RotateEvent ScrollEvent
                                SwipeEvent TouchEvent ZoomEvent GestureEvent TouchPoint]
            [javafx.event Event ActionEvent]
            [javafx.scene.media MediaErrorEvent]))
@@ -167,28 +166,4 @@
 
   Object
   (datafy [e] e))
-
-(defn map-event-handler [m opts]
-  (let [f (:cljfx.opt/map-event-handler opts)]
-    #(f (assoc m :cljfx/event %))))
-
-(defn make-change-listener ^ChangeListener [x opts]
-  (cond
-    (instance? ChangeListener x)
-    x
-
-    (map? x)
-    (let [handler (map-event-handler x opts)]
-      (reify ChangeListener
-        (changed [_ _ _ value]
-          (handler value))))
-
-    (fn? x)
-    (reify ChangeListener
-      (changed [_ _ _ value]
-        (x value)))
-
-    :else
-    (throw (ex-info "Don't know how to create change listener"
-                    {:x x}))))
 

@@ -22,7 +22,6 @@
 
 (def app
   (cljfx/create-app
-    :opts {:cljfx.opt/tag->lifecycle cljfx/default-tag->lifecycle
-           :cljfx.opt/map-event-handler map-event-handler}))
+    :opts {:cljfx.opt/map-event-handler map-event-handler}))
 
 (cljfx/mount-app *state app)

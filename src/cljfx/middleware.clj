@@ -6,11 +6,6 @@
     (fn [component value opts]
       (render-fn component (f value) opts))))
 
-(defn map-opts [f]
-  (fn [render-fn]
-    (fn [component value opts]
-      (render-fn component value (f opts)))))
-
 (defn- prepend-opt-value [f args opts]
   (apply vector f (::value opts) args))
 

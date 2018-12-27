@@ -20,7 +20,7 @@
     (when-not (:request-rendering old)
       (platform/on-fx-thread (perform-render *app)))))
 
-(defn- advance-app-component
+(defn- render-app-component
   "Advance rendered component with special semantics for nil (meaning absence)
 
   This allows to create, advance and delete components in single function"
@@ -39,9 +39,9 @@
     (lifecycle/advance lifecycle/dynamic-hiccup component desc opts)))
 
 (defn create [middleware opts]
-  (let [advance-fn (middleware advance-app-component)
+  (let [render-fn (middleware render-app-component)
         *app (atom {:*component (volatile! nil)
-                    :render-fn #(advance-fn %1 %2 opts)
+                    :render-fn #(render-fn %1 %2 opts)
                     :request-rendering false})]
     (fn [desc]
       (request-render *app desc)

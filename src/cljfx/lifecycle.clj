@@ -67,6 +67,28 @@
 (def fn-dynamic-hiccup
   ((wrap-fn-hiccup) dynamic-hiccup))
 
+(defn wrap-coerce [coerce]
+  (fn [lifecycle]
+    (with-meta
+      [::coerce lifecycle coerce]
+      {`create (fn [_ desc opts]
+                 (let [child (create lifecycle desc opts)]
+                   (with-meta {:child child
+                               :value (coerce (component/instance child))}
+                              {`component/description #(-> % :child component/description)
+                               `component/instance :value})))
+       `advance (fn [_ component desc opts]
+                  (let [child (:child component)
+                        new-child (advance lifecycle child desc opts)]
+                    (cond-> component
+                      :always
+                      (assoc :child new-child)
+
+                      (not= (component/instance child) (component/instance new-child))
+                      (assoc :value (coerce (component/instance new-child))))))
+       `delete (fn [_ component opts]
+                 (delete lifecycle (:child component) opts))})))
+
 (def scalar
   (with-meta
     [::scalar]
@@ -75,65 +97,30 @@
      `delete (fn [_ _ _])}))
 
 (defn- make-handler-fn [desc opts]
-  (cond
-    (map? desc)
+  (if (map? desc)
     (let [f (:cljfx.opt/map-event-handler opts)]
       #(f (assoc desc :cljfx/event %)))
+    desc))
 
-    (fn? desc)
-    desc
-
-    :else
-    (throw (ex-info "Can't make handler fn" {:desc desc}))))
-
-(defn- create-event-handler-component [coerce desc opts]
+(defn- create-event-handler-component [desc opts]
   (with-meta {:desc desc
               :cljfx.opt/map-event-handler (:cljfx.opt/map-event-handler opts)
-              :value (coerce (make-handler-fn desc opts))}
+              :value (make-handler-fn desc opts)}
              {`component/description :desc
               `component/instance :value}))
 
-(defn event-handler [coerce]
+(def event-handler
   (with-meta
-    [::event-handler coerce]
+    [::event-handler]
     {`create (fn [_ desc opts]
-               (create-event-handler-component coerce desc opts))
+               (create-event-handler-component desc opts))
      `advance (fn [_ component desc opts]
                 (if (and (= desc (:desc component))
                          (= (:cljfx.opt/map-event-handler component)
                             (:cljfx.opt/map-event-handler opts)))
                   component
-                  (create-event-handler-component coerce desc opts)))
+                  (create-event-handler-component desc opts)))
      `delete (fn [_ _ _])}))
-
-(defn wrap-map-desc [f & args]
-  (fn [lifecycle]
-    (with-meta
-      [::map-desc lifecycle f args]
-      {`create
-       (fn [_ desc opts]
-         (create lifecycle (apply f desc args) opts))
-
-       `advance
-       (fn [_ component desc opts]
-         (advance lifecycle component (apply f desc args) opts))
-
-       `delete
-       (fn [_ component opts]
-         (delete lifecycle component opts))})))
-
-(defn wrap-advance-when [pred]
-  (fn [lifecycle]
-    (with-meta
-      [::advance-when lifecycle pred]
-      {`create (fn [_ desc opts]
-                 (create lifecycle desc opts))
-       `advance (fn [_ component desc opts]
-                  (if (pred component desc opts)
-                    (advance lifecycle component desc opts)
-                    component))
-       `delete (fn [_ value opts]
-                 (delete lifecycle value opts))})))
 
 (defn- ordered-keys+key->val
   "Return a vec of ordered calculated keys and a map of calculated keys to components
