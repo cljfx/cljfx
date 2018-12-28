@@ -78,13 +78,12 @@
      `retract! (fn [_ _ _ value]
                  (throw (ex-info "Retract forbidden" {:value value})))}))
 
-(defn wrap-default [default]
-  (fn [mutator]
-    (with-meta
-      [::default mutator default]
-      {`assign! (fn [_ instance coerce value]
-                  (assign! mutator instance coerce value))
-       `replace! (fn [_ instance coerce old-value new-value]
-                   (replace! mutator instance coerce old-value new-value))
-       `retract! (fn [_ instance coerce value]
-                   (replace! mutator instance coerce value default))})))
+(defn wrap-default [mutator default]
+  (with-meta
+    [::default mutator default]
+    {`assign! (fn [_ instance coerce value]
+                (assign! mutator instance coerce value))
+     `replace! (fn [_ instance coerce old-value new-value]
+                 (replace! mutator instance coerce old-value new-value))
+     `retract! (fn [_ instance coerce value]
+                 (replace! mutator instance coerce value default))}))

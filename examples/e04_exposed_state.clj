@@ -13,8 +13,7 @@
      :text (get state key)}]])
 
 (defn root [state]
-  [:stage
-   {:showing true}
+  [:stage {:showing true}
    [:scene
     [:v-box
      [:label (str "You are " (:first-name state) " " (:last-name state) "!")]

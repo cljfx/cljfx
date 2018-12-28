@@ -18,9 +18,12 @@
 (defn- create-props [props-desc props-config opts]
   (reduce
     (fn [acc k]
-      (assoc acc k (lifecycle/create (prop/lifecycle (get props-config k))
-                                     (get props-desc k)
-                                     opts)))
+      (let [prop-config (get props-config k)]
+        (when-not prop-config
+          (throw (ex-info "No such prop" {:key k :desc (get props-desc k)})))
+        (assoc acc k (lifecycle/create (prop/lifecycle prop-config)
+                                       (get props-desc k)
+                                       opts))))
     props-desc
     (keys props-desc)))
 

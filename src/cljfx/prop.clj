@@ -7,7 +7,7 @@
                                       default ::no-default}}]
   {:mutator (if (= default ::no-default)
               mutator
-              ((mutator/wrap-default default) mutator))
+              (mutator/wrap-default mutator default))
    :lifecycle lifecycle
    :coerce coerce})
 

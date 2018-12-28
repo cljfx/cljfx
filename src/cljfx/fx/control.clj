@@ -334,7 +334,7 @@
     :props {:current-page-index [:setter lifecycle/scalar :coerce int :default 0]
             :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
             :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
-            :page-factory [:setter ((lifecycle/wrap-factory) lifecycle/dynamic-hiccup)
+            :page-factory [:setter (lifecycle/wrap-factory lifecycle/dynamic-hiccup)
                            :coerce coerce/page-factory]}))
 
 (def progress-indicator
@@ -542,6 +542,7 @@
 (def tab
   (lifecycle.composite/describe Tab
     :ctor []
+    :default-prop [:content prop/extract-single]
     :props {:closable [:setter lifecycle/scalar :default true]
             :content [:setter lifecycle/dynamic-hiccup]
             :context-menu [:setter lifecycle/dynamic-hiccup]
@@ -566,8 +567,8 @@
             :text [:setter lifecycle/scalar]
             :on-text-changed [(mutator/property-change-listener
                                 #(.textProperty ^TextField %))
-                              ((lifecycle/wrap-coerce coerce/change-listener)
-                               lifecycle/event-handler)]
+                              (lifecycle/wrap-coerce lifecycle/event-handler
+                                                     coerce/change-listener)]
             :text-formatter [:setter lifecycle/scalar :coerce coerce/text-formatter]}))
 
 (def text-area

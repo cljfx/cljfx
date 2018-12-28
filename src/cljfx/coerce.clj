@@ -90,6 +90,12 @@
   (cond
     (instance? Image x) x
     (string? x) (Image. ^String x)
+    (map? x) (Image. (:url x)
+                     (double (:requested-width x 0))
+                     (double (:requested-height x 0))
+                     (boolean (:preserve-ratio x))
+                     (boolean (:smooth x))
+                     (boolean (:background-loading x)))
     :else (fail Image x)))
 
 (defn map->image-pattern [m]

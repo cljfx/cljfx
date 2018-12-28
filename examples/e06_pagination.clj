@@ -3,8 +3,7 @@
 
 (cljfx/on-fx-thread
   (cljfx/create-component
-    [:stage
-     {:showing true}
+    [:stage {:showing true}
      [:scene
       [:pagination
        {:page-count 10

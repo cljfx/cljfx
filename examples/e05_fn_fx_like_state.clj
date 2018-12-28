@@ -13,8 +13,7 @@
      :text value}]])
 
 (defn root [{:keys [first-name last-name]}]
-  [:stage
-   {:showing true}
+  [:stage {:showing true}
    [:scene
     [:v-box
      (if (empty? (str first-name last-name))
