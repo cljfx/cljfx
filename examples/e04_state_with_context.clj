@@ -1,4 +1,4 @@
-(ns e04-exposed-state
+(ns e04-state-with-context
   (:require [cljfx.api :as cljfx]))
 
 (def *state
@@ -23,9 +23,9 @@
 (def app
   (cljfx/create-app
     :middleware (comp
-                  (cljfx/wrap-expose-value)
-                  (cljfx/wrap-map-value (constantly [root])))
+                  cljfx/wrap-set-desc-as-context
+                  (cljfx/wrap-map-desc (constantly [root])))
     :opts {:cljfx.opt/tag->lifecycle #(or (cljfx/fx-tag->lifecycle %)
-                                          (cljfx/fn-tag->exposed-lifecycle %))}))
+                                          (cljfx/fn-tag->lifecycle-with-context %))}))
 
 (cljfx/mount-app *state app)

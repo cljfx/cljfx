@@ -24,24 +24,24 @@
   "Advance rendered component with special semantics for nil (meaning absence)
 
   This allows to create, advance and delete components in single function"
-  [component desc opts]
+  [lifecycle component desc opts]
   (cond
     (and (nil? component) (nil? desc))
     nil
 
     (nil? component)
-    (lifecycle/create lifecycle/dynamic-hiccup desc opts)
+    (lifecycle/create lifecycle desc opts)
 
     (nil? desc)
-    (do (lifecycle/delete lifecycle/dynamic-hiccup component opts) nil)
+    (do (lifecycle/delete lifecycle component opts) nil)
 
     :else
-    (lifecycle/advance lifecycle/dynamic-hiccup component desc opts)))
+    (lifecycle/advance lifecycle component desc opts)))
 
 (defn create [middleware opts]
-  (let [render-fn (middleware render-app-component)
+  (let [lifecycle (middleware lifecycle/hiccup)
         *app (atom {:*component (volatile! nil)
-                    :render-fn #(render-fn %1 %2 opts)
+                    :render-fn #(render-app-component lifecycle %1 %2 opts)
                     :request-rendering false})]
     (fn [desc]
       (request-render *app desc)

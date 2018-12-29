@@ -29,7 +29,7 @@
     :ctor []
     :extends [fx.stage/popup-window]
     :default-prop [:content prop/extract-all]
-    :props {:content [:list lifecycle/many-dynamic-hiccups]}))
+    :props {:content [:list lifecycle/hiccups]}))
 
 (def popup-control
   (lifecycle.composite/describe PopupControl
@@ -50,15 +50,15 @@
     :ctor []
     :extends [popup-control]
     :default-prop [:items prop/extract-all]
-    :props {:items [:list lifecycle/many-dynamic-hiccups]
+    :props {:items [:list lifecycle/hiccups]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]}))
 
 
 (def control
   (lifecycle.composite/describe Control
     :extends [fx.scene/region]
-    :props {:context-menu [:setter lifecycle/dynamic-hiccup]
-            :tooltip [:setter lifecycle/dynamic-hiccup]}))
+    :props {:context-menu [:setter lifecycle/hiccup]
+            :tooltip [:setter lifecycle/hiccup]}))
 
 (def menu-item
   (lifecycle.composite/describe MenuItem
@@ -68,7 +68,7 @@
             :disabled [(mutator/setter (lifecycle.composite/setter MenuItem :disable))
                        lifecycle/scalar
                        :default false]
-            :graphic [:setter lifecycle/dynamic-hiccup]
+            :graphic [:setter lifecycle/hiccup]
             :id [:setter lifecycle/scalar]
             :mnemonic-parsing [:setter lifecycle/scalar :default true]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -87,7 +87,7 @@
                               :default :left]
             :ellipsis-string [:setter lifecycle/scalar :default "..."]
             :font [:setter lifecycle/scalar :coerce coerce/font :default :default]
-            :graphic [:setter lifecycle/dynamic-hiccup]
+            :graphic [:setter lifecycle/hiccup]
             :graphic-text-gap [:setter lifecycle/scalar :coerce double :default 4]
             :line-spacing [:setter lifecycle/scalar :coerce double :default 0]
             :mnemonic-parsing [:setter lifecycle/scalar :default false]
@@ -124,14 +124,14 @@
     :ctor []
     :extends [menu-item]
     :default-prop [:content prop/extract-single]
-    :props {:content [:setter lifecycle/dynamic-hiccup]
+    :props {:content [:setter lifecycle/hiccup]
             :hide-on-click [:setter lifecycle/scalar :default true]}))
 (def menu
   (lifecycle.composite/describe Menu
     :ctor []
     :extends [menu-item]
     :default-prop [:items prop/extract-all]
-    :props {:items [:list lifecycle/many-dynamic-hiccups]
+    :props {:items [:list lifecycle/hiccups]
             :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -151,7 +151,7 @@
     :default-prop [:text prop/extract-single]
     :props {:content-display [:setter lifecycle/scalar :coerce (coerce/enum ContentDisplay) :default :left]
             :font [:setter lifecycle/scalar :coerce coerce/font :default :default]
-            :graphic [:setter lifecycle/dynamic-hiccup]
+            :graphic [:setter lifecycle/hiccup]
             :graphic-text-gap [:setter lifecycle/scalar :coerce double :default 4.0]
             :hide-delay [:setter lifecycle/scalar :coerce coerce/duration :default [200 :ms]]
             :show-delay [:setter lifecycle/scalar :coerce coerce/duration :default [1 :second]]
@@ -168,7 +168,7 @@
     :default-prop [:content prop/extract-single]
     :props {:animated [:setter lifecycle/scalar :default true]
             :collapsible [:setter lifecycle/scalar :default true]
-            :content [:setter lifecycle/dynamic-hiccup]
+            :content [:setter lifecycle/hiccup]
             :expanded [:setter lifecycle/scalar :default true]}))
 
 (def accordion
@@ -176,7 +176,7 @@
     :ctor []
     :extends [control]
     :default-prop [:panes prop/extract-all]
-    :props {:panes [:list lifecycle/many-dynamic-hiccups]}))
+    :props {:panes [:list lifecycle/hiccups]}))
 
 (def button-bar
   (lifecycle.composite/describe ButtonBar
@@ -185,7 +185,7 @@
     :default-prop [:buttons prop/extract-all]
     :props {:button-min-width [:setter lifecycle/scalar :coerce double]
             :button-order [:setter lifecycle/scalar]
-            :buttons [:list lifecycle/many-dynamic-hiccups]}))
+            :buttons [:list lifecycle/hiccups]}))
 
 (def choice-box
   (lifecycle.composite/describe ChoiceBox
@@ -214,12 +214,12 @@
     :ctor []
     :extends [combo-box-base]
     :default-prop [:items prop/extract-all]
-    :props {:button-cell [:setter lifecycle/dynamic-hiccup]
+    :props {:button-cell [:setter lifecycle/hiccup]
             :cell-factory [:setter lifecycle/scalar :coerce coerce/cell-factory]
             :converter [:setter lifecycle/scalar :coerce coerce/string-converter
                         :default :default]
             :items [:list lifecycle/scalar]
-            :placeholder [:setter lifecycle/dynamic-hiccup]
+            :placeholder [:setter lifecycle/hiccup]
             :visible-row-count [:setter lifecycle/scalar :coerce int :default 10]}))
 
 (def date-picker
@@ -265,7 +265,7 @@
     :ctor []
     :extends [button-base]
     :default-prop [:items prop/extract-all]
-    :props {:items [:list lifecycle/many-dynamic-hiccups]
+    :props {:items [:list lifecycle/hiccups]
             :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -312,7 +312,7 @@
             :on-scroll-to [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
                           :default :vertical]
-            :placeholder [:setter lifecycle/dynamic-hiccup]
+            :placeholder [:setter lifecycle/hiccup]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^ListView %1) %2))
                              lifecycle/scalar
@@ -324,7 +324,7 @@
     :ctor []
     :extends [control]
     :default-prop [:menus prop/extract-all]
-    :props {:menus [:list lifecycle/many-dynamic-hiccups]
+    :props {:menus [:list lifecycle/hiccups]
             :use-system-menu-bar [:setter lifecycle/scalar :default false]}))
 
 (def pagination
@@ -334,7 +334,7 @@
     :props {:current-page-index [:setter lifecycle/scalar :coerce int :default 0]
             :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
             :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
-            :page-factory [:setter (lifecycle/wrap-factory lifecycle/dynamic-hiccup)
+            :page-factory [:setter (lifecycle/wrap-factory lifecycle/hiccup)
                            :coerce coerce/page-factory]}))
 
 (def progress-indicator
@@ -361,7 +361,7 @@
     :ctor []
     :extends [control]
     :default-prop [:content prop/extract-single]
-    :props {:content [:setter lifecycle/dynamic-hiccup]
+    :props {:content [:setter lifecycle/hiccup]
             :fit-to-height [:setter lifecycle/scalar :default false]
             :fit-to-width [:setter lifecycle/scalar :default false]
             :hbar-policy [:setter lifecycle/scalar
@@ -422,7 +422,7 @@
             :initial-delay [:setter lifecycle/scalar :coerce coerce/duration :default [300 :ms]]
             :prompt-text [:setter lifecycle/scalar :default ""]
             :repeat-delay [:setter lifecycle/scalar :default [60 :ms]]
-            :value-factory [:setter lifecycle/dynamic-hiccup]}))
+            :value-factory [:setter lifecycle/hiccup]}))
 
 (def spinner-value-factory
   (lifecycle.composite/describe SpinnerValueFactory
@@ -462,7 +462,7 @@
     :props {:divider-positions [:setter lifecycle/scalar
                                 :coerce (fn [x _] (into-array Double/TYPE x))
                                 :default []]
-            :items [:list lifecycle/many-dynamic-hiccups]
+            :items [:list lifecycle/hiccups]
             :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
                           :default :horizontal]}))
 
@@ -472,14 +472,14 @@
     :extends [control]
     :props {:column-resize-policy [:setter lifecycle/scalar :coerce coerce/table-resize-policy
                                    :default :unconstrained]
-            :columns [:list lifecycle/many-dynamic-hiccups]
+            :columns [:list lifecycle/hiccups]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]
             :items [:list lifecycle/scalar]
             :on-scroll-to [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-scroll-to-column [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-sort [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :placeholder [:setter lifecycle/dynamic-hiccup]
+            :placeholder [:setter lifecycle/hiccup]
             :row-factory [:setter lifecycle/scalar]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^TableView %1) %2))
@@ -493,18 +493,18 @@
 
 (def table-column-base
   (lifecycle.composite/describe TableColumnBase
-    :props {:columns [:list lifecycle/many-dynamic-hiccups]
+    :props {:columns [:list lifecycle/hiccups]
             :comparator [:setter lifecycle/scalar :default TableColumnBase/DEFAULT_COMPARATOR]
-            :context-menu [:setter lifecycle/dynamic-hiccup]
+            :context-menu [:setter lifecycle/hiccup]
             :editable [:setter lifecycle/scalar :default true]
-            :graphic [:setter lifecycle/dynamic-hiccup]
+            :graphic [:setter lifecycle/hiccup]
             :id [:setter lifecycle/scalar]
             :max-width [:setter lifecycle/scalar :coerce double :default 5000]
             :min-width [:setter lifecycle/scalar :coerce double :default 10]
             :pref-width [:setter lifecycle/scalar :coerce double :default 80]
             :reorderable [:setter lifecycle/scalar :default true]
             :resizable [:setter lifecycle/scalar :default true]
-            :sort-node [:setter lifecycle/dynamic-hiccup]
+            :sort-node [:setter lifecycle/hiccup]
             :sortable [:setter lifecycle/scalar :default true]
             :style [:setter lifecycle/scalar :coerce coerce/style :default ""]
             :style-class [:list lifecycle/scalar :coerce coerce/style-class]
@@ -518,7 +518,7 @@
     :extends [table-column-base]
     :props {:cell-factory [:setter lifecycle/scalar :default TableColumn/DEFAULT_CELL_FACTORY]
             :cell-value-factory [:setter lifecycle/scalar :coerce coerce/table-cell-value-factory]
-            :columns [:list lifecycle/many-dynamic-hiccups]
+            :columns [:list lifecycle/hiccups]
             :on-edit-cancel [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-edit-commit [:setter lifecycle/event-handler :coerce coerce/event-handler] ;; has private default
             :on-edit-start [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -540,17 +540,17 @@
             :tab-max-width [:setter lifecycle/scalar :coerce double :default Double/MAX_VALUE]
             :tab-min-height [:setter lifecycle/scalar :coerce double :default 0.0]
             :tab-min-width [:setter lifecycle/scalar :coerce double :default 0.0]
-            :tabs [:list lifecycle/many-dynamic-hiccups]}))
+            :tabs [:list lifecycle/hiccups]}))
 
 (def tab
   (lifecycle.composite/describe Tab
     :ctor []
     :default-prop [:content prop/extract-single]
     :props {:closable [:setter lifecycle/scalar :default true]
-            :content [:setter lifecycle/dynamic-hiccup]
-            :context-menu [:setter lifecycle/dynamic-hiccup]
+            :content [:setter lifecycle/hiccup]
+            :context-menu [:setter lifecycle/hiccup]
             :disable [:setter lifecycle/scalar :default false]
-            :graphic [:setter lifecycle/dynamic-hiccup]
+            :graphic [:setter lifecycle/hiccup]
             :id [:setter lifecycle/scalar]
             :on-close-request [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-closed [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -558,7 +558,7 @@
             :style [:setter lifecycle/scalar :coerce coerce/style]
             :style-class [:list lifecycle/scalar :coerce coerce/style-class]
             :text [:setter lifecycle/scalar]
-            :tooltip [:setter lifecycle/dynamic-hiccup]
+            :tooltip [:setter lifecycle/hiccup]
             :user-data [:setter lifecycle/scalar]}))
 
 (def text-input-control
@@ -605,7 +605,7 @@
     :ctor []
     :extends [control]
     :default-prop [:items prop/extract-all]
-    :props {:items [:list lifecycle/many-dynamic-hiccups]
+    :props {:items [:list lifecycle/hiccups]
             :orientation [:setter lifecycle/scalar
                           :coerce (coerce/enum Orientation)
                           :default :horizontal]}))
@@ -618,14 +618,14 @@
     :props {:column-resize-policy [:setter lifecycle/scalar
                                    :coerce coerce/tree-table-resize-policy
                                    :default :unconstrained]
-            :columns [:list lifecycle/many-dynamic-hiccups]
+            :columns [:list lifecycle/hiccups]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]
             :on-scroll-to [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-scroll-to-column [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-sort [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :placeholder [:setter lifecycle/dynamic-hiccup]
-            :root [:setter lifecycle/dynamic-hiccup]
+            :placeholder [:setter lifecycle/hiccup]
+            :root [:setter lifecycle/hiccup]
             :row-factory [:setter lifecycle/scalar]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^TreeTableView %1) %2))
@@ -645,9 +645,9 @@
   (lifecycle.composite/describe TreeItem
     :ctor []
     :default-prop [:children prop/extract-all]
-    :props {:children [:list lifecycle/many-dynamic-hiccups]
+    :props {:children [:list lifecycle/hiccups]
             :expanded [:setter lifecycle/scalar :default false]
-            :graphic [:setter lifecycle/dynamic-hiccup]
+            :graphic [:setter lifecycle/hiccup]
             :value [:setter lifecycle/scalar]}))
 
 (def tree-table-column
@@ -656,7 +656,7 @@
     :extends [table-column-base]
     :props {:cell-factory [:setter lifecycle/scalar :default TreeTableColumn/DEFAULT_CELL_FACTORY]
             :cell-value-factory [:setter lifecycle/scalar :coerce coerce/tree-table-cell-value-factory]
-            :columns [:list lifecycle/many-dynamic-hiccups]
+            :columns [:list lifecycle/hiccups]
             :on-edit-cancel [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-edit-commit [:setter lifecycle/event-handler :coerce coerce/event-handler] ;; has private default
             :on-edit-start [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -675,7 +675,7 @@
             :on-edit-commit [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-edit-start [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-scroll-to [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :root [:setter lifecycle/dynamic-hiccup]
+            :root [:setter lifecycle/hiccup]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^TreeView %1) %2))
                              lifecycle/scalar

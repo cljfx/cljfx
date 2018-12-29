@@ -22,7 +22,7 @@
       (lifecycle.composite/describe
         :ctor [:media]
         :default-prop [:media prop/extract-single]
-        :props {:media [mutator/forbidden lifecycle/dynamic-hiccup]
+        :props {:media [mutator/forbidden lifecycle/hiccup]
                 :state [(mutator/setter #(case %2
                                            :playing (.play ^MediaPlayer %1)
                                            :paused (.pause ^MediaPlayer %1)
@@ -51,7 +51,7 @@
                 :rate [:setter lifecycle/scalar :coerce double :default 1]
                 :start-time [:setter lifecycle/scalar
                              :coerce coerce/duration :default :zero]
-                :stop-time [:setter lifecycle/dynamic-hiccup
+                :stop-time [:setter lifecycle/hiccup
                             :coerce coerce/duration
                             :default :indefinite]
                 :volume [:setter lifecycle/scalar :coerce double :default 1]})
@@ -62,7 +62,7 @@
     :ctor []
     :extends [fx.scene/node]
     :default-prop [:media-player prop/extract-single]
-    :props {:media-player [:setter lifecycle/dynamic-hiccup]
+    :props {:media-player [:setter lifecycle/hiccup]
             :on-error [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :preserve-ratio [:setter lifecycle/scalar :default true]
             :smooth [:setter lifecycle/scalar :default ImageView/SMOOTH_DEFAULT]

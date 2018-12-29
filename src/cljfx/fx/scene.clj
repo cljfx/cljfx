@@ -28,7 +28,7 @@
             :depth-test [:setter lifecycle/scalar :coerce (coerce/enum DepthTest)]
             :disabled [(mutator/setter (lifecycle.composite/setter Node :disable))
                        lifecycle/scalar]
-            :effect [:setter lifecycle/dynamic-hiccup]
+            :effect [:setter lifecycle/hiccup]
             :event-dispatcher [:setter lifecycle/scalar]
             :focus-traversable [:setter lifecycle/scalar :default false]
             :id [:setter lifecycle/scalar]
@@ -87,7 +87,7 @@
             :scale-z [:setter lifecycle/scalar :coerce double :default 1]
             :style [:setter lifecycle/scalar :coerce coerce/style :default ""]
             :style-class [:list lifecycle/scalar :coerce coerce/style-class]
-            :transforms [:list lifecycle/many-dynamic-hiccups]
+            :transforms [:list lifecycle/hiccups]
             :translate-x [:setter lifecycle/scalar :coerce double :default 0]
             :translate-y [:setter lifecycle/scalar :coerce double :default 0]
             :translate-z [:setter lifecycle/scalar :coerce double :default 0]
@@ -131,7 +131,7 @@
     :ctor []
     :extends [node]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list lifecycle/many-dynamic-hiccups]
+    :props {:children [:list lifecycle/hiccups]
             :auto-size-children [:setter lifecycle/scalar :default true]}))
 
 (def sub-scene
@@ -139,10 +139,10 @@
     :ctor [:root :width :height]
     :default-prop [:root prop/extract-single]
     :extends [node]
-    :props {:root [:setter lifecycle/dynamic-hiccup]
+    :props {:root [:setter lifecycle/hiccup]
             :width [:setter lifecycle/scalar :coerce double :default 0]
             :height [:setter lifecycle/scalar :coerce double :default 0]
-            :camera [:setter lifecycle/dynamic-hiccup]
+            :camera [:setter lifecycle/hiccup]
             :fill [:setter lifecycle/scalar :coerce coerce/paint]
             :user-agent-stylesheet [:setter lifecycle/scalar]}))
 
@@ -164,14 +164,14 @@
             :pref-height [:setter lifecycle/scalar :coerce double :default -1.0]
             :pref-width [:setter lifecycle/scalar :coerce double :default -1.0]
             :scale-shape [:setter lifecycle/scalar :default true]
-            :shape [:setter lifecycle/dynamic-hiccup]
+            :shape [:setter lifecycle/hiccup]
             :snap-to-pixel [:setter lifecycle/scalar :default true]}))
 
 (def scene
   (lifecycle.composite/describe Scene
     :ctor [:root]
     :default-prop [:root prop/extract-single]
-    :props {:camera [:setter lifecycle/dynamic-hiccup :default [:camera/parallel]]
+    :props {:camera [:setter lifecycle/hiccup :default [:camera/parallel]]
             :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
             :event-dispatcher [:setter lifecycle/scalar]
             :fill [:setter lifecycle/scalar :coerce coerce/paint :default :white]
@@ -216,7 +216,7 @@
             :on-zoom [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-zoom-finished [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-zoom-started [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :root [:setter lifecycle/dynamic-hiccup]
+            :root [:setter lifecycle/hiccup]
             :stylesheets [:list lifecycle/scalar :default []]
             :user-agent-stylesheet [:setter lifecycle/scalar]
             :user-data [:setter lifecycle/scalar]}))

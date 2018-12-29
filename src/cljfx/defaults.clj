@@ -3,7 +3,7 @@
             [cljfx.lifecycle :as lifecycle]))
 
 (defn fn-tag->lifecycle [tag]
-  (when (fn? tag) lifecycle/fn-dynamic-hiccup))
+  (when (fn? tag) lifecycle/hiccup-fn->hiccup))
 
 (defn- tag->lifecycle [tag]
   (or (fx/tag->lifecycle tag)

@@ -94,7 +94,7 @@
     :ctor []
     :extends [shape]
     :default-prop [:elements prop/extract-all]
-    :props {:elements [:list lifecycle/many-dynamic-hiccups]
+    :props {:elements [:list lifecycle/hiccups]
             :fill [:setter lifecycle/scalar :coerce coerce/paint]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
             :fill-rule [:setter lifecycle/scalar :coerce (coerce/enum FillRule)

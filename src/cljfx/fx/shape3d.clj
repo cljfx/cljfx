@@ -32,7 +32,7 @@
     :extends [fx.scene/node]
     :props {:cull-face [:setter lifecycle/scalar :coerce (coerce/enum CullFace) :default :back]
             :draw-mode [:setter lifecycle/scalar :coerce (coerce/enum DrawMode) :default :fill]
-            :material [:setter lifecycle/dynamic-hiccup]}))
+            :material [:setter lifecycle/hiccup]}))
 
 (def box
   (lifecycle.composite/describe Box
@@ -54,7 +54,7 @@
     :ctor []
     :extends [shape3d]
     :default-prop [:mesh prop/extract-single]
-    :props {:mesh [:setter lifecycle/dynamic-hiccup]}))
+    :props {:mesh [:setter lifecycle/hiccup]}))
 
 (def triangle-mesh
   (lifecycle.composite/describe TriangleMesh

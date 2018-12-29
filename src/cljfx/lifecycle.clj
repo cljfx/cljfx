@@ -20,18 +20,18 @@
         (throw (ex-info "Don't know how to get component lifecycle from tag"
                         {:tag tag})))))
 
-(defn- create-dynamic-component [lifecycle desc opts]
+(defn- create-hiccup-component [lifecycle desc opts]
   (with-meta
     {:lifecycle lifecycle
      :child (create lifecycle desc opts)}
     {`component/instance #(-> % :child component/instance)}))
 
-(def dynamic-hiccup
+(def hiccup
   (with-meta
-    [::dynamic-hiccup]
+    [::hiccup]
     {`create (fn [_ desc opts]
                (let [lifecycle (desc->lifecycle desc opts)]
-                 (create-dynamic-component lifecycle desc opts)))
+                 (create-hiccup-component lifecycle desc opts)))
      `advance (fn [_ component desc opts]
                 (let [lifecycle (:lifecycle component)
                       new-lifecycle (desc->lifecycle desc opts)]
@@ -39,16 +39,17 @@
                     (-> component
                         (update :child #(advance lifecycle % desc opts)))
                     (do (delete lifecycle (:child component) opts)
-                        (create-dynamic-component new-lifecycle desc opts)))))
+                        (create-hiccup-component new-lifecycle desc opts)))))
      `delete (fn [_ component opts]
                (delete (:lifecycle component) (:child component) opts))}))
 
-(defn wrap-fn-hiccup [lifecycle]
+(defn wrap-hiccup-fn [lifecycle]
   (with-meta
-    [::fn-hiccup lifecycle]
+    [::hiccup-fn lifecycle]
     {`create (fn [_ [f & args] opts]
                (let [child-desc (apply f args)]
                  (with-meta {:child-desc child-desc
+                             :args args
                              :child (create lifecycle child-desc opts)}
                             {`component/instance #(-> % :child component/instance)})))
      `advance (fn [_ component [f & args] opts]
@@ -59,13 +60,13 @@
                                                      opts))
                   (let [child-desc (apply f args)]
                     (-> component
-                        (assoc :child-desc child-desc)
+                        (assoc :child-desc child-desc :args args)
                         (update :child #(advance lifecycle % child-desc opts))))))
      `delete (fn [_ component opts]
                (delete lifecycle (:child component) opts))}))
 
-(def fn-dynamic-hiccup
-  (wrap-fn-hiccup dynamic-hiccup))
+(def hiccup-fn->hiccup
+  (wrap-hiccup-fn hiccup))
 
 (defn wrap-coerce [lifecycle coerce]
   (with-meta
@@ -174,7 +175,7 @@
                rest))
       [(persistent! keys) (persistent! vals)])))
 
-(defn key-from-meta [desc]
+(defn- key-from-meta [desc]
   (:key (meta desc) ::no-key))
 
 (defn wrap-many
@@ -223,8 +224,8 @@
                 (doseq [x (vals (:key->component component))]
                   (delete lifecycle x opts)))})))
 
-(def many-dynamic-hiccups
-  (wrap-many dynamic-hiccup))
+(def hiccups
+  (wrap-many hiccup))
 
 (defn wrap-log [lifecycle log-fn]
   (with-meta
@@ -352,3 +353,36 @@
      `delete (fn [_ component opts]
                (delete lifecycle component opts)
                (f (component/instance component)))}))
+
+(defn- inject-context [f args opts]
+  (apply vector f (::context opts) args))
+
+(def hiccup-fn-with-context->hiccup
+  (with-meta
+    [::hiccup-fn-with-context->hiccup]
+    {`create (fn [_ [f & args] opts]
+               (create hiccup-fn->hiccup (inject-context f args opts) opts))
+     `advance (fn [_ component [f & args] opts]
+                (advance hiccup-fn->hiccup component (inject-context f args opts) opts))
+     `delete (fn [_ component opts]
+               (delete hiccup-fn->hiccup component opts))}))
+
+(defn wrap-desc-as-context [lifecycle]
+  (with-meta
+    [::context lifecycle]
+    {`create (fn [_ desc opts]
+               (create lifecycle desc (assoc opts ::context desc)))
+     `advance (fn [_ component desc opts]
+                (advance lifecycle component desc (assoc opts ::context desc)))
+     `delete (fn [_ component opts]
+               (delete lifecycle component opts))}))
+
+(defn wrap-map-desc [lifecycle f]
+  (with-meta
+    [::map-desc lifecycle f]
+    {`create (fn [_ desc opts]
+               (create lifecycle (f desc) opts))
+     `advance (fn [_ component desc opts]
+                (advance lifecycle component (f desc) opts))
+     `delete (fn [_ component opts]
+               (delete lifecycle component opts))}))

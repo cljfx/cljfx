@@ -61,6 +61,6 @@
 (def app
   (cljfx/create-app
     :opts {:cljfx.opt/map-event-handler map-event-handler}
-    :middleware (cljfx/wrap-map-value root)))
+    :middleware (cljfx/wrap-map-desc root)))
 
 (cljfx/mount-app *state app)

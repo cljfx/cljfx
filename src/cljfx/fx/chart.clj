@@ -51,11 +51,11 @@
 (def xy-chart
   (lifecycle.composite/describe XYChart
     :extends [chart]
-    :props {:x-axis [mutator/forbidden lifecycle/dynamic-hiccup]
-            :y-axis [mutator/forbidden lifecycle/dynamic-hiccup]
+    :props {:x-axis [mutator/forbidden lifecycle/hiccup]
+            :y-axis [mutator/forbidden lifecycle/hiccup]
             :alternative-column-fill-visible [:setter lifecycle/scalar :default false]
             :alternative-row-fill-visible [:setter lifecycle/scalar :default true]
-            :data [:list lifecycle/many-dynamic-hiccups]
+            :data [:list lifecycle/hiccups]
             :horizontal-grid-lines-visible [:setter lifecycle/scalar :default true]
             :horizontal-zero-line-visible [:setter lifecycle/scalar :default true]
             :vertical-grid-lines-visible [:setter lifecycle/scalar :default true]
@@ -83,7 +83,7 @@
     :ctor []
     :extends [chart]
     :props {:clockwise [:setter lifecycle/scalar :default true]
-            :data [:list lifecycle/many-dynamic-hiccups]
+            :data [:list lifecycle/hiccups]
             :label-line-length [:setter lifecycle/scalar :coerce double :default 20.0]
             :labels-visible [:setter lifecycle/scalar :default true]
             :start-angle [:setter lifecycle/scalar :coerce double :default 0.0]}))
@@ -98,7 +98,7 @@
   (lifecycle.composite/describe XYChart$Data
     :ctor []
     :props {:extra-value [:setter lifecycle/scalar]
-            :node [:setter lifecycle/dynamic-hiccup]
+            :node [:setter lifecycle/hiccup]
             :x-value [:setter lifecycle/scalar]
             :y-value [:setter lifecycle/scalar]}))
 
@@ -106,9 +106,9 @@
   (lifecycle.composite/describe XYChart$Series
     :ctor []
     :default-prop [:data prop/extract-all]
-    :props {:data [:list lifecycle/many-dynamic-hiccups]
+    :props {:data [:list lifecycle/hiccups]
             :name [:setter lifecycle/scalar]
-            :node [:setter lifecycle/dynamic-hiccup]}))
+            :node [:setter lifecycle/hiccup]}))
 
 (def area-chart
   (lifecycle.composite/describe AreaChart

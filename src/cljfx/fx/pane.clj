@@ -17,14 +17,14 @@
     :ctor []
     :extends [fx.scene/region]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list lifecycle/many-dynamic-hiccups]}))
+    :props {:children [:list lifecycle/hiccups]}))
 
 (def anchor-pane
   (lifecycle.composite/describe AnchorPane
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:top ["pane-top-anchor" double]
                                     :left ["pane-left-anchor" double]
@@ -34,7 +34,7 @@
 
 (def ^:private border-pane-dynamic-hiccup
   (lifecycle/wrap-meta-constraints
-    lifecycle/dynamic-hiccup
+    lifecycle/hiccup
     {:margin ["borderpane-margin" coerce/insets]
      :alignment ["borderpane-alignment" (coerce/enum Pos)]}))
 
@@ -53,7 +53,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["flowpane-margin" coerce/insets]})
                                  lifecycle/wrap-many)]
@@ -73,7 +73,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["gridpane-margin" coerce/insets]
                                     :halignment ["gridpane-halignment" (coerce/enum HPos)]
@@ -88,10 +88,10 @@
                                     :full-height ["gridpane-fill-height" boolean]})
                                  lifecycle/wrap-many)]
             :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
-            :column-constraints [:list lifecycle/many-dynamic-hiccups]
+            :column-constraints [:list lifecycle/hiccups]
             :grid-lines-visible [:setter lifecycle/scalar :default false]
             :hgap [:setter lifecycle/scalar :coerce double :default 0.0]
-            :row-constraints [:list lifecycle/many-dynamic-hiccups]
+            :row-constraints [:list lifecycle/hiccups]
             :vgap [:setter lifecycle/scalar :coerce double :default 0.0]}))
 
 (def column-constraints
@@ -121,7 +121,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["hbox-margin" coerce/insets]
                                     :hgrow ["hbox-hgrow" (coerce/enum Priority)]})
@@ -135,7 +135,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["stackpane-margin" coerce/insets]
                                     :alignment ["stackpane-alignment" (coerce/enum Pos)]})
@@ -156,7 +156,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["tilepane-margin" coerce/insets]
                                     :alignment ["tilepane-alignment" (coerce/enum Pos)]})
@@ -178,7 +178,7 @@
     :ctor []
     :extends [pane]
     :default-prop [:children prop/extract-all]
-    :props {:children [:list (-> lifecycle/dynamic-hiccup
+    :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["vbox-margin" coerce/insets]
                                     :vgrow ["vbox-vgrow" (coerce/enum Priority)]})
