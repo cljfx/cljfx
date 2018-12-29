@@ -408,6 +408,10 @@
             :show-tick-marks [:setter lifecycle/scalar :default false]
             :snap-to-ticks [:setter lifecycle/scalar :default false]
             :value [:setter lifecycle/scalar :coerce double :default 0.0]
+            :on-value-changed [(mutator/property-change-listener
+                                 #(.valueProperty ^Slider %))
+                               (lifecycle/wrap-coerce lifecycle/event-handler
+                                                      coerce/change-listener)]
             :value-changing [:setter lifecycle/scalar :default false]}))
 
 (def spinner
@@ -486,7 +490,6 @@
             :sort-policy [:setter lifecycle/scalar :coerce coerce/table-sort-policy
                           :default :default]
             :table-menu-button-visible [:setter lifecycle/scalar :default false]}))
-
 
 (def table-column-base
   (lifecycle.composite/describe TableColumnBase

@@ -91,9 +91,7 @@
 (defn- delete-composite-component [this component opts]
   (let [props-config (:props this)]
     (doseq [[k v] (:props component)]
-      (lifecycle/delete (prop/lifecycle (get props-config k)) v opts))
-    (when-let [on-delete (:on-delete this)]
-      (on-delete (component/instance component)))))
+      (lifecycle/delete (prop/lifecycle (get props-config k)) v opts))))
 
 (defn component [m]
   (with-meta

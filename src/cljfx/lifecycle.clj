@@ -341,3 +341,14 @@
          (doseq [[k v] (:props component)]
            (delete (prop/lifecycle (get props-config k)) v opts))
          (delete lifecycle (:child component) opts))})))
+
+(defn wrap-on-delete [lifecycle f]
+  (with-meta
+    [::on-delete lifecycle f]
+    {`create (fn [_ desc opts]
+               (create lifecycle desc opts))
+     `advance (fn [_ component desc opts]
+                (advance lifecycle component desc opts))
+     `delete (fn [_ component opts]
+               (delete lifecycle component opts)
+               (f (component/instance component)))}))

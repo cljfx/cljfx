@@ -3,7 +3,8 @@
   (:import [javafx.scene.input KeyEvent MouseEvent MouseDragEvent RotateEvent ScrollEvent
                                SwipeEvent TouchEvent ZoomEvent GestureEvent TouchPoint]
            [javafx.event Event ActionEvent]
-           [javafx.scene.media MediaErrorEvent]))
+           [javafx.scene.media MediaErrorEvent]
+           [javafx.stage WindowEvent]))
 
 (set! *warn-on-reflection* true)
 
@@ -162,7 +163,11 @@
 
   ActionEvent
   (datafy [e]
-    (merge (datafy-event e)))
+    (datafy-event e))
+
+  WindowEvent
+  (datafy [e]
+    (datafy-event e))
 
   Object
   (datafy [e] e))

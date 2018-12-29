@@ -2,6 +2,7 @@
 
 ### TODO
 
+- replace middleware with custom lifecycles + :cljfx/quit for apps
 - expand on props and composite lifecycle. What's known about them:
   - ctor:
     - scene requires root, root can be replaced afterwards
@@ -13,23 +14,19 @@
     created for us, but otherwise it's just a node and we have props for
     them
   - prop in composite lifecycle may be a map or a function taking
+  - changing media should re-create media player
   instance and returning prop!
 
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
-- `:on-delete` should not be a part of composite lifecycle, instead
-  composite lifecycle should be composed
-
 - extract-rest instead of default-props
-- controlled props (mostly in controls)
+- controlled props (mostly in controls, also stage's `:showing`)
 - `:on-text-changed` handler dispatches during advancing, maybe it
   shouldn't?
-- default :managed properties in controls
-- pane props should be set through meta?
+- default `:managed` properties in controls
 - default focus traversable of controls!
 - default style classes!
 - default on-x-changed prop change listeners!
-- replace middleware with custom lifecycles?
 - ctrl+z on text fields throws exceptions
 - write docs
 
