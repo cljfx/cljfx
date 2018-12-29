@@ -23,10 +23,8 @@
 (defn- create-dynamic-component [lifecycle desc opts]
   (with-meta
     {:lifecycle lifecycle
-     :child (create lifecycle desc opts)
-     :desc desc}
-    {`component/description :desc
-     `component/instance #(-> % :child component/instance)}))
+     :child (create lifecycle desc opts)}
+    {`component/instance #(-> % :child component/instance)}))
 
 (def dynamic-hiccup
   (with-meta
@@ -39,8 +37,7 @@
                       new-lifecycle (desc->lifecycle desc opts)]
                   (if (identical? lifecycle new-lifecycle)
                     (-> component
-                        (update :child #(advance lifecycle % desc opts))
-                        (assoc :desc desc))
+                        (update :child #(advance lifecycle % desc opts)))
                     (do (delete lifecycle (:child component) opts)
                         (create-dynamic-component new-lifecycle desc opts)))))
      `delete (fn [_ component opts]
@@ -49,14 +46,12 @@
 (defn wrap-fn-hiccup [lifecycle]
   (with-meta
     [::fn-hiccup lifecycle]
-    {`create (fn [_ [f & args :as desc] opts]
+    {`create (fn [_ [f & args] opts]
                (let [child-desc (apply f args)]
-                 (with-meta {:desc desc
-                             :child-desc child-desc
+                 (with-meta {:child-desc child-desc
                              :child (create lifecycle child-desc opts)}
-                            {`component/description :desc
-                             `component/instance #(-> % :child component/instance)})))
-     `advance (fn [_ component [f & args :as desc] opts]
+                            {`component/instance #(-> % :child component/instance)})))
+     `advance (fn [_ component [f & args] opts]
                 (if (= args (:args component))
                   (update component :child #(advance lifecycle
                                                      %
@@ -64,7 +59,7 @@
                                                      opts))
                   (let [child-desc (apply f args)]
                     (-> component
-                        (assoc :child-desc child-desc :desc desc)
+                        (assoc :child-desc child-desc)
                         (update :child #(advance lifecycle % child-desc opts))))))
      `delete (fn [_ component opts]
                (delete lifecycle (:child component) opts))}))
@@ -79,8 +74,7 @@
                (let [child (create lifecycle desc opts)]
                  (with-meta {:child child
                              :value (coerce (component/instance child))}
-                            {`component/description #(-> % :child component/description)
-                             `component/instance :value})))
+                            {`component/instance :value})))
      `advance (fn [_ component desc opts]
                 (let [child (:child component)
                       old-instance (component/instance child)
@@ -112,8 +106,7 @@
   (with-meta {:desc desc
               :cljfx.opt/map-event-handler (:cljfx.opt/map-event-handler opts)
               :value (make-handler-fn desc opts)}
-             {`component/description :desc
-              `component/instance :value}))
+             {`component/instance :value}))
 
 (def event-handler
   (with-meta
@@ -138,8 +131,7 @@
                   :value (if (fn? desc)
                            #(component/instance (create lifecycle (desc %) opts))
                            desc)}
-                 {`component/description :desc
-                  `component/instance :value}))
+                 {`component/instance :value}))
      `advance (fn [this component desc opts]
                 (if (and (= desc (:desc component))
                          (= opts (:opts opts)))
@@ -152,11 +144,11 @@
 
   Example:
   ```
-  (ordered-keys+key->component [{:x 1}
-                                (with-meta {:key 1} {:key 1})
-                                (with-meta {:also 1} {:key 1})
-                                {}]
-                               #(-> % meta (get :key ::no-key)))
+  (ordered-keys+key->val [{:x 1}
+                          (with-meta {:key 1} {:key 1})
+                          (with-meta {:also 1} {:key 1})
+                          {}]
+                         #(-> % meta (get :key ::no-key)))
   => [[[::no-key 0]
        [1 0]
        [1 1]
@@ -166,22 +158,21 @@
        [1 1] {:also 1},
        [::no-key 1] {}}]
   ```"
-  [vals key-fn]
-  (loop [key->component (transient {})
-         index->key (transient [])
-         component-key->index (transient {})
-         [x & xs] vals]
-    (let [key-value (key-fn x)
-          key-index (component-key->index key-value 0)
-          key [key-value key-index]
-          new-key->component (assoc! key->component key x)
-          new-index->key (conj! index->key key)]
-      (if xs
-        (recur new-key->component
-               new-index->key
-               (assoc! component-key->index key-value (inc key-index))
-               xs)
-        [(persistent! new-index->key) (persistent! new-key->component)]))))
+  [key-fn coll]
+  (loop [key-value->counter (transient {})
+         keys (transient [])
+         vals (transient {})
+         xs (seq coll)]
+    (if xs
+      (let [[x & rest] xs
+            key-value (key-fn x)
+            key-index (key-value->counter key-value 0)
+            key [key-value key-index]]
+        (recur (assoc! key-value->counter key-value (inc key-index))
+               (conj! keys key)
+               (assoc! vals key x)
+               rest))
+      [(persistent! keys) (persistent! vals)])))
 
 (defn key-from-meta [desc]
   (:key (meta desc) ::no-key))
@@ -189,54 +180,47 @@
 (defn wrap-many
   ([lifecycle]
    (wrap-many lifecycle key-from-meta))
-  ([lifecycle desc->key]
+  ([lifecycle key-fn]
    (with-meta
-     [::many lifecycle desc->key]
+     [::many lifecycle key-fn]
      {`create
       (fn [_ desc opts]
-        (let [components (mapv #(create lifecycle % opts) desc)
-              [_ key->component] (ordered-keys+key->val
-                                   components
-                                   #(-> % component/description desc->key))]
-          (with-meta {:components components
-                      :desc desc
-                      :key->component key->component}
-                     {`component/description :desc
-                      `component/instance #(->> %
-                                                :components
-                                                (mapv component/instance))})))
+        (let [[ordered-keys key->desc] (ordered-keys+key->val key-fn desc)
+              key->component (reduce (fn [acc key]
+                                       (update acc key #(create lifecycle % opts)))
+                                     key->desc
+                                     ordered-keys)]
+          (with-meta
+            {:instance (mapv #(-> % key->component component/instance) ordered-keys)
+             :key->component key->component}
+            {`component/instance :instance})))
 
       `advance
       (fn [_ component desc opts]
-        (let [key->component (:key->component component)
-              [ordered-keys key->desc] (ordered-keys+key->val desc desc->key)
-              new-key->component (reduce (fn [acc key]
-                                           (let [old-e (find key->component key)
-                                                 new-e (find key->desc key)]
-                                             (cond
-                                               (and (some? old-e) (some? new-e))
-                                               (assoc acc key (advance lifecycle
-                                                                       (val old-e)
-                                                                       (val new-e)
-                                                                       opts))
+        (let [old-key->component (:key->component component)
+              [ordered-keys key->desc] (ordered-keys+key->val key-fn desc)
+              key->component (reduce
+                               (fn [acc key]
+                                 (let [old-e (find acc key)
+                                       new-e (find key->desc key)]
+                                   (cond
+                                     (and (some? old-e) (some? new-e))
+                                     (assoc acc key (advance lifecycle (val old-e) (val new-e) opts))
 
-                                               (some? old-e)
-                                               (do (delete lifecycle (val old-e) opts)
-                                                   (dissoc acc key))
+                                     (some? old-e)
+                                     (do (delete lifecycle (val old-e) opts)
+                                         (dissoc acc key))
 
-                                               :else
-                                               (assoc acc key (create lifecycle
-                                                                      (val new-e)
-                                                                      opts)))))
-                                         key->component
-                                         (set (concat (keys key->component)
-                                                      (keys key->desc))))]
-          (assoc component :key->component new-key->component
-                           :desc desc
-                           :components (mapv new-key->component ordered-keys))))
+                                     :else
+                                     (assoc acc key (create lifecycle (val new-e) opts)))))
+                               old-key->component
+                               (set (concat (keys old-key->component) ordered-keys)))]
+          (assoc component
+            :key->component key->component
+            :instance (mapv #(-> % key->component component/instance) ordered-keys))))
 
       `delete (fn [_ component opts]
-                (doseq [x (:components component)]
+                (doseq [x (vals (:key->component component))]
                   (delete lifecycle x opts)))})))
 
 (def many-dynamic-hiccups
@@ -247,13 +231,16 @@
     [::log lifecycle log-fn]
     {`create (fn [_ desc opts]
                (log-fn `create desc)
-               (create lifecycle desc opts))
+               (let [child (create lifecycle desc opts)]
+                 (with-meta {:child child
+                             :desc desc}
+                            {`component/instance #(-> % :child component/instance)})))
      `advance (fn [_ component desc opts]
-                (log-fn `advance (component/description component) desc)
-                (advance lifecycle component desc opts))
+                (log-fn `advance (:desc component) desc)
+                (update component :child #(advance lifecycle % desc opts)))
      `delete (fn [_ component opts]
-               (log-fn `delete (component/description component))
-               (delete lifecycle component opts))}))
+               (log-fn `delete (:desc component))
+               (delete lifecycle (:child component) opts))}))
 
 (defn- constraint-mutator
   "This mutator re-implements javafx.scene.layout.Pane/setConstraint (which is internal)"
@@ -293,10 +280,8 @@
            (doseq [[k v] props]
              (prop/assign! (get props-config k) node v))
            (with-meta {:child child
-                       :desc desc
                        :props props}
-                      {`component/description :desc
-                       `component/instance #(-> % :child component/instance)})))
+                      {`component/instance #(-> % :child component/instance)})))
 
        `advance
        (fn [_ component desc opts]

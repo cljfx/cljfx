@@ -2,7 +2,6 @@
 
 ### TODO
 
-- `component/description` may be unnecessary
 - expand on props and composite lifecycle. What's known about them:
   - ctor:
     - scene requires root, root can be replaced afterwards

@@ -20,7 +20,7 @@
     (fn [acc k]
       (let [prop-config (get props-config k)]
         (when-not prop-config
-          (throw (ex-info "No such prop" {:key k :desc (get props-desc k)})))
+          (throw (ex-info "No such prop" {:key k})))
         (assoc acc k (lifecycle/create (prop/lifecycle prop-config)
                                        (get props-desc k)
                                        opts))))
@@ -41,18 +41,14 @@
     (doseq [[k v] sorted-props
             :when (not (contains? arg-set k))]
       (prop/assign! (get props-config k) instance v))
-    (with-meta {:props props
-                :desc desc
-                :instance instance}
-               {`component/instance :instance
-                `component/description :desc})))
+    (with-meta {:props props :instance instance}
+               {`component/instance :instance})))
 
 (defn- advance-composite-component [this component desc opts]
   (let [props-desc (desc->props-desc desc this)
         props-config (:props this)
         instance (component/instance component)]
     (-> component
-        (assoc :desc desc)
         (update
           :props
           (fn [props]
