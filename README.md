@@ -3,6 +3,14 @@
 Cljfx is a library that tries to provide reagent-like experience for
 JavaFX applications.
 
+## Rationale
+
+I wanted to have an elegant declarative wrapper around JavaFX and
+couldn't find one. Cljfx is inspired by react, reagent, re-frame and
+fn-fx, which is also a declarative wrapper of JavaFX, but I found it not
+composable enough: I wanted to have just data and functions for
+describing application instead of using macros to define classes.
+
 ## Introduction
 
 ### Hello world
@@ -51,8 +59,8 @@ Clicking `close` button will hide this window.
 
 ### Atoms
 
-Example above works, but not very convenient: what we'd really like is
-to have a single global state as a value in an atom, derive our
+Example above works, but it's not very convenient: what we'd really like
+is to have a single global state as a value in an atom, derive our
 description of JavaFX state from this value, and change this atom's
 contents instead. Here is how it's done:
 ```clj
@@ -88,11 +96,60 @@ contents instead. Here is how it's done:
 
 (cljfx/mount-app *state app)
 ```
-Evaluating this code pops up this window:
+Evaluating code above pops up this window:
 
 ![](doc/state-example.png)
 
 Editing input then immediately updates displayed app title.
+
+### Metas
+
+Some components use description's meta. Main uses are:
+
+1. Reordering of nodes (instead of re-creating them) in parents that may
+   have many children. Descriptions that have `:key` in meta during
+   advancing get reordered instead of recreated if their position in
+   child list is changed. Consider this example:
+   ```clj
+   (let [component-1 (cljfx/create-component
+                       [:v-box
+                        ^{:key 1} [:label "- buy milk"]
+                        ^{:key 2} [:label "- buy socks"]])
+         [milk-1 socks-1] (vec (.getChildren (cljfx/instance component-1)))
+         component-2 (cljfx/advance-component
+                       component-1
+                       [:v-box
+                        ^{:key 2} [:label "- buy socks"]
+                        ^{:key 1} [:label "- buy milk"]])
+         [socks-2 milk-2] (vec (.getChildren (cljfx/instance component-2)))]
+     (and (identical? milk-1 milk-2)
+          (identical? socks-1 socks-2)))
+   => true
+   ```
+   With `:key`-s specified, advancing of this component reordered
+   children of VBox, and didn't change text of any label, because their
+   description stayed the same.
+2. Setting pane constraints. If node is placed inside a pane, pane can
+   layout it differently by looking into properties map of a node. These
+   properties can be specified via meta:
+   ```clj
+   (cljfx/on-fx-thread
+     (cljfx/create-component
+       [:stage {:showing true}
+        [:scene
+         [:stack-pane
+          [:rectangle {:width 200 :height 200 :fill :lightgray}]
+          ^{:alignment :bottom-left :margin 5}
+          [:label "bottom-left"]
+          ^{:alignment :top-right :margin 5}
+          [:label "top-right"]]]]))
+   ```
+   Evaluating code above produces this window:
+
+   ![](doc/pane-example.png)
+
+   For a more complete example of available pane metas, see
+   [examples/e07_panes.clj](examples/e07_panes.clj)
 
 ## More examples
 
@@ -128,8 +185,7 @@ TBD, need to consult my employer first
 - default focus traversable of controls!
 - default style classes!
 - default on-x-changed prop change listeners!
-- advanced docs: lifecycles, opts, contexts, `:key` in lists, pane
-  metadata, etc.
+- advanced docs: lifecycles, opts, contexts, etc.
 
 ## Food for thought
 - wrap-factory may use some memoizing and advancing
