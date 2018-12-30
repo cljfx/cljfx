@@ -567,7 +567,10 @@
     :props {:editable [:setter lifecycle/scalar :default true]
             :font [:setter lifecycle/scalar :coerce coerce/font :default :default]
             :prompt-text [:setter lifecycle/scalar :default ""]
-            :text [:setter lifecycle/scalar]
+            :text [(mutator/setter (fn [^TextInputControl control text]
+                                     (when-not (= text (.getText control))
+                                       (.setText control text))))
+                   lifecycle/scalar]
             :on-text-changed [(mutator/property-change-listener
                                 #(.textProperty ^TextField %))
                               (lifecycle/wrap-coerce lifecycle/event-handler
