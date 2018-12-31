@@ -6,14 +6,14 @@
   (atom [:stage
          {:always-on-top true
           :style :transparent
-          :showing true}
-         [:scene
-          {:fill :transparent
-           :on-key-pressed {:event/type :event/scene-key-press}
-           :stylesheets #{"styles.css"}}
-          [:v-box
-           [:label "Hi! What's your name?"]
-           [:text-field]]]]))
+          :showing true
+          :scene [:scene
+                  {:fill :transparent
+                   :on-key-pressed {:event/type :event/scene-key-press}
+                   :stylesheets #{"styles.css"}
+                   :root [:v-box
+                          {:children [[:label {:text "Hi! What's your name?"}]
+                                      [:text-field]]}]}]}]))
 
 (defn map-event-handler [e]
   (when (and (= :event/scene-key-press (:event/type e))

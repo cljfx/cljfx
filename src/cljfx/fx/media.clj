@@ -1,6 +1,5 @@
 (ns cljfx.fx.media
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
-            [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.fx.scene :as fx.scene]
             [cljfx.lifecycle :as lifecycle]
@@ -13,7 +12,6 @@
 (def media
   (lifecycle.composite/describe Media
     :ctor [:source]
-    :default-prop [:source prop/extract-single]
     :props {:source [mutator/forbidden lifecycle/scalar]
             :on-error [:setter lifecycle/event-handler :coerce coerce/runnable]}))
 
@@ -21,7 +19,6 @@
   (-> MediaPlayer
       (lifecycle.composite/describe
         :ctor [:media]
-        :default-prop [:media prop/extract-single]
         :props {:media [mutator/forbidden lifecycle/hiccup]
                 :state [(mutator/setter #(case %2
                                            :playing (.play ^MediaPlayer %1)
@@ -61,7 +58,6 @@
   (lifecycle.composite/describe MediaView
     :ctor []
     :extends [fx.scene/node]
-    :default-prop [:media-player prop/extract-single]
     :props {:media-player [:setter lifecycle/hiccup]
             :on-error [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :preserve-ratio [:setter lifecycle/scalar :default true]

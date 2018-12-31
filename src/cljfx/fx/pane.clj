@@ -1,7 +1,6 @@
 (ns cljfx.fx.pane
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.fx.scene :as fx.scene]
-            [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.layout Pane AnchorPane BorderPane FlowPane GridPane
@@ -16,14 +15,12 @@
   (lifecycle.composite/describe Pane
     :ctor []
     :extends [fx.scene/region]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list lifecycle/hiccups]}))
 
 (def anchor-pane
   (lifecycle.composite/describe AnchorPane
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:top ["pane-top-anchor" double]
@@ -52,7 +49,6 @@
   (lifecycle.composite/describe FlowPane
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["flowpane-margin" coerce/insets]})
@@ -72,7 +68,6 @@
   (lifecycle.composite/describe GridPane
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["gridpane-margin" coerce/insets]
@@ -120,7 +115,6 @@
   (lifecycle.composite/describe HBox
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["hbox-margin" coerce/insets]
@@ -134,7 +128,6 @@
   (lifecycle.composite/describe StackPane
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["stackpane-margin" coerce/insets]
@@ -146,7 +139,6 @@
   (lifecycle.composite/describe TextFlow
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:line-spacing [:setter lifecycle/scalar :coerce double :default 0.0]
             :text-alignment [:setter lifecycle/scalar :coerce (coerce/enum TextAlignment)
                              :default :left]}))
@@ -155,7 +147,6 @@
   (lifecycle.composite/describe TilePane
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["tilepane-margin" coerce/insets]
@@ -177,7 +168,6 @@
   (lifecycle.composite/describe VBox
     :ctor []
     :extends [pane]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list (-> lifecycle/hiccup
                                  (lifecycle/wrap-meta-constraints
                                    {:margin ["vbox-margin" coerce/insets]

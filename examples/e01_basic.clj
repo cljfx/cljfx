@@ -6,13 +6,15 @@
     [:stage
      {:showing true
       :always-on-top true
-      :style :transparent}
-     [:scene
-      {:fill :transparent
-       :stylesheets #{"styles.css"}}
-      [:v-box
-       [:label
-        {:effect [:effect/drop-shadow {:radius 1 :offset-y 2}]
-         :tooltip [:tooltip "I am a tooltip!"]}
-        "Hi! What's your name?"]
-       [:text-field]]]]))
+      :style :transparent
+      :scene [:scene
+              {:fill :transparent
+               :stylesheets #{"styles.css"}
+               :root [:v-box
+                      {:children [[:label
+                                   {:effect [:effect/drop-shadow
+                                             {:radius 1 :offset-y 2}]
+                                    :tooltip [:tooltip
+                                              {:text "I am a tooltip!"}]
+                                    :text "Hi! What's your name?"}]
+                                  [:text-field]]}]}]}]))

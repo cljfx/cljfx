@@ -1,7 +1,6 @@
 (ns cljfx.fx.shape
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.fx.scene :as fx.scene]
-            [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.shape Arc ArcType Circle CubicCurve Ellipse Line Path ArcTo
@@ -93,7 +92,6 @@
   (lifecycle.composite/describe Path
     :ctor []
     :extends [shape]
-    :default-prop [:elements prop/extract-all]
     :props {:elements [:list lifecycle/hiccups]
             :fill [:setter lifecycle/scalar :coerce coerce/paint]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
@@ -132,7 +130,6 @@
   (lifecycle.composite/describe HLineTo
     :ctor []
     :extends [path-element]
-    :default-prop [:x prop/extract-single]
     :props {:x [:setter lifecycle/scalar :coerce double :default 0]}))
 
 (def line-to
@@ -162,14 +159,12 @@
   (lifecycle.composite/describe VLineTo
     :ctor []
     :extends [path-element]
-    :default-prop [:y prop/extract-single]
     :props {:y [:setter lifecycle/scalar :coerce double :default 0]}))
 
 (def polygon
   (lifecycle.composite/describe Polygon
     :ctor []
     :extends [shape]
-    :default-prop [:points prop/extract-all]
     :props {:points [:list lifecycle/scalar :coerce #(->> %
                                                           (mapcat identity)
                                                           (map double))]}))
@@ -177,7 +172,6 @@
   (lifecycle.composite/describe Polyline
     :ctor []
     :extends [shape]
-    :default-prop [:points prop/extract-all]
     :props {:fill [:setter lifecycle/scalar :coerce coerce/paint]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
             :points [:list lifecycle/scalar :coerce #(->> %
@@ -209,7 +203,6 @@
   (lifecycle.composite/describe SVGPath
     :ctor []
     :extends [shape]
-    :default-prop [:content prop/extract-single]
     :props {:content [:setter lifecycle/scalar]
             :fill-rule [:setter lifecycle/scalar
                         :coerce (coerce/enum FillRule)
@@ -219,7 +212,6 @@
   (lifecycle.composite/describe Text
     :ctor []
     :extends [shape]
-    :default-prop [:text prop/extract-single]
     :props {:text [:setter lifecycle/scalar :default ""]
             :x [:setter lifecycle/scalar :coerce double :default 0.0]
             :y [:setter lifecycle/scalar :coerce double :default 0.0]

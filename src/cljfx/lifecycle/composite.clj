@@ -5,15 +5,8 @@
             [cljfx.prop :as prop]
             [clojure.string :as str]))
 
-(defn- desc->props-desc [desc component-config]
-  (let [args? (next desc)
-        props? (first args?)
-        has-props? (map? props?)
-        props (if has-props? props? {})
-        args (if has-props? (next args?) args?)
-        [default-prop extract-fn] (:default-prop component-config)]
-    (cond-> props
-      args (assoc default-prop (extract-fn args)))))
+(defn- desc->props-desc [[_ props]]
+  (or props {}))
 
 (defn- create-props [props-desc props-config opts]
   (reduce
@@ -28,7 +21,7 @@
     (keys props-desc)))
 
 (defn- create-composite-component [this desc opts]
-  (let [props-desc (desc->props-desc desc this)
+  (let [props-desc (desc->props-desc desc)
         props-config (:props this)
         props (create-props props-desc props-config opts)
         args (:args this)
@@ -45,7 +38,7 @@
                {`component/instance :instance})))
 
 (defn- advance-composite-component [this component desc opts]
-  (let [props-desc (desc->props-desc desc this)
+  (let [props-desc (desc->props-desc desc)
         props-config (:props this)
         instance (component/instance component)]
     (-> component

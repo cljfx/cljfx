@@ -1,6 +1,5 @@
 (ns cljfx.fx.scene
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
-            [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator])
@@ -98,7 +97,6 @@
   (lifecycle.composite/describe ImageView
     :ctor []
     :extends [node]
-    :default-prop [:image prop/extract-single]
     :props {:image [:setter lifecycle/scalar :coerce coerce/image]
             :x [:setter lifecycle/scalar :coerce double, :default 0
                 :y [:setter lifecycle/scalar :coerce double, :default 0]
@@ -130,14 +128,12 @@
   (lifecycle.composite/describe Group
     :ctor []
     :extends [node]
-    :default-prop [:children prop/extract-all]
     :props {:children [:list lifecycle/hiccups]
             :auto-size-children [:setter lifecycle/scalar :default true]}))
 
 (def sub-scene
   (lifecycle.composite/describe SubScene
     :ctor [:root :width :height]
-    :default-prop [:root prop/extract-single]
     :extends [node]
     :props {:root [:setter lifecycle/hiccup]
             :width [:setter lifecycle/scalar :coerce double :default 0]
@@ -170,7 +166,6 @@
 (def scene
   (lifecycle.composite/describe Scene
     :ctor [:root]
-    :default-prop [:root prop/extract-single]
     :props {:camera [:setter lifecycle/hiccup :default [:camera/parallel]]
             :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
             :event-dispatcher [:setter lifecycle/scalar]

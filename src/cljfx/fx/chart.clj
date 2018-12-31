@@ -1,6 +1,5 @@
 (ns cljfx.fx.chart
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
-            [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.fx.scene :as fx.scene]
             [cljfx.lifecycle :as lifecycle]
@@ -65,7 +64,6 @@
   (lifecycle.composite/describe CategoryAxis
     :ctor []
     :extends [axis]
-    :default-prop [:categories prop/extract-all]
     :props {:categories [:list lifecycle/scalar]
             :start-margin [:setter lifecycle/scalar :coerce double :default 5.0]
             :end-margin [:setter lifecycle/scalar :coerce double :default 5.0]
@@ -105,7 +103,6 @@
 (def xy-chart-series
   (lifecycle.composite/describe XYChart$Series
     :ctor []
-    :default-prop [:data prop/extract-all]
     :props {:data [:list lifecycle/hiccups]
             :name [:setter lifecycle/scalar]
             :node [:setter lifecycle/hiccup]}))
@@ -114,28 +111,24 @@
   (lifecycle.composite/describe AreaChart
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
-    :default-prop [:data prop/extract-all]
     :props {:create-symbols [:setter lifecycle/scalar :default true]}))
 
 (def bar-chart
   (lifecycle.composite/describe BarChart
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
-    :default-prop [:data prop/extract-all]
     :props {:bar-gap [:setter lifecycle/scalar :coerce double :default 4]
             :category-gap [:setter lifecycle/scalar :coerce double :default 10]}))
 
 (def bubble-chart
   (lifecycle.composite/describe BubbleChart
     :ctor [:x-axis :y-axis]
-    :extends [xy-chart]
-    :default-prop [:data prop/extract-all]))
+    :extends [xy-chart]))
 
 (def line-chart
   (lifecycle.composite/describe LineChart
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
-    :default-prop [:data prop/extract-all]
     :props {:axis-sorting-policy [:setter lifecycle/scalar
                                   :coerce (coerce/enum LineChart$SortingPolicy)
                                   :default :x-axis]
@@ -144,21 +137,18 @@
 (def scatter-chart
   (lifecycle.composite/describe ScatterChart
     :ctor [:x-axis :y-axis]
-    :extends [xy-chart]
-    :default-prop [:data prop/extract-all]))
+    :extends [xy-chart]))
 
 (def stacked-area-chart
   (lifecycle.composite/describe StackedAreaChart
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
-    :default-prop [:data prop/extract-all]
     :props {:create-symbols [:setter lifecycle/scalar :default true]}))
 
 (def stacked-bar-chart
   (lifecycle.composite/describe StackedBarChart
     :ctor [:x-axis :y-axis]
     :extends [xy-chart]
-    :default-prop [:data prop/extract-all]
     :props {:category-gap [:setter lifecycle/scalar :coerce double :default 10]}))
 
 (def tag->lifecycle

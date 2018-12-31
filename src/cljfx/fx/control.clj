@@ -1,6 +1,5 @@
 (ns cljfx.fx.control
-  (:require [cljfx.prop :as prop]
-            [cljfx.fx.stage :as fx.stage]
+  (:require [cljfx.fx.stage :as fx.stage]
             [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.coerce :as coerce]
             [cljfx.fx.scene :as fx.scene]
@@ -28,7 +27,6 @@
   (lifecycle.composite/describe Popup
     :ctor []
     :extends [fx.stage/popup-window]
-    :default-prop [:content prop/extract-all]
     :props {:content [:list lifecycle/hiccups]}))
 
 (def popup-control
@@ -49,7 +47,6 @@
   (lifecycle.composite/describe ContextMenu
     :ctor []
     :extends [popup-control]
-    :default-prop [:items prop/extract-all]
     :props {:items [:list lifecycle/hiccups]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]}))
 
@@ -63,7 +60,6 @@
 (def menu-item
   (lifecycle.composite/describe MenuItem
     :ctor []
-    :default-prop [:text prop/extract-single]
     :props {:accelerator [:setter lifecycle/scalar :coerce coerce/key-combination]
             :disabled [(mutator/setter (lifecycle.composite/setter MenuItem :disable))
                        lifecycle/scalar
@@ -116,21 +112,18 @@
   (lifecycle.composite/describe CheckMenuItem
     :ctor []
     :extends [menu-item]
-    :default-prop [:text prop/extract-single]
     :props {:selected [:setter lifecycle/scalar :default false]}))
 
 (def custom-menu-item
   (lifecycle.composite/describe CustomMenuItem
     :ctor []
     :extends [menu-item]
-    :default-prop [:content prop/extract-single]
     :props {:content [:setter lifecycle/hiccup]
             :hide-on-click [:setter lifecycle/scalar :default true]}))
 (def menu
   (lifecycle.composite/describe Menu
     :ctor []
     :extends [menu-item]
-    :default-prop [:items prop/extract-all]
     :props {:items [:list lifecycle/hiccups]
             :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -141,14 +134,12 @@
   (lifecycle.composite/describe RadioMenuItem
     :ctor []
     :extends [menu-item]
-    :default-prop [:text prop/extract-single]
     :props {:selected [:setter lifecycle/scalar :default false]}))
 
 (def tooltip
   (lifecycle.composite/describe Tooltip
     :ctor []
     :extends [popup-control]
-    :default-prop [:text prop/extract-single]
     :props {:content-display [:setter lifecycle/scalar :coerce (coerce/enum ContentDisplay) :default :left]
             :font [:setter lifecycle/scalar :coerce coerce/font :default :default]
             :graphic [:setter lifecycle/hiccup]
@@ -165,7 +156,6 @@
   (lifecycle.composite/describe TitledPane
     :ctor []
     :extends [labeled]
-    :default-prop [:content prop/extract-single]
     :props {:animated [:setter lifecycle/scalar :default true]
             :collapsible [:setter lifecycle/scalar :default true]
             :content [:setter lifecycle/hiccup]
@@ -175,14 +165,12 @@
   (lifecycle.composite/describe Accordion
     :ctor []
     :extends [control]
-    :default-prop [:panes prop/extract-all]
     :props {:panes [:list lifecycle/hiccups]}))
 
 (def button-bar
   (lifecycle.composite/describe ButtonBar
     :ctor []
     :extends [control]
-    :default-prop [:buttons prop/extract-all]
     :props {:button-min-width [:setter lifecycle/scalar :coerce double]
             :button-order [:setter lifecycle/scalar]
             :buttons [:list lifecycle/hiccups]}))
@@ -191,7 +179,6 @@
   (lifecycle.composite/describe ChoiceBox
     :ctor []
     :extends [control]
-    :default-prop [:items prop/extract-all]
     :props {:converter [:setter lifecycle/scalar :coerce coerce/string-converter]
             :items [:list lifecycle/scalar]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -205,7 +192,6 @@
   (lifecycle.composite/describe ColorPicker
     :ctor []
     :extends [combo-box-base]
-    :default-prop [:value prop/extract-single]
     :props {:value [:setter lifecycle/scalar :coerce coerce/color]
             :custom-colors [:list lifecycle/scalar :coerce (fn [x _] (map coerce/color x))]}))
 
@@ -213,7 +199,6 @@
   (lifecycle.composite/describe ComboBox
     :ctor []
     :extends [combo-box-base]
-    :default-prop [:items prop/extract-all]
     :props {:button-cell [:setter lifecycle/hiccup]
             :cell-factory [:setter lifecycle/scalar :coerce coerce/cell-factory]
             :converter [:setter lifecycle/scalar :coerce coerce/string-converter
@@ -248,7 +233,6 @@
   (lifecycle.composite/describe CheckBox
     :ctor []
     :extends [button-base]
-    :default-prop [:selected prop/extract-single]
     :props {:allow-indeterminate [:setter lifecycle/scalar :default false]
             :indeterminate [:setter lifecycle/scalar :default false]
             :selected [:setter lifecycle/scalar :default false]}))
@@ -257,14 +241,12 @@
   (lifecycle.composite/describe Hyperlink
     :ctor []
     :extends [button-base]
-    :default-prop [:text prop/extract-single]
     :props {:visited [:setter lifecycle/scalar :default false]}))
 
 (def menu-button
   (lifecycle.composite/describe MenuButton
     :ctor []
     :extends [button-base]
-    :default-prop [:items prop/extract-all]
     :props {:items [:list lifecycle/hiccups]
             :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
@@ -275,7 +257,6 @@
 (def split-menu-button
   (lifecycle.composite/describe SplitMenuButton
     :ctor []
-    :default-prop [:items prop/extract-all]
     :extends [menu-button]))
 
 (def toggle-button
@@ -294,14 +275,12 @@
   ;; TODO label has label-for prop - a component ref
   (lifecycle.composite/describe Label
     :ctor []
-    :extends [labeled]
-    :default-prop [:text prop/extract-single]))
+    :extends [labeled]))
 
 (def list-view
   (lifecycle.composite/describe ListView
     :ctor []
     :extends [control]
-    :default-prop [:items prop/extract-all]
     :props {:cell-factory [:setter lifecycle/scalar]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]
@@ -323,7 +302,6 @@
   (lifecycle.composite/describe MenuBar
     :ctor []
     :extends [control]
-    :default-prop [:menus prop/extract-all]
     :props {:menus [:list lifecycle/hiccups]
             :use-system-menu-bar [:setter lifecycle/scalar :default false]}))
 
@@ -341,7 +319,6 @@
   (lifecycle.composite/describe ProgressIndicator
     :ctor []
     :extends [control]
-    :default-prop [:progress prop/extract-single]
     :props {:progress [:setter lifecycle/scalar :coerce double :default -1.0]}))
 
 (def scroll-bar
@@ -360,7 +337,6 @@
   (lifecycle.composite/describe ScrollPane
     :ctor []
     :extends [control]
-    :default-prop [:content prop/extract-single]
     :props {:content [:setter lifecycle/hiccup]
             :fit-to-height [:setter lifecycle/scalar :default false]
             :fit-to-width [:setter lifecycle/scalar :default false]
@@ -458,7 +434,6 @@
   (lifecycle.composite/describe SplitPane
     :ctor []
     :extends [control]
-    :default-prop [:items prop/extract-all]
     :props {:divider-positions [:setter lifecycle/scalar
                                 :coerce (fn [x _] (into-array Double/TYPE x))
                                 :default []]
@@ -528,7 +503,6 @@
   (lifecycle.composite/describe TabPane
     :ctor []
     :extends [control]
-    :default-prop [:tabs prop/extract-all]
     :props {:rotate-graphic [:setter lifecycle/scalar :default false]
             :side [:setter lifecycle/scalar :coerce (coerce/enum Side) :default :top]
             :tab-closing-policy [:setter lifecycle/scalar
@@ -545,7 +519,6 @@
 (def tab
   (lifecycle.composite/describe Tab
     :ctor []
-    :default-prop [:content prop/extract-single]
     :props {:closable [:setter lifecycle/scalar :default true]
             :content [:setter lifecycle/hiccup]
             :context-menu [:setter lifecycle/hiccup]
@@ -581,7 +554,6 @@
   (lifecycle.composite/describe TextArea
     :ctor []
     :extends [text-input-control]
-    :default-prop [:text prop/extract-single]
     :props {:pref-column-count [:setter lifecycle/scalar :coerce int :default 40]
             :pref-row-count [:setter lifecycle/scalar :coerce int :default 10]
             :scroll-left [:setter lifecycle/scalar :coerce double :default 0.0]
@@ -592,7 +564,6 @@
   (lifecycle.composite/describe TextField
     :ctor []
     :extends [text-input-control]
-    :default-prop [:text prop/extract-single]
     :props {:alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :center-left]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :pref-column-count [:setter lifecycle/scalar :coerce int :default 12]}))
@@ -600,14 +571,12 @@
 (def password-field
   (lifecycle.composite/describe PasswordField
     :ctor []
-    :extends [text-field]
-    :default-prop [:text prop/extract-single]))
+    :extends [text-field]))
 
 (def tool-bar
   (lifecycle.composite/describe ToolBar
     :ctor []
     :extends [control]
-    :default-prop [:items prop/extract-all]
     :props {:items [:list lifecycle/hiccups]
             :orientation [:setter lifecycle/scalar
                           :coerce (coerce/enum Orientation)
@@ -617,7 +586,6 @@
   (lifecycle.composite/describe TreeTableView
     :ctor []
     :extends [control]
-    :default-prop [:columns prop/extract-all]
     :props {:column-resize-policy [:setter lifecycle/scalar
                                    :coerce coerce/tree-table-resize-policy
                                    :default :unconstrained]
@@ -647,7 +615,6 @@
 (def tree-item
   (lifecycle.composite/describe TreeItem
     :ctor []
-    :default-prop [:children prop/extract-all]
     :props {:children [:list lifecycle/hiccups]
             :expanded [:setter lifecycle/scalar :default false]
             :graphic [:setter lifecycle/hiccup]
@@ -670,7 +637,6 @@
   (lifecycle.composite/describe TreeView
     :ctor []
     :extends [control]
-    :default-prop [:root prop/extract-single]
     :props {:cell-factory [:setter lifecycle/scalar]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]

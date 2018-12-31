@@ -3,10 +3,11 @@
 
 (cljfx/on-fx-thread
   (cljfx/create-component
-    [:stage {:showing true}
-     [:scene
-      [:pagination
-       {:page-count 10
-        :current-page-index 4
-        :page-factory (fn [i]
-                        [:label (str "This is a page " i)])}]]]))
+    [:stage
+     {:showing true
+      :scene [:scene
+              {:root [:pagination
+                      {:page-count 10
+                       :current-page-index 4
+                       :page-factory (fn [i]
+                                       [:label {:text (str "This is a page " i)}])}]}]}]))

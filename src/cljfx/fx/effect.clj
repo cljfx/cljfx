@@ -1,6 +1,5 @@
 (ns cljfx.fx.effect
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
-            [cljfx.prop :as prop]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect Blend BlendMode Bloom BoxBlur ColorAdjust ColorInput
@@ -34,14 +33,12 @@
 (def bloom
   (lifecycle.composite/describe Bloom
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :threshold [:setter lifecycle/scalar :coerce double :default 0.3]}))
 
 (def box-blur
   (lifecycle.composite/describe BoxBlur
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :iterations [:setter lifecycle/scalar :coerce int :default 1]
             :width [:setter lifecycle/scalar :coerce double :default 5]
@@ -50,7 +47,6 @@
 (def color-adjust
   (lifecycle.composite/describe ColorAdjust
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :hue [:setter lifecycle/scalar :coerce double :default 0
                   :saturation [:setter lifecycle/scalar :coerce double :default 0]
@@ -69,7 +65,6 @@
 (def displacement-map
   (lifecycle.composite/describe DisplacementMap
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :map-data [:setter lifecycle/scalar :coerce coerce/float-map
                        :offset-x [:setter lifecycle/scalar :coerce double :default 0]
@@ -81,7 +76,6 @@
 (def drop-shadow
   (lifecycle.composite/describe DropShadow
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :radius [:setter lifecycle/scalar :coerce double :default 10]
             :width [:setter lifecycle/scalar :coerce double :default 21]
@@ -96,21 +90,18 @@
 (def gaussian-blur
   (lifecycle.composite/describe GaussianBlur
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :radius [:setter lifecycle/scalar :coerce double :default 10]}))
 
 (def glow
   (lifecycle.composite/describe Glow
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :level [:setter lifecycle/scalar :coerce double :default 0.3]}))
 
 (def image-input
   (lifecycle.composite/describe ImageInput
     :ctor []
-    :default-prop [:source prop/extract-single]
     :props {:source [:setter lifecycle/scalar :coerce coerce/image]
             :x [:setter lifecycle/scalar :coerce double :default 0]
             :y [:setter lifecycle/scalar :coerce double :default 0]}))
@@ -118,7 +109,6 @@
 (def inner-shadow
   (lifecycle.composite/describe InnerShadow
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :radius [:setter lifecycle/scalar :coerce double :default 10]
             :width [:setter lifecycle/scalar :coerce double :default 21]
@@ -134,7 +124,6 @@
 (def lighting
   (lifecycle.composite/describe Lighting
     :ctor []
-    :default-prop [:light prop/extract-single]
     :props {:light [:setter lifecycle/hiccup]
             :bump-input [:setter lifecycle/hiccup]
             :content-input [:setter lifecycle/hiccup]
@@ -162,7 +151,6 @@
 (def motion-blur
   (lifecycle.composite/describe MotionBlur
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :radius [:setter lifecycle/scalar :coerce double :default 10]
             :angle [:setter lifecycle/scalar :coerce double :default 0]}))
@@ -170,7 +158,6 @@
 (def perspective-transform
   (lifecycle.composite/describe PerspectiveTransform
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :llx [:setter lifecycle/scalar :coerce double :default 0.0]
             :lly [:setter lifecycle/scalar :coerce double :default 0.0]
@@ -184,7 +171,6 @@
 (def reflection
   (lifecycle.composite/describe Reflection
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :top-offset [:setter lifecycle/scalar :coerce double :default 0.0]
             :fraction [:setter lifecycle/scalar :coerce double :default 0.75]
@@ -194,14 +180,12 @@
 (def sepia-tone
   (lifecycle.composite/describe SepiaTone
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :level [:setter lifecycle/scalar :coerce double :default 1.0]}))
 
 (def shadow
   (lifecycle.composite/describe Shadow
     :ctor []
-    :default-prop [:input prop/extract-single]
     :props {:input [:setter lifecycle/hiccup]
             :radius [:setter lifecycle/scalar :coerce double :default 10.0]
             :width [:setter lifecycle/scalar :coerce double :default 21.0]

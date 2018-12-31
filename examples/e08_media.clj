@@ -18,37 +18,47 @@
     :value volume
     :on-value-changed {:event/type ::set-volume}}])
 
+(def media-url
+  "https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_1mb.mp4")
+
 (defn media-view [media-state volume]
-  [:media-view {:fit-width 640 :fit-height 480}
-   [:media-player
-    {:state media-state
-     :volume volume
-     :on-end-of-media {:event/type ::stop}}
-    [:media
-     "https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_1mb.mp4"]]])
+  [:media-view
+   {:fit-width 640
+    :fit-height 480
+    :media-player
+    [:media-player
+     {:state media-state
+      :volume volume
+      :on-end-of-media {:event/type ::stop}
+      :media
+      [:media
+       {:source media-url}]}]}])
 
 (def stopped-label
   [:label
    {:pref-width 640
     :pref-height 480
-    :alignment :center}
-   "Stopped!"])
+    :alignment :center
+    :text "Stopped!"}])
 
 (defn root [{:keys [media-state volume]}]
   [:stage
    {:showing true
-    :on-close-request {:event/type ::stop}}
-   [:scene
-    [:v-box
-     (if (not= :stopped media-state)
-       [media-view media-state volume]
-       stopped-label)
-     [:h-box {:padding 10 :spacing 10 :alignment :center-left}
-      [button "Stop" ::stop]
-      (if (= :playing media-state)
-        [button "Pause" ::pause]
-        [button "Play" ::play])
-      [volume-slider volume]]]]])
+    :on-close-request {:event/type ::stop}
+    :scene [:scene
+            {:root [:v-box
+                    {:children [(if (not= :stopped media-state)
+                                  [media-view media-state volume]
+                                  stopped-label)
+                                [:h-box
+                                 {:padding 10
+                                  :spacing 10
+                                  :alignment :center-left
+                                  :children [[button "Stop" ::stop]
+                                             (if (= :playing media-state)
+                                               [button "Pause" ::pause]
+                                               [button "Play" ::play])
+                                             [volume-slider volume]]}]]}]}]}])
 
 (defn map-event-handler [e]
   (case (:event/type e)

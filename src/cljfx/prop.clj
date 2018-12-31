@@ -32,14 +32,3 @@
 (defn retract! [prop instance component]
   (let [{:keys [mutator coerce]} prop]
     (mutator/retract! mutator instance coerce (component/instance component))))
-
-;; TODO remove
-
-(defn extract-single [args]
-  (if-not (= 1 (count args))
-    (throw (ex-info "Should have exactly one arg"
-                    {:args args})))
-  (first args))
-
-(defn extract-all [args]
-  args)

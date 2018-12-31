@@ -7,18 +7,22 @@
 
 (defn text-input [state label-text key]
   [:v-box
-   [:label label-text]
-   [:text-field
-    {:on-text-changed #(swap! *state assoc key %)
-     :text (get state key)}]])
+   {:children [[:label {:text label-text}]
+               [:text-field
+                {:on-text-changed #(swap! *state assoc key %)
+                 :text (get state key)}]]}])
 
 (defn root [state]
-  [:stage {:showing true}
-   [:scene
-    [:v-box
-     [:label (str "You are " (:first-name state) " " (:last-name state) "!")]
-     [text-input "First Name" :first-name]
-     [text-input "Last Name" :last-name]]]])
+  [:stage
+   {:showing true
+    :scene
+    [:scene
+     {:root
+      [:v-box
+       {:children
+        [[:label {:text (str "You are " (:first-name state) " " (:last-name state) "!")}]
+         [text-input "First Name" :first-name]
+         [text-input "Last Name" :last-name]]}]}]}])
 
 (def app
   (cljfx/create-app

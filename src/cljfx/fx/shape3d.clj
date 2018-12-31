@@ -1,6 +1,5 @@
 (ns cljfx.fx.shape3d
-  (:require [cljfx.prop :as prop]
-            [cljfx.coerce :as coerce]
+  (:require [cljfx.coerce :as coerce]
             [cljfx.fx.scene :as fx.scene]
             [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.lifecycle :as lifecycle])
@@ -53,7 +52,6 @@
   (lifecycle.composite/describe MeshView
     :ctor []
     :extends [shape3d]
-    :default-prop [:mesh prop/extract-single]
     :props {:mesh [:setter lifecycle/hiccup]}))
 
 (def triangle-mesh
@@ -70,7 +68,6 @@
   (lifecycle.composite/describe Sphere
     :ctor []
     :extends [shape3d]
-    :default-prop [:radius prop/extract-single]
     :props {:radius [:setter lifecycle/scalar :coerce double :default 1.0]}))
 
 (def phong-material
