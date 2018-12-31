@@ -50,11 +50,11 @@
 (def xy-chart
   (lifecycle.composite/describe XYChart
     :extends [chart]
-    :props {:x-axis [mutator/forbidden lifecycle/hiccup]
-            :y-axis [mutator/forbidden lifecycle/hiccup]
+    :props {:x-axis [mutator/forbidden lifecycle/dynamic]
+            :y-axis [mutator/forbidden lifecycle/dynamic]
             :alternative-column-fill-visible [:setter lifecycle/scalar :default false]
             :alternative-row-fill-visible [:setter lifecycle/scalar :default true]
-            :data [:list lifecycle/hiccups]
+            :data [:list lifecycle/dynamics]
             :horizontal-grid-lines-visible [:setter lifecycle/scalar :default true]
             :horizontal-zero-line-visible [:setter lifecycle/scalar :default true]
             :vertical-grid-lines-visible [:setter lifecycle/scalar :default true]
@@ -81,7 +81,7 @@
     :ctor []
     :extends [chart]
     :props {:clockwise [:setter lifecycle/scalar :default true]
-            :data [:list lifecycle/hiccups]
+            :data [:list lifecycle/dynamics]
             :label-line-length [:setter lifecycle/scalar :coerce double :default 20.0]
             :labels-visible [:setter lifecycle/scalar :default true]
             :start-angle [:setter lifecycle/scalar :coerce double :default 0.0]}))
@@ -96,16 +96,16 @@
   (lifecycle.composite/describe XYChart$Data
     :ctor []
     :props {:extra-value [:setter lifecycle/scalar]
-            :node [:setter lifecycle/hiccup]
+            :node [:setter lifecycle/dynamic]
             :x-value [:setter lifecycle/scalar]
             :y-value [:setter lifecycle/scalar]}))
 
 (def xy-chart-series
   (lifecycle.composite/describe XYChart$Series
     :ctor []
-    :props {:data [:list lifecycle/hiccups]
+    :props {:data [:list lifecycle/dynamics]
             :name [:setter lifecycle/scalar]
-            :node [:setter lifecycle/hiccup]}))
+            :node [:setter lifecycle/dynamic]}))
 
 (def area-chart
   (lifecycle.composite/describe AreaChart
@@ -151,7 +151,7 @@
     :extends [xy-chart]
     :props {:category-gap [:setter lifecycle/scalar :coerce double :default 10]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:chart.axis/category category-axis
    :chart.axis/number number-axis
    :chart.data/pie pie-chart-data

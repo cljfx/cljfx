@@ -190,7 +190,7 @@ TBD, need to consult my employer first
 - default style classes!
 - default on-x-changed prop change listeners!
 - advanced docs: lifecycles, opts, contexts, map-event-handlers,
-  extract-rest vs existing props etc.
+  styles etc.
 
 ## Food for thought
 - `:points` in polyline has unexpected behavior for first-time user

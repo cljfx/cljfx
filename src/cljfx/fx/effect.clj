@@ -25,21 +25,21 @@
 (def blend
   (lifecycle.composite/describe Blend
     :ctor []
-    :props {:bottom-input [:setter lifecycle/hiccup]
+    :props {:bottom-input [:setter lifecycle/dynamic]
             :mode [:setter lifecycle/scalar :coerce (coerce/enum BlendMode)]
             :opacity [:setter lifecycle/scalar :coerce double :default 1]
-            :top-input [:setter lifecycle/hiccup]}))
+            :top-input [:setter lifecycle/dynamic]}))
 
 (def bloom
   (lifecycle.composite/describe Bloom
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :threshold [:setter lifecycle/scalar :coerce double :default 0.3]}))
 
 (def box-blur
   (lifecycle.composite/describe BoxBlur
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :iterations [:setter lifecycle/scalar :coerce int :default 1]
             :width [:setter lifecycle/scalar :coerce double :default 5]
             :height [:setter lifecycle/scalar :coerce double :default 5]}))
@@ -47,7 +47,7 @@
 (def color-adjust
   (lifecycle.composite/describe ColorAdjust
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :hue [:setter lifecycle/scalar :coerce double :default 0
                   :saturation [:setter lifecycle/scalar :coerce double :default 0]
                   :brightness [:setter lifecycle/scalar :coerce double :default 0]
@@ -65,7 +65,7 @@
 (def displacement-map
   (lifecycle.composite/describe DisplacementMap
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :map-data [:setter lifecycle/scalar :coerce coerce/float-map
                        :offset-x [:setter lifecycle/scalar :coerce double :default 0]
                        :offset-y [:setter lifecycle/scalar :coerce double :default 0]
@@ -76,7 +76,7 @@
 (def drop-shadow
   (lifecycle.composite/describe DropShadow
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :radius [:setter lifecycle/scalar :coerce double :default 10]
             :width [:setter lifecycle/scalar :coerce double :default 21]
             :height [:setter lifecycle/scalar :coerce double :default 21]
@@ -90,13 +90,13 @@
 (def gaussian-blur
   (lifecycle.composite/describe GaussianBlur
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :radius [:setter lifecycle/scalar :coerce double :default 10]}))
 
 (def glow
   (lifecycle.composite/describe Glow
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :level [:setter lifecycle/scalar :coerce double :default 0.3]}))
 
 (def image-input
@@ -109,7 +109,7 @@
 (def inner-shadow
   (lifecycle.composite/describe InnerShadow
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :radius [:setter lifecycle/scalar :coerce double :default 10]
             :width [:setter lifecycle/scalar :coerce double :default 21]
             :height [:setter lifecycle/scalar :coerce double :default 21]
@@ -124,9 +124,9 @@
 (def lighting
   (lifecycle.composite/describe Lighting
     :ctor []
-    :props {:light [:setter lifecycle/hiccup]
-            :bump-input [:setter lifecycle/hiccup]
-            :content-input [:setter lifecycle/hiccup]
+    :props {:light [:setter lifecycle/dynamic]
+            :bump-input [:setter lifecycle/dynamic]
+            :content-input [:setter lifecycle/dynamic]
             :diffuse-constant [:setter lifecycle/scalar :coerce double :default 1]
             :specular-constant [:setter lifecycle/scalar :coerce double :default 0.3]
             :specular-exponent [:setter lifecycle/scalar :coerce double :default 0.3]
@@ -151,14 +151,14 @@
 (def motion-blur
   (lifecycle.composite/describe MotionBlur
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :radius [:setter lifecycle/scalar :coerce double :default 10]
             :angle [:setter lifecycle/scalar :coerce double :default 0]}))
 
 (def perspective-transform
   (lifecycle.composite/describe PerspectiveTransform
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :llx [:setter lifecycle/scalar :coerce double :default 0.0]
             :lly [:setter lifecycle/scalar :coerce double :default 0.0]
             :lrx [:setter lifecycle/scalar :coerce double :default 0.0]
@@ -171,7 +171,7 @@
 (def reflection
   (lifecycle.composite/describe Reflection
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :top-offset [:setter lifecycle/scalar :coerce double :default 0.0]
             :fraction [:setter lifecycle/scalar :coerce double :default 0.75]
             :top-opacity [:setter lifecycle/scalar :coerce double :default 0.5]
@@ -180,13 +180,13 @@
 (def sepia-tone
   (lifecycle.composite/describe SepiaTone
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :level [:setter lifecycle/scalar :coerce double :default 1.0]}))
 
 (def shadow
   (lifecycle.composite/describe Shadow
     :ctor []
-    :props {:input [:setter lifecycle/hiccup]
+    :props {:input [:setter lifecycle/dynamic]
             :radius [:setter lifecycle/scalar :coerce double :default 10.0]
             :width [:setter lifecycle/scalar :coerce double :default 21.0]
             :height [:setter lifecycle/scalar :coerce double :default 21.0]
@@ -194,7 +194,7 @@
                         :default :three-pass-box]
             :color [:setter lifecycle/scalar :coerce coerce/color :default :black]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:effect/blend blend
    :effect/bloom bloom
    :effect/box-blur box-blur

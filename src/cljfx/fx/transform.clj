@@ -65,7 +65,7 @@
             :y [:setter lifecycle/scalar :coerce double :default 0.0]
             :z [:setter lifecycle/scalar :coerce double :default 0.0]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:transform/affine affine
    :transform/rotate rotate
    :transform/scale scale

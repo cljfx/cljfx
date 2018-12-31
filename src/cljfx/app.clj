@@ -39,7 +39,7 @@
     (lifecycle/advance lifecycle component desc opts)))
 
 (defn create [middleware opts]
-  (let [lifecycle (middleware lifecycle/hiccup)
+  (let [lifecycle (middleware lifecycle/dynamic)
         *app (atom {:*component (volatile! nil)
                     :render-fn #(render-app-component lifecycle %1 %2 opts)
                     :request-rendering false})]

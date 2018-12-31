@@ -2,12 +2,12 @@
   (:require [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]))
 
-(defn fn-tag->lifecycle [tag]
-  (when (fn? tag) lifecycle/hiccup-fn->hiccup))
+(defn fn->lifecycle [fx-type]
+  (when (fn? fx-type) lifecycle/dynamic-fn->dynamic))
 
-(defn- tag->lifecycle [tag]
-  (or (fx/tag->lifecycle tag)
-      (fn-tag->lifecycle tag)))
+(defn- fx-type->lifecycle [fx-type]
+  (or (fx/keyword->lifecycle fx-type)
+      (fn->lifecycle fx-type)))
 
 (defn- map-event-handler [e]
   (prn ::unhandled-map-event e))
@@ -17,5 +17,5 @@
 
 (defn fill-opts [opts]
   (-> opts
-      (update :cljfx.opt/tag->lifecycle or-default tag->lifecycle)
-      (update :cljfx.opt/map-event-handler or-default map-event-handler)))
+      (update :fx.opt/type->lifecycle or-default fx-type->lifecycle)
+      (update :fx.opt/map-event-handler or-default map-event-handler)))

@@ -12,14 +12,14 @@
 
 (Platform/setImplicitExit false)
 
-(defn fx-tag->lifecycle [tag]
-  (fx/tag->lifecycle tag))
+(defn keyword->lifecycle [fx-type]
+  (fx/keyword->lifecycle fx-type))
 
-(defn fn-tag->lifecycle [tag]
-  (defaults/fn-tag->lifecycle tag))
+(defn fn->lifecycle [fx-type]
+  (defaults/fn->lifecycle fx-type))
 
-(defn fn-tag->lifecycle-with-context [tag]
-  (when (fn? tag) lifecycle/hiccup-fn-with-context->hiccup))
+(defn fn->lifecycle-with-context [fx-type]
+  (when (fn? fx-type) lifecycle/dynamic-fn-with-context->dynamic))
 
 (def wrap-set-desc-as-context
   (fn [lifecycle]
@@ -41,19 +41,19 @@
   ([desc]
    (create-component desc {}))
   ([desc opts]
-   (lifecycle/create lifecycle/hiccup desc (defaults/fill-opts opts))))
+   (lifecycle/create lifecycle/dynamic desc (defaults/fill-opts opts))))
 
 (defn advance-component
   ([component desc]
    (advance-component component desc {}))
   ([component desc opts]
-   (lifecycle/advance lifecycle/hiccup component desc (defaults/fill-opts opts))))
+   (lifecycle/advance lifecycle/dynamic component desc (defaults/fill-opts opts))))
 
 (defn delete-component
   ([component]
    (delete-component component {}))
   ([component opts]
-   (lifecycle/delete lifecycle/hiccup component (defaults/fill-opts opts))))
+   (lifecycle/delete lifecycle/dynamic component (defaults/fill-opts opts))))
 
 (defn instance [component]
   (component/instance component))

@@ -20,6 +20,6 @@
     :props {:field-of-view [:setter lifecycle/scalar :coerce double :default 30.0]
             :vertical-field-of-view [:setter lifecycle/scalar :default true]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:camera/parallel parallel-camera
    :camera/perspective perspective-camera})

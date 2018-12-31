@@ -1,16 +1,18 @@
 (ns e02-fn
   (:require [cljfx.api :as cljfx]))
 
-(defn text-input [label]
-  [:v-box
-   {:children [[:label {:text label}]
-               [:text-field]]}])
+(defn text-input [{:keys [label]}]
+  {:fx/type :v-box
+   :children [{:fx/type :label :text label}
+              {:fx/type :text-field}]})
 
 (cljfx/on-fx-thread
   (cljfx/create-component
-    [:stage
-     {:showing true
-      :scene [:scene
-              {:root [:v-box
-                      {:children [[text-input "First Name"]
-                                  [text-input "Last Name"]]}]}]}]))
+    {:fx/type :stage
+     :showing true
+     :scene {:fx/type :scene
+             :root {:fx/type :v-box
+                    :children [{:fx/type text-input
+                                :label "First Name"}
+                               {:fx/type text-input
+                                :label "Last Name"}]}}}))

@@ -31,7 +31,7 @@
     :extends [fx.scene/node]
     :props {:cull-face [:setter lifecycle/scalar :coerce (coerce/enum CullFace) :default :back]
             :draw-mode [:setter lifecycle/scalar :coerce (coerce/enum DrawMode) :default :fill]
-            :material [:setter lifecycle/hiccup]}))
+            :material [:setter lifecycle/dynamic]}))
 
 (def box
   (lifecycle.composite/describe Box
@@ -52,7 +52,7 @@
   (lifecycle.composite/describe MeshView
     :ctor []
     :extends [shape3d]
-    :props {:mesh [:setter lifecycle/hiccup]}))
+    :props {:mesh [:setter lifecycle/dynamic]}))
 
 (def triangle-mesh
   (lifecycle.composite/describe TriangleMesh
@@ -81,7 +81,7 @@
             :specular-map [:setter lifecycle/scalar :coerce coerce/image]
             :specular-power [:setter lifecycle/scalar :coerce double :default 32.0]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:box box
    :cylinder cylinder
    :mesh-view mesh-view

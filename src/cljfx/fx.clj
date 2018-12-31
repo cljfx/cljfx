@@ -12,17 +12,17 @@
             [cljfx.fx.scene :as fx.scene]
             [cljfx.fx.stage :as fx.stage]))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   (merge
-    fx.effect/tag->lifecycle
-    fx.shape/tag->lifecycle
-    fx.scene/tag->lifecycle
-    fx.media/tag->lifecycle
-    fx.shape3d/tag->lifecycle
-    fx.transform/tag->lifecycle
-    fx.chart/tag->lifecycle
-    fx.camera/tag->lifecycle
-    fx.control/tag->lifecycle
-    fx.pane/tag->lifecycle
-    fx.web/tag->lifecycle
-    fx.stage/tag->lifecycle))
+    fx.effect/keyword->lifecycle
+    fx.shape/keyword->lifecycle
+    fx.scene/keyword->lifecycle
+    fx.media/keyword->lifecycle
+    fx.shape3d/keyword->lifecycle
+    fx.transform/keyword->lifecycle
+    fx.chart/keyword->lifecycle
+    fx.camera/keyword->lifecycle
+    fx.control/keyword->lifecycle
+    fx.pane/keyword->lifecycle
+    fx.web/keyword->lifecycle
+    fx.stage/keyword->lifecycle))

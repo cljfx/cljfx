@@ -60,7 +60,7 @@
                 :min-height [:setter lifecycle/scalar :coerce double :default 0.0]
                 :min-width [:setter lifecycle/scalar :coerce double :default 0.0]
                 :resizable [:setter lifecycle/scalar :default true]
-                :scene [:setter lifecycle/hiccup]
+                :scene [:setter lifecycle/dynamic]
                 :title [:setter lifecycle/scalar]
                 :style [(mutator/setter #(.initStyle ^Stage %1 %2))
                         lifecycle/scalar
@@ -71,5 +71,5 @@
                           :default false]})
       (lifecycle/wrap-on-delete #(.hide ^Stage %))))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:stage stage})

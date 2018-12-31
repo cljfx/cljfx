@@ -19,7 +19,7 @@
   (-> MediaPlayer
       (lifecycle.composite/describe
         :ctor [:media]
-        :props {:media [mutator/forbidden lifecycle/hiccup]
+        :props {:media [mutator/forbidden lifecycle/dynamic]
                 :state [(mutator/setter #(case %2
                                            :playing (.play ^MediaPlayer %1)
                                            :paused (.pause ^MediaPlayer %1)
@@ -48,7 +48,7 @@
                 :rate [:setter lifecycle/scalar :coerce double :default 1]
                 :start-time [:setter lifecycle/scalar
                              :coerce coerce/duration :default :zero]
-                :stop-time [:setter lifecycle/hiccup
+                :stop-time [:setter lifecycle/dynamic
                             :coerce coerce/duration
                             :default :indefinite]
                 :volume [:setter lifecycle/scalar :coerce double :default 1]})
@@ -58,7 +58,7 @@
   (lifecycle.composite/describe MediaView
     :ctor []
     :extends [fx.scene/node]
-    :props {:media-player [:setter lifecycle/hiccup]
+    :props {:media-player [:setter lifecycle/dynamic]
             :on-error [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :preserve-ratio [:setter lifecycle/scalar :default true]
             :smooth [:setter lifecycle/scalar :default ImageView/SMOOTH_DEFAULT]
@@ -68,7 +68,7 @@
             :fit-height [:setter lifecycle/scalar :coerce double :default 0.0]
             :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:media media
    :media-player media-player
    :media-view media-view})

@@ -92,7 +92,7 @@
   (lifecycle.composite/describe Path
     :ctor []
     :extends [shape]
-    :props {:elements [:list lifecycle/hiccups]
+    :props {:elements [:list lifecycle/dynamics]
             :fill [:setter lifecycle/scalar :coerce coerce/paint]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
             :fill-rule [:setter lifecycle/scalar :coerce (coerce/enum FillRule)
@@ -235,7 +235,7 @@
             :caret-position [:setter lifecycle/scalar :coerce int :default -1]
             :caret-bias [:setter lifecycle/scalar :default true]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:arc arc
    :circle circle
    :cubic-curve cubic-curve

@@ -34,6 +34,6 @@
             :url [(mutator/setter #(.load (.getEngine ^WebView %1) %2))
                   lifecycle/scalar]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:html-editor html-editor
    :web-view web-view})

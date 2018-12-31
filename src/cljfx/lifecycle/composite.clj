@@ -5,8 +5,8 @@
             [cljfx.prop :as prop]
             [clojure.string :as str]))
 
-(defn- desc->props-desc [[_ props]]
-  (or props {}))
+(defn- desc->props-desc [desc]
+  (dissoc desc :fx/type))
 
 (defn- create-props [props-desc props-config opts]
   (reduce

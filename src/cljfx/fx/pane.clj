@@ -15,25 +15,25 @@
   (lifecycle.composite/describe Pane
     :ctor []
     :extends [fx.scene/region]
-    :props {:children [:list lifecycle/hiccups]}))
+    :props {:children [:list lifecycle/dynamics]}))
 
 (def anchor-pane
   (lifecycle.composite/describe AnchorPane
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:top ["pane-top-anchor" double]
-                                    :left ["pane-left-anchor" double]
-                                    :bottom ["pane-bottom-anchor" double]
-                                    :right ["pane-right-anchor" double]})
+    :props {:children [:list (-> lifecycle/dynamic
+                                 (lifecycle/wrap-constraints
+                                   {:anchor-pane/top ["pane-top-anchor" double]
+                                    :anchor-pane/left ["pane-left-anchor" double]
+                                    :anchor-pane/bottom ["pane-bottom-anchor" double]
+                                    :anchor-pane/right ["pane-right-anchor" double]})
                                  lifecycle/wrap-many)]}))
 
 (def ^:private border-pane-dynamic-hiccup
-  (lifecycle/wrap-meta-constraints
-    lifecycle/hiccup
-    {:margin ["borderpane-margin" coerce/insets]
-     :alignment ["borderpane-alignment" (coerce/enum Pos)]}))
+  (lifecycle/wrap-constraints
+    lifecycle/dynamic
+    {:border-pane/margin ["borderpane-margin" coerce/insets]
+     :border-pane/alignment ["borderpane-alignment" (coerce/enum Pos)]}))
 
 (def border-pane
   (lifecycle.composite/describe BorderPane
@@ -49,9 +49,9 @@
   (lifecycle.composite/describe FlowPane
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:margin ["flowpane-margin" coerce/insets]})
+    :props {:children [:list (-> lifecycle/dynamic
+                                 (lifecycle/wrap-constraints
+                                   {:flow-pane/margin ["flowpane-margin" coerce/insets]})
                                  lifecycle/wrap-many)]
             :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
             :column-halignment [:setter lifecycle/scalar :coerce (coerce/enum HPos)
@@ -68,25 +68,27 @@
   (lifecycle.composite/describe GridPane
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:margin ["gridpane-margin" coerce/insets]
-                                    :halignment ["gridpane-halignment" (coerce/enum HPos)]
-                                    :valignment ["gridpane-valignment" (coerce/enum VPos)]
-                                    :hgrow ["gridpane-hgrow" (coerce/enum Priority)]
-                                    :vgrow ["gridpane-vgrow" (coerce/enum Priority)]
-                                    :row ["gridpane-row" int]
-                                    :column ["gridpane-column" int]
-                                    :row-span ["gridpane-row-span" int]
-                                    :column-span ["gridpane-column-span" int]
-                                    :full-width ["gridpane-fill-width" boolean]
-                                    :full-height ["gridpane-fill-height" boolean]})
-                                 lifecycle/wrap-many)]
-            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
-            :column-constraints [:list lifecycle/hiccups]
+    :props {:children
+            [:list (-> lifecycle/dynamic
+                       (lifecycle/wrap-constraints
+                         {:grid-pane/margin ["gridpane-margin" coerce/insets]
+                          :grid-pane/halignment ["gridpane-halignment" (coerce/enum HPos)]
+                          :grid-pane/valignment ["gridpane-valignment" (coerce/enum VPos)]
+                          :grid-pane/hgrow ["gridpane-hgrow" (coerce/enum Priority)]
+                          :grid-pane/vgrow ["gridpane-vgrow" (coerce/enum Priority)]
+                          :grid-pane/row ["gridpane-row" int]
+                          :grid-pane/column ["gridpane-column" int]
+                          :grid-pane/row-span ["gridpane-row-span" int]
+                          :grid-pane/column-span ["gridpane-column-span" int]
+                          :grid-pane/full-width ["gridpane-fill-width" boolean]
+                          :grid-pane/full-height ["gridpane-fill-height" boolean]})
+                       lifecycle/wrap-many)]
+            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                        :default :top-left]
+            :column-constraints [:list lifecycle/dynamics]
             :grid-lines-visible [:setter lifecycle/scalar :default false]
             :hgap [:setter lifecycle/scalar :coerce double :default 0.0]
-            :row-constraints [:list lifecycle/hiccups]
+            :row-constraints [:list lifecycle/dynamics]
             :vgap [:setter lifecycle/scalar :coerce double :default 0.0]}))
 
 (def column-constraints
@@ -115,12 +117,13 @@
   (lifecycle.composite/describe HBox
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:margin ["hbox-margin" coerce/insets]
-                                    :hgrow ["hbox-hgrow" (coerce/enum Priority)]})
+    :props {:children [:list (-> lifecycle/dynamic
+                                 (lifecycle/wrap-constraints
+                                   {:h-box/margin ["hbox-margin" coerce/insets]
+                                    :h-box/hgrow ["hbox-hgrow" (coerce/enum Priority)]})
                                  lifecycle/wrap-many)]
-            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
+            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                        :default :top-left]
             :fill-height [:setter lifecycle/scalar :default true]
             :spacing [:setter lifecycle/scalar :coerce double :default 0.0]}))
 
@@ -128,12 +131,14 @@
   (lifecycle.composite/describe StackPane
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:margin ["stackpane-margin" coerce/insets]
-                                    :alignment ["stackpane-alignment" (coerce/enum Pos)]})
-                                 lifecycle/wrap-many)]
-            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :center]}))
+    :props {:children
+            [:list (-> lifecycle/dynamic
+                       (lifecycle/wrap-constraints
+                         {:stack-pane/alignment ["stackpane-alignment" (coerce/enum Pos)]
+                          :stack-pane/margin ["stackpane-margin" coerce/insets]})
+                       lifecycle/wrap-many)]
+            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                        :default :center]}))
 
 (def text-flow
   (lifecycle.composite/describe TextFlow
@@ -147,12 +152,14 @@
   (lifecycle.composite/describe TilePane
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:margin ["tilepane-margin" coerce/insets]
-                                    :alignment ["tilepane-alignment" (coerce/enum Pos)]})
-                                 lifecycle/wrap-many)]
-            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
+    :props {:children
+            [:list (-> lifecycle/dynamic
+                       (lifecycle/wrap-constraints
+                         {:tile-pane/margin ["tilepane-margin" coerce/insets]
+                          :tile-pane/alignment ["tilepane-alignment" (coerce/enum Pos)]})
+                       lifecycle/wrap-many)]
+            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                        :default :top-left]
             :hgap [:setter lifecycle/scalar :coerce double :default 0.0]
             :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
                           :default :horizontal]
@@ -168,16 +175,17 @@
   (lifecycle.composite/describe VBox
     :ctor []
     :extends [pane]
-    :props {:children [:list (-> lifecycle/hiccup
-                                 (lifecycle/wrap-meta-constraints
-                                   {:margin ["vbox-margin" coerce/insets]
-                                    :vgrow ["vbox-vgrow" (coerce/enum Priority)]})
+    :props {:children [:list (-> lifecycle/dynamic
+                                 (lifecycle/wrap-constraints
+                                   {:v-box/margin ["vbox-margin" coerce/insets]
+                                    :v-box/vgrow ["vbox-vgrow" (coerce/enum Priority)]})
                                  lifecycle/wrap-many)]
-            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
+            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                        :default :top-left]
             :fill-width [:setter lifecycle/scalar :default true]
             :spacing [:setter lifecycle/scalar :coerce double :default 0.0]}))
 
-(def tag->lifecycle
+(def keyword->lifecycle
   {:pane pane
    :anchor-pane anchor-pane
    :border-pane border-pane
