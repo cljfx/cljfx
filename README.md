@@ -34,12 +34,13 @@ Evaluating this code will create and show this window:
 ### App
 
 To be truly useful, there should be some state and changes over time,
-for this matter there is an `app` abstraction, which is basically a
-function that you may call whenever you want with new hiccup-like
-description, and cljfx will advance all the mutable state underneath to
-fit it. Example:
+for this matter there is an `app` abstraction, which is a function that
+you may call whenever you want with new hiccup-like description, and
+cljfx will advance all the mutable state underneath to match this
+description. Example:
 ```clj
-(def app (cljfx/create-app))
+(def app
+  (cljfx/create-app))
 
 (defn root [showing]
   [:stage {:showing showing}
@@ -127,7 +128,7 @@ Some components use description's meta. Main uses are:
    => true
    ```
    With `:key`-s specified, advancing of this component reordered
-   children of VBox, and didn't change text of any label, because their
+   children of VBox, and didn't change text of any labels, because their
    description stayed the same.
 2. Setting pane constraints. If node is placed inside a pane, pane can
    layout it differently by looking into properties map of a node. These
@@ -161,6 +162,10 @@ TBD, need to consult my employer first
 
 ## TODO
 
+- hiccup->maps
+- optional flatten in wrap-many
+- better explanation regarding fn-fx
+- better support for multiple windows
 - expand on props and composite lifecycle. What's known about them:
   - ctor:
     - scene requires root, root can be replaced afterwards
@@ -172,22 +177,24 @@ TBD, need to consult my employer first
     created for us, but otherwise it's just a node and we have props for
     them
   - prop in composite lifecycle may be a map or a function taking
+    instance and returning prop!
   - changing media should re-create media player
-  instance and returning prop!
 
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
 - extract-rest instead of default-props
 - controlled props (mostly in controls, also stage's `:showing`)
-- `:on-text-changed` handler dispatches during advancing, maybe it
-  shouldn't?
+- `:on-text-changed` handler dispatches during advancing, it shouldn't
 - default `:managed` properties in controls
 - default focus traversable of controls!
 - default style classes!
 - default on-x-changed prop change listeners!
-- advanced docs: lifecycles, opts, contexts, etc.
+- advanced docs: lifecycles, opts, contexts, map-event-handlers,
+  extract-rest vs existing props etc.
 
 ## Food for thought
+- `:points` in polyline has unexpected behavior for first-time user
+- research lazy-loading of classes
 - wrap-factory may use some memoizing and advancing
 - prop lifecycle
 - should I use namespaced keywords in fx components?

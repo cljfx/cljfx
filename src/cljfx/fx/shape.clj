@@ -135,17 +135,19 @@
     :default-prop [:x prop/extract-single]
     :props {:x [:setter lifecycle/scalar :coerce double :default 0]}))
 
-(def line-to (lifecycle.composite/describe LineTo
-               :ctor []
-               :extends [path-element]
-               :props {:x [:setter lifecycle/scalar :coerce double :default 0]
-                       :y [:setter lifecycle/scalar :coerce double :default 0]}))
+(def line-to
+  (lifecycle.composite/describe LineTo
+    :ctor []
+    :extends [path-element]
+    :props {:x [:setter lifecycle/scalar :coerce double :default 0]
+            :y [:setter lifecycle/scalar :coerce double :default 0]}))
 
-(def move-to (lifecycle.composite/describe MoveTo
-               :ctor []
-               :extends [path-element]
-               :props {:x [:setter lifecycle/scalar :coerce double :default 0]
-                       :y [:setter lifecycle/scalar :coerce double :default 0]}))
+(def move-to
+  (lifecycle.composite/describe MoveTo
+    :ctor []
+    :extends [path-element]
+    :props {:x [:setter lifecycle/scalar :coerce double :default 0]
+            :y [:setter lifecycle/scalar :coerce double :default 0]}))
 
 (def quad-curve-to
   (lifecycle.composite/describe QuadCurveTo
@@ -156,20 +158,21 @@
             :x [:setter lifecycle/scalar :coerce double :default 0]
             :y [:setter lifecycle/scalar :coerce double :default 0]}))
 
-(def v-line-to (lifecycle.composite/describe VLineTo
-                 :ctor []
-                 :extends [path-element]
-                 :default-prop [:y prop/extract-single]
-                 :props {:y [:setter lifecycle/scalar :coerce double :default 0]}))
+(def v-line-to
+  (lifecycle.composite/describe VLineTo
+    :ctor []
+    :extends [path-element]
+    :default-prop [:y prop/extract-single]
+    :props {:y [:setter lifecycle/scalar :coerce double :default 0]}))
 
-(def polygon (lifecycle.composite/describe Polygon
-               :ctor []
-               :extends [shape]
-               :default-prop [:points prop/extract-all]
-               :props {:points [:list lifecycle/scalar :coerce (fn [x _]
-                                                                 (->> x
-                                                                      (mapcat identity)
-                                                                      (map double)))]}))
+(def polygon
+  (lifecycle.composite/describe Polygon
+    :ctor []
+    :extends [shape]
+    :default-prop [:points prop/extract-all]
+    :props {:points [:list lifecycle/scalar :coerce #(->> %
+                                                          (mapcat identity)
+                                                          (map double))]}))
 (def polyline
   (lifecycle.composite/describe Polyline
     :ctor []
@@ -177,10 +180,9 @@
     :default-prop [:points prop/extract-all]
     :props {:fill [:setter lifecycle/scalar :coerce coerce/paint]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
-            :points [:list lifecycle/scalar :coerce (fn [x _]
-                                                      (->> x
-                                                           (mapcat identity)
-                                                           (map double)))]}))
+            :points [:list lifecycle/scalar :coerce #(->> %
+                                                          (mapcat identity)
+                                                          (map double))]}))
 (def quad-curve
   (lifecycle.composite/describe QuadCurve
     :ctor []
