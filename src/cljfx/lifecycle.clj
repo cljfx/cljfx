@@ -43,11 +43,14 @@
      `delete (fn [_ component opts]
                (delete (:lifecycle component) (:child component) opts))}))
 
+(defn- call-dynamic-fn [desc]
+  ((:fx/type desc) (dissoc desc :fx/type)))
+
 (defn wrap-dynamic-fn [lifecycle]
   (with-meta
     [::dynamic-fn lifecycle]
     {`create (fn [_ desc opts]
-               (let [child-desc ((:fx/type desc) desc)]
+               (let [child-desc (call-dynamic-fn desc)]
                  (with-meta {:child-desc child-desc
                              :desc desc
                              :child (create lifecycle child-desc opts)}
@@ -58,7 +61,7 @@
                                                      %
                                                      (:child-desc component)
                                                      opts))
-                  (let [child-desc ((:fx/type desc) desc)]
+                  (let [child-desc (call-dynamic-fn desc)]
                     (-> component
                         (assoc :child-desc child-desc :desc desc)
                         (update :child #(advance lifecycle % child-desc opts))))))
@@ -389,12 +392,12 @@
      `delete (fn [_ component opts]
                (delete lifecycle component opts))}))
 
-(defn wrap-map-desc [lifecycle f]
+(defn wrap-map-desc [lifecycle f & args]
   (with-meta
     [::map-desc lifecycle f]
     {`create (fn [_ desc opts]
-               (create lifecycle (f desc) opts))
+               (create lifecycle (apply f desc args) opts))
      `advance (fn [_ component desc opts]
-                (advance lifecycle component (f desc) opts))
+                (advance lifecycle component (apply f desc args) opts))
      `delete (fn [_ component opts]
                (delete lifecycle component opts))}))

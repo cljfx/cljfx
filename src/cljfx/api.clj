@@ -25,9 +25,9 @@
   (fn [lifecycle]
     (lifecycle/wrap-desc-as-context lifecycle)))
 
-(defn wrap-map-desc [f]
+(defn wrap-map-desc [f & args]
   (fn [lifecycle]
-    (lifecycle/wrap-map-desc lifecycle f)))
+    (apply lifecycle/wrap-map-desc lifecycle f args)))
 
 (defmacro on-fx-thread
   "Execute body (in implicit do) on fx thread
