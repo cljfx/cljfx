@@ -58,11 +58,11 @@
   (lifecycle.composite/describe TriangleMesh
     :ctor []
     :props {:vertex-format [:setter lifecycle/scalar :coerce coerce/vertex-format]
-            :faces [:list lifecycle/scalar :coerce (fn [x _] (map int x))]
-            :face-smoothing-groups [:list lifecycle/scalar :coerce (fn [x _] (map int x))]
-            :normals [:list lifecycle/scalar :coerce (fn [x _] (map float x))]
-            :points [:list lifecycle/scalar :coerce (fn [x _] (map float x))]
-            :tex-coords [:list lifecycle/scalar :coerce (fn [x _] (map float x))]}))
+            :faces [:list lifecycle/scalar :coerce #(map int %)]
+            :face-smoothing-groups [:list lifecycle/scalar :coerce #(map int %)]
+            :normals [:list lifecycle/scalar :coerce #(map float %)]
+            :points [:list lifecycle/scalar :coerce #(map float %)]
+            :tex-coords [:list lifecycle/scalar :coerce #(map float %)]}))
 
 (def sphere
   (lifecycle.composite/describe Sphere

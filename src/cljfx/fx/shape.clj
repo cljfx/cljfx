@@ -19,7 +19,7 @@
     :props {:fill [:setter lifecycle/scalar :coerce coerce/paint :default :black]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint]
             :smooth [:setter lifecycle/scalar :default true]
-            :stroke-dash-array [:list lifecycle/scalar :coerce (fn [x _] (map double x))]
+            :stroke-dash-array [:list lifecycle/scalar :coerce #(map double %)]
             :stroke-dash-offset [:setter lifecycle/scalar :coerce double :default 0]
             :stroke-line-cap [:setter lifecycle/scalar
                               :coerce (coerce/enum StrokeLineCap)
@@ -165,18 +165,16 @@
   (lifecycle.composite/describe Polygon
     :ctor []
     :extends [shape]
-    :props {:points [:list lifecycle/scalar :coerce #(->> %
-                                                          (mapcat identity)
-                                                          (map double))]}))
+    :props {:points [:list lifecycle/scalar :coerce #(map double %)]}))
+
 (def polyline
   (lifecycle.composite/describe Polyline
     :ctor []
     :extends [shape]
     :props {:fill [:setter lifecycle/scalar :coerce coerce/paint]
             :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
-            :points [:list lifecycle/scalar :coerce #(->> %
-                                                          (mapcat identity)
-                                                          (map double))]}))
+            :points [:list lifecycle/scalar :coerce #(map double %)]}))
+
 (def quad-curve
   (lifecycle.composite/describe QuadCurve
     :ctor []
@@ -242,14 +240,14 @@
    :ellipse ellipse
    :line line
    :path path
-   :path-element/arc-to arc-to
-   :path-element/close-path close-path
-   :path-element/cubic-curve-to cubic-curve-to
-   :path-element/h-line-to h-line-to
-   :path-element/line-to line-to
-   :path-element/move-to move-to
-   :path-element/quad-curve-to quad-curve-to
-   :path-element/v-line-to v-line-to
+   :arc-to arc-to
+   :close-path close-path
+   :cubic-curve-to cubic-curve-to
+   :h-line-to h-line-to
+   :line-to line-to
+   :move-to move-to
+   :quad-curve-to quad-curve-to
+   :v-line-to v-line-to
    :polygon polygon
    :polyline polyline
    :quad-curve quad-curve

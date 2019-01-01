@@ -12,7 +12,7 @@
              :stylesheets #{"styles.css"}
              :root {:fx/type :v-box
                     :children [{:fx/type :label
-                                :effect {:fx/type :effect/drop-shadow
+                                :effect {:fx/type :drop-shadow
                                          :radius 1
                                          :offset-y 2}
                                 :tooltip {:fx/type :tooltip

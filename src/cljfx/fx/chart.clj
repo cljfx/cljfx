@@ -152,16 +152,16 @@
     :props {:category-gap [:setter lifecycle/scalar :coerce double :default 10]}))
 
 (def keyword->lifecycle
-  {:chart.axis/category category-axis
-   :chart.axis/number number-axis
-   :chart.data/pie pie-chart-data
-   :chart.data/xy xy-chart-data
-   :chart.series/xy xy-chart-series
-   :chart/pie pie-chart
-   :chart/area area-chart
-   :chart/bar bar-chart
-   :chart/bubble bubble-chart
-   :chart/line line-chart
-   :chart/scatter scatter-chart
-   :chart/stacked-area stacked-area-chart
-   :chart/stacked-bar stacked-bar-chart})
+  {:category-axis category-axis
+   :number-axis number-axis
+   :pie-chart-data pie-chart-data
+   :xy-chart-data xy-chart-data
+   :xy-chart-series xy-chart-series
+   :pie-chart pie-chart
+   :area-chart area-chart
+   :bar-chart bar-chart
+   :bubble-chart bubble-chart
+   :line-chart line-chart
+   :scatter-chart scatter-chart
+   :stacked-area-chart stacked-area-chart
+   :stacked-bar-chart stacked-bar-chart})

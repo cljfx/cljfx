@@ -14,9 +14,7 @@
 
 (def node
   (lifecycle.composite/describe Node
-    :props {:properties [(mutator/observable-map #(.getProperties ^Node %))
-                         lifecycle/scalar]
-            :accessible-help [:setter lifecycle/scalar]
+    :props {:accessible-help [:setter lifecycle/scalar]
             :accessible-role-description [:setter lifecycle/scalar]
             :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)]
             :blend-mode [:setter lifecycle/scalar :coerce (coerce/enum BlendMode)]
@@ -166,7 +164,7 @@
 (def scene
   (lifecycle.composite/describe Scene
     :ctor [:root]
-    :props {:camera [:setter lifecycle/dynamic :default [:camera/parallel]]
+    :props {:camera [:setter lifecycle/dynamic :default {:fx/type :parallel-camera}]
             :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
             :event-dispatcher [:setter lifecycle/scalar]
             :fill [:setter lifecycle/scalar :coerce coerce/paint :default :white]

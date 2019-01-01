@@ -51,7 +51,7 @@
                 :full-screen-exit-key-combination [:setter lifecycle/scalar
                                                    :coerce coerce/key-combination]
                 :iconified [:setter lifecycle/scalar :default false]
-                :icons [:list lifecycle/scalar :coerce (fn [x _] (map coerce/image x))]
+                :icons [:list lifecycle/scalar :coerce #(map coerce/image %)]
                 :max-height [:setter lifecycle/scalar :coerce double
                              :default Double/MAX_VALUE]
                 :max-width [:setter lifecycle/scalar :coerce double

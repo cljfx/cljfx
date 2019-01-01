@@ -17,7 +17,13 @@
                                  Slider Spinner SpinnerValueFactory
                                  SpinnerValueFactory$IntegerSpinnerValueFactory
                                  SpinnerValueFactory$DoubleSpinnerValueFactory
-                                 SpinnerValueFactory$ListSpinnerValueFactory SplitPane TableView TableColumnBase TableColumn TableColumn$SortType TabPane TabPane$TabClosingPolicy TabPane$TabDragPolicy Tab TextInputControl TextArea TextField PasswordField ToolBar TreeTableView TreeSortMode TreeItem TreeTableColumn TreeTableColumn$SortType TreeView]
+                                 SpinnerValueFactory$ListSpinnerValueFactory SplitPane
+                                 TableView TableColumnBase TableColumn
+                                 TableColumn$SortType TabPane TabPane$TabClosingPolicy
+                                 TabPane$TabDragPolicy Tab TextInputControl TextArea
+                                 TextField PasswordField ToolBar TreeTableView
+                                 TreeSortMode TreeItem TreeTableColumn
+                                 TreeTableColumn$SortType TreeView]
            [javafx.scene.text TextAlignment]
            [javafx.geometry Pos Side Orientation VPos HPos]))
 
@@ -193,7 +199,7 @@
     :ctor []
     :extends [combo-box-base]
     :props {:value [:setter lifecycle/scalar :coerce coerce/color]
-            :custom-colors [:list lifecycle/scalar :coerce (fn [x _] (map coerce/color x))]}))
+            :custom-colors [:list lifecycle/scalar :coerce #(map coerce/color %)]}))
 
 (def combo-box
   (lifecycle.composite/describe ComboBox
@@ -435,7 +441,7 @@
     :ctor []
     :extends [control]
     :props {:divider-positions [:setter lifecycle/scalar
-                                :coerce (fn [x _] (into-array Double/TYPE x))
+                                :coerce #(into-array Double/TYPE %)
                                 :default []]
             :items [:list lifecycle/dynamics]
             :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
@@ -656,11 +662,11 @@
   {:popup popup
    :popup-control popup-control
    :context-menu context-menu
-   :menu.item/default menu-item
-   :menu.item/check check-menu-item
-   :menu.item/custom custom-menu-item
-   :menu.item/menu menu
-   :menu.item/radio radio-menu-item
+   :menu-item menu-item
+   :check-menu-item check-menu-item
+   :custom-menu-item custom-menu-item
+   :menu menu
+   :radio-menu-item radio-menu-item
    :tooltip tooltip
    :titled-pane titled-pane
    :accordion accordion
@@ -686,9 +692,9 @@
    :separator separator
    :slider slider
    :spinner spinner
-   :spinner.value-factory/integer integer-spinner-value-factory
-   :spinner.value-factory/double double-spinner-value-factory
-   :spinner.value-factory/list list-spinner-value-factory
+   :integer-spinner-value-factory integer-spinner-value-factory
+   :double-spinner-value-factory double-spinner-value-factory
+   :list-spinner-value-factory list-spinner-value-factory
    :split-pane split-pane
    :table-view table-view
    :table-column table-column

@@ -66,8 +66,8 @@
             :z [:setter lifecycle/scalar :coerce double :default 0.0]}))
 
 (def keyword->lifecycle
-  {:transform/affine affine
-   :transform/rotate rotate
-   :transform/scale scale
-   :transform/shear shear
-   :transform/translate translate})
+  {:affine affine
+   :rotate rotate
+   :scale scale
+   :shear shear
+   :translate translate})

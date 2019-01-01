@@ -5,9 +5,9 @@ applications.
 
 ## Rationale
 
-I wanted to have an elegant, dynamic, declarative and composable UI
-library and couldn't find one. Cljfx is inspired by react, reagent and
-fn-fx.
+I wanted to have an elegant, declarative and composable UI
+library for JVM and couldn't find one. Cljfx is inspired by react,
+reagent and fn-fx.
 
 Like react, it allows to specify only desired layout, and handles
 all actual changes underneath. Unlike react (and web in general) it does
@@ -170,7 +170,8 @@ Some components accept specially treated keys. Main uses are:
    descriptions stayed the same.
 2. Setting pane constraints. If node is placed inside a pane, pane can
    layout it differently by looking into properties map of a node. These
-   properties can be specified via keywords namespaced by pane fx-type:
+   properties can be specified via keywords namespaced by pane's
+   fx-type:
    ```clj
    (cljfx/on-fx-thread
      (cljfx/create-component
@@ -237,11 +238,9 @@ TBD, need to consult my employer first
   styles etc.
 
 ## Food for thought
-- `:points` in polyline has unexpected behavior for first-time user
 - research lazy-loading of classes
 - wrap-factory may use some memoizing and advancing
 - prop lifecycle
-- should I use namespaced keywords in fx components?
 - how to handle dialogs, animations and other possibly missed things?
 - escape hatch to force-re-render everything?
 - make jfx-media and jfx-web optional?

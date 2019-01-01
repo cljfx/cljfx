@@ -195,23 +195,23 @@
             :color [:setter lifecycle/scalar :coerce coerce/color :default :black]}))
 
 (def keyword->lifecycle
-  {:effect/blend blend
-   :effect/bloom bloom
-   :effect/box-blur box-blur
-   :effect/color-adjust color-adjust
-   :effect/color-input color-input
-   :effect/displacement-map displacement-map
-   :effect/drop-shadow drop-shadow
-   :effect/gaussian-blur gaussian-blur
-   :effect/glow glow
-   :effect/image-input image-input
-   :effect/inner-shadow inner-shadow
-   :effect/lighting lighting
-   :effect/distant-light distant-light
-   :effect/point-light point-light
-   :effect/spot-light spot-light
-   :effect/motion-blur motion-blur
-   :effect/perspective-transform perspective-transform
-   :effect/reflection reflection
-   :effect/sepia-tone sepia-tone
-   :effect/shadow shadow})
+  {:blend blend
+   :bloom bloom
+   :box-blur box-blur
+   :color-adjust color-adjust
+   :color-input color-input
+   :displacement-map displacement-map
+   :drop-shadow drop-shadow
+   :gaussian-blur gaussian-blur
+   :glow glow
+   :image-input image-input
+   :inner-shadow inner-shadow
+   :lighting lighting
+   :distant-light distant-light
+   :point-light-effect point-light
+   :spot-light spot-light
+   :motion-blur motion-blur
+   :perspective-transform perspective-transform
+   :reflection reflection
+   :sepia-tone sepia-tone
+   :shadow shadow})

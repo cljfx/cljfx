@@ -21,5 +21,5 @@
             :vertical-field-of-view [:setter lifecycle/scalar :default true]}))
 
 (def keyword->lifecycle
-  {:camera/parallel parallel-camera
-   :camera/perspective perspective-camera})
+  {:parallel-camera parallel-camera
+   :perspective-camera perspective-camera})

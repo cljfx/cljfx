@@ -22,7 +22,7 @@
     {:fx/type :v-box
      :children [(if (empty? (str first-name last-name))
                   {:fx/type :v-box
-                   :effect {:fx/type :effect/drop-shadow}
+                   :effect {:fx/type :drop-shadow}
                    :children [{:fx/type :label :text "You are very mysterious!"}
                               {:fx/type :label :text "Please, introduce yourself:"}]}
                   {:fx/type :label
