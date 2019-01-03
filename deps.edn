@@ -5,8 +5,6 @@
                                  :classifier ["mac" "linux" "win" "sources"]}
         org.openjfx/javafx-graphics {:mvn/version "11"
                                      :classifier ["mac" "linux" "win" "sources"]}
-        org.openjfx/javafx-swing {:mvn/version "11"
-                                  :classifier ["mac" "linux" "win" "sources"]}
         org.openjfx/javafx-media {:mvn/version "11"
                                   :classifier ["mac" "linux" "win" "sources"]}
         org.openjfx/javafx-web {:mvn/version "11"

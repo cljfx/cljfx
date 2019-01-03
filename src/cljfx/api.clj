@@ -5,10 +5,14 @@
             [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform])
-  (:import [javafx.application Platform]
-           [javafx.embed.swing JFXPanel]))
+  (:import [javafx.application Platform]))
 
-(JFXPanel.)
+(defonce initialized
+  (try
+    (Platform/startup (fn []))
+    :initialized
+    (catch IllegalStateException _
+      :already-initialized)))
 
 (Platform/setImplicitExit false)
 

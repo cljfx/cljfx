@@ -133,6 +133,70 @@ Evaluating code above pops up this window:
 
 Editing input then immediately updates displayed app title.
 
+### Map events
+
+Consider this example:
+
+```clj
+(defn todo-view [{:keys [text id done]}]
+  {:fx/type :h-box
+   :children [{:fx/type :check-box
+               :selected done
+               :on-selected-changed #(swap! *state assoc-in [:by-id id :done] %)
+              {:fx/type :label
+               :style {:-fx-text-fill (if done :grey :black)}
+               :text text}]})
+```
+
+There are problems with using functions as event handlers:
+1. Performing mutation from these handlers requires coupling with that
+state, thus making `todo-view` dependent on mutable `*state`
+2. Updating state from listeners complects logic with view, making
+application messier over time
+3. There are unnecessary reassignments to `on-selected-changed`:
+functions have no equality semantics other than their identity, so on
+every change to this view (for example, when changing it's text),
+`on-selected-changed` will be replaced with another function with same
+behavior.
+
+To mitigate these problems, cljfx allows to define event handlers as
+arbitrary maps, and provide a function to an app that performs actual
+handling of these map-events (with additional `:fx/event` key containing
+dispatched event):
+
+```clj
+
+;; Define view as just data
+
+(defn todo-view [{:keys [text id done]}]
+  {:fx/type :h-box
+   :spacing 5
+   :padding 5
+   :children [{:fx/type :check-box
+               :selected done
+               :on-selected-changed {:event/type ::set-done :id id}}
+              {:fx/type :label
+               :style {:-fx-text-fill (if done :grey :black)}
+               :text text}]})
+
+;; Define single map-event-handler that does mutation
+
+(defn map-event-handler [event]
+  (case (:event/type event)
+    ::set-done (swap! *state assoc-in [:by-id (:id event) :done] (:fx/event event))))
+
+;; Provide map-event-handler to app as an option
+
+(cljfx/mount-app
+  *state
+  (cljfx/create-app
+    :middleware (cljfx/wrap-map-desc assoc :fx/type root)
+    :opts {:fx.opt/map-event-handler map-event-handler}))
+
+```
+
+You can see full example at [examples/e09_todo_app.clj](examples/e09_todo_app.clj).
+
 ### Special keys
 
 Some components accept specially treated keys. Main uses are:
@@ -234,8 +298,7 @@ TBD, need to consult my employer first
 - default focus traversable of controls!
 - default style classes!
 - default on-x-changed prop change listeners!
-- advanced docs: lifecycles, opts, contexts, map-event-handlers,
-  styles etc.
+- advanced docs: lifecycles, opts, contexts, styles etc.
 
 ## Food for thought
 - research lazy-loading of classes

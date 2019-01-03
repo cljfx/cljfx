@@ -56,7 +56,6 @@
     :props {:items [:list lifecycle/dynamics]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]}))
 
-
 (def control
   (lifecycle.composite/describe Control
     :extends [fx.scene/region]
@@ -126,6 +125,7 @@
     :extends [menu-item]
     :props {:content [:setter lifecycle/dynamic]
             :hide-on-click [:setter lifecycle/scalar :default true]}))
+
 (def menu
   (lifecycle.composite/describe Menu
     :ctor []
@@ -241,7 +241,10 @@
     :extends [button-base]
     :props {:allow-indeterminate [:setter lifecycle/scalar :default false]
             :indeterminate [:setter lifecycle/scalar :default false]
-            :selected [:setter lifecycle/scalar :default false]}))
+            :selected [:setter lifecycle/scalar :default false]
+            :on-selected-changed [:property-change-listener
+                                  (lifecycle/wrap-coerce lifecycle/event-handler
+                                                         coerce/change-listener)]}))
 
 (def hyperlink
   (lifecycle.composite/describe Hyperlink
@@ -550,8 +553,7 @@
                                      (when-not (= text (.getText control))
                                        (.setText control text))))
                    lifecycle/scalar]
-            :on-text-changed [(mutator/property-change-listener
-                                #(.textProperty ^TextField %))
+            :on-text-changed [:property-change-listener
                               (lifecycle/wrap-coerce lifecycle/event-handler
                                                      coerce/change-listener)]
             :text-formatter [:setter lifecycle/scalar :coerce coerce/text-formatter]}))

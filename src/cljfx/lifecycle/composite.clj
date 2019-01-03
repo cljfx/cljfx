@@ -112,6 +112,18 @@
     `(fn ~fn-name [~instance-sym]
        (~getter-expr ~instance-sym))))
 
+(defmacro property-change-listener [type-expr kw]
+  (let [instance-sym (with-meta (gensym "instance") {:tag type-expr})
+        property-name (second (re-matches #"on-(.+)-changed" (name kw)))
+        prop-parts (conj (str/split property-name #"-") "property")
+        prop-expr (symbol (str "."
+                               (first prop-parts)
+                               (apply str (map str/capitalize (rest prop-parts)))))
+        fn-name (symbol (str/join "-" prop-parts))]
+    [prop-parts prop-expr fn-name]
+    `(fn ~fn-name [~instance-sym]
+       (~prop-expr ~instance-sym))))
+
 (defmacro prop-map [type-expr & kvs]
   `(hash-map
      ~@(->> kvs
@@ -124,9 +136,16 @@
                 (let [[mutator & args] v
                       prop `(prop/make
                               ~(case mutator
-                                 :setter `(mutator/setter (setter ~type-expr ~k))
-                                 :list `(mutator/observable-list
-                                          (observable-list ~type-expr ~k))
+                                 :setter
+                                 `(mutator/setter (setter ~type-expr ~k))
+
+                                 :list
+                                 `(mutator/observable-list
+                                    (observable-list ~type-expr ~k))
+
+                                 :property-change-listener
+                                 `(mutator/property-change-listener
+                                    (property-change-listener ~type-expr ~k))
                                  mutator)
                               ~@args)]
                   [k prop]))))))
