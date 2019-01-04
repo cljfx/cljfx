@@ -22,7 +22,8 @@
   {:source (.getSource e)
    :target (.getTarget e)
    :event-type (screaming-case->keyword (.getName (.getEventType e)))
-   :consumed (.isConsumed e)})
+   :consumed (.isConsumed e)
+   :event e})
 
 (defn- datafy-mouse-event [^MouseEvent e]
   (merge

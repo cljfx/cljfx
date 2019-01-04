@@ -273,6 +273,7 @@ TBD, need to consult my employer first
 
 ## TODO
 
+- add proper context instead of naive one
 - add tests for various lifecycles and re-calculations
 - optional flatten in wrap-many
 - better support for multiple windows
@@ -289,11 +290,9 @@ TBD, need to consult my employer first
   - prop in composite lifecycle may be a map or a function taking
     instance and returning prop!
   - changing media should re-create media player
-
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
 - controlled props (mostly in controls, also stage's `:showing`)
-- `:on-text-changed` handler dispatches during advancing, it shouldn't
 - default `:managed` properties in controls
 - default focus traversable of controls!
 - default style classes!

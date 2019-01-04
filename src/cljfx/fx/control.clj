@@ -301,6 +301,11 @@
             :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
                           :default :vertical]
             :placeholder [:setter lifecycle/dynamic]
+            :on-selected-item-changed [(mutator/property-change-listener
+                                         #(.selectedItemProperty
+                                            (.getSelectionModel ^ListView %)))
+                                       (lifecycle/wrap-coerce lifecycle/event-handler
+                                                              coerce/change-listener)]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^ListView %1) %2))
                              lifecycle/scalar
@@ -465,6 +470,11 @@
             :on-sort [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :placeholder [:setter lifecycle/dynamic]
             :row-factory [:setter lifecycle/scalar]
+            :on-selected-item-changed [(mutator/property-change-listener
+                                         #(.selectedItemProperty
+                                            (.getSelectionModel ^TableView %)))
+                                       (lifecycle/wrap-coerce lifecycle/event-handler
+                                                              coerce/change-listener)]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^TableView %1) %2))
                              lifecycle/scalar
@@ -606,6 +616,11 @@
             :placeholder [:setter lifecycle/dynamic]
             :root [:setter lifecycle/dynamic]
             :row-factory [:setter lifecycle/scalar]
+            :on-selected-item-changed [(mutator/property-change-listener
+                                         #(.selectedItemProperty
+                                            (.getSelectionModel ^TreeTableView %)))
+                                       (lifecycle/wrap-coerce lifecycle/event-handler
+                                                              coerce/change-listener)]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^TreeTableView %1) %2))
                              lifecycle/scalar
@@ -653,6 +668,11 @@
             :on-edit-start [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-scroll-to [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :root [:setter lifecycle/dynamic]
+            :on-selected-item-changed [(mutator/property-change-listener
+                                         #(.selectedItemProperty
+                                            (.getSelectionModel ^TreeView %)))
+                                       (lifecycle/wrap-coerce lifecycle/event-handler
+                                                              coerce/change-listener)]
             :selection-mode [(mutator/setter
                                #(.setSelectionMode (.getSelectionModel ^TreeView %1) %2))
                              lifecycle/scalar

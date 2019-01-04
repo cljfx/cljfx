@@ -43,6 +43,21 @@
      `delete (fn [_ component opts]
                (delete (:lifecycle component) (:child component) opts))}))
 
+(def ^:dynamic *in-progress?* false)
+
+(def root
+  (with-meta
+    [::root]
+    {`create (fn [_ desc opts]
+               (binding [*in-progress?* true]
+                 (create dynamic desc opts)))
+     `advance (fn [_ component desc opts]
+                (binding [*in-progress?* true]
+                  (advance dynamic component desc opts)))
+     `delete (fn [_ component opts]
+               (binding [*in-progress?* true]
+                 (delete dynamic component opts)))}))
+
 (defn- call-dynamic-fn [desc]
   ((:fx/type desc) (dissoc desc :fx/type)))
 
@@ -101,9 +116,17 @@
      `delete (fn [_ _ _])}))
 
 (defn- make-handler-fn [desc opts]
-  (if (map? desc)
-    (let [f (:fx.opt/map-event-handler opts)]
-      #(f (assoc desc :fx/event %)))
+  (cond
+    (map? desc)
+    (let [map-event-handler (:fx.opt/map-event-handler opts)]
+      #(when-not *in-progress?*
+         (map-event-handler (assoc desc :fx/event %))))
+
+    (fn? desc)
+    #(when-not *in-progress?*
+       (desc %))
+
+    :else
     desc))
 
 (defn- create-event-handler-component [desc opts]
