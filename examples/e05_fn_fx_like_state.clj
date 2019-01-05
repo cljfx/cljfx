@@ -1,5 +1,5 @@
 (ns e05-fn-fx-like-state
-  (:require [cljfx.api :as cljfx]))
+  (:require [cljfx.api :as fx]))
 
 (def *state
   (atom {:first-name "Vlad"
@@ -40,8 +40,8 @@
   (swap! *state assoc (:key event) (:fx/event event)))
 
 (def app
-  (cljfx/create-app
-    :middleware (cljfx/wrap-map-desc root)
+  (fx/create-app
+    :middleware (fx/wrap-map-desc root)
     :opts {:fx.opt/map-event-handler map-event-handler}))
 
-(cljfx/mount-app *state app)
+(fx/mount-app *state app)

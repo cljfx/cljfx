@@ -34,10 +34,10 @@ class, or a function, which receives this map as argument and returns
 another description. Minimal example:
 ```clj
 (ns example
-  (:require [cljfx.api :as cljfx]))
+  (:require [cljfx.api :as fx]))
 
-(cljfx/on-fx-thread
-  (cljfx/create-component
+(fx/on-fx-thread
+  (fx/create-component
     {:fx/type :stage
      :showing true
      :title "Cljfx example"
@@ -62,7 +62,7 @@ cljfx will advance all the mutable state underneath to match this
 description. Example:
 ```clj
 (def app
-  (cljfx/create-app))
+  (fx/create-app))
 
 (defn root [{:keys [showing]}]
   {:fx/type :stage
@@ -120,12 +120,12 @@ contents instead. Here is how it's done:
 ;; Here description is just passed as an argument to function component.
 
 (def app
-  (cljfx/create-app
-    :middleware (cljfx/wrap-map-desc assoc :fx/type root)))
+  (fx/create-app
+    :middleware (fx/wrap-map-desc assoc :fx/type root)))
 
 ;; Convenient way to add watch to an atom + immediately render app
 
-(cljfx/mount-app *state app)
+(fx/mount-app *state app)
 ```
 Evaluating code above pops up this window:
 
@@ -187,10 +187,10 @@ dispatched event):
 
 ;; Provide map-event-handler to app as an option
 
-(cljfx/mount-app
+(fx/mount-app
   *state
-  (cljfx/create-app
-    :middleware (cljfx/wrap-map-desc assoc :fx/type root)
+  (fx/create-app
+    :middleware (fx/wrap-map-desc assoc :fx/type root)
     :opts {:fx.opt/map-event-handler map-event-handler}))
 
 ```
@@ -206,7 +206,7 @@ Some components accept specially treated keys. Main uses are:
    advancing get reordered instead of recreated if their position in
    child list is changed. Consider this example:
    ```clj
-   (let [component-1 (cljfx/create-component
+   (let [component-1 (fx/create-component
                        {:fx/type :v-box
                         :children [{:fx/type :label
                                     :fx/key 1
@@ -214,8 +214,8 @@ Some components accept specially treated keys. Main uses are:
                                    {:fx/type :label
                                     :fx/key 2
                                     :text "- buy socks"}]})
-         [milk-1 socks-1] (vec (.getChildren (cljfx/instance component-1)))
-         component-2 (cljfx/advance-component
+         [milk-1 socks-1] (vec (.getChildren (fx/instance component-1)))
+         component-2 (fx/advance-component
                        component-1
                        {:fx/type :v-box
                         :children [{:fx/type :label
@@ -224,7 +224,7 @@ Some components accept specially treated keys. Main uses are:
                                    {:fx/type :label
                                     :fx/key 1
                                     :text "- buy milk"}]})
-         [socks-2 milk-2] (vec (.getChildren (cljfx/instance component-2)))]
+         [socks-2 milk-2] (vec (.getChildren (fx/instance component-2)))]
      (and (identical? milk-1 milk-2)
           (identical? socks-1 socks-2)))
    => true
@@ -237,8 +237,8 @@ Some components accept specially treated keys. Main uses are:
    properties can be specified via keywords namespaced by pane's
    fx-type:
    ```clj
-   (cljfx/on-fx-thread
-     (cljfx/create-component
+   (fx/on-fx-thread
+     (fx/create-component
        {:fx/type :stage
         :showing true
         :scene {:fx/type :scene

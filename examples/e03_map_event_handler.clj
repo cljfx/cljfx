@@ -1,5 +1,5 @@
 (ns e03-map-event-handler
-  (:require [cljfx.api :as cljfx])
+  (:require [cljfx.api :as fx])
   (:import [javafx.scene.input KeyCode]))
 
 (def *state
@@ -21,7 +21,7 @@
     (reset! *state nil)))
 
 (def app
-  (cljfx/create-app
+  (fx/create-app
     :opts {:fx.opt/map-event-handler map-event-handler}))
 
-(cljfx/mount-app *state app)
+(fx/mount-app *state app)

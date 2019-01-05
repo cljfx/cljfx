@@ -1,5 +1,5 @@
 (ns e08-media
-  (:require [cljfx.api :as cljfx]))
+  (:require [cljfx.api :as fx]))
 
 (def *state
   (atom {:media-state :playing
@@ -76,8 +76,8 @@
     (prn e)))
 
 (def app
-  (cljfx/create-app
+  (fx/create-app
     :opts {:fx.opt/map-event-handler map-event-handler}
-    :middleware (cljfx/wrap-map-desc root)))
+    :middleware (fx/wrap-map-desc root)))
 
-(cljfx/mount-app *state app)
+(fx/mount-app *state app)

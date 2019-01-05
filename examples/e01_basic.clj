@@ -1,8 +1,8 @@
 (ns e01-basic
-  (:require [cljfx.api :as cljfx]))
+  (:require [cljfx.api :as fx]))
 
-(cljfx/on-fx-thread
-  (cljfx/create-component
+(fx/on-fx-thread
+  (fx/create-component
     {:fx/type :stage
      :showing true
      :always-on-top true

@@ -1,5 +1,5 @@
 (ns e07-panes
-  (:require [cljfx.api :as cljfx]))
+  (:require [cljfx.api :as fx]))
 
 (def anchor-pane
   {:fx/type :anchor-pane
@@ -156,8 +156,8 @@
                :max-width Double/MAX_VALUE
                :text "expanded label"}]})
 
-(cljfx/on-fx-thread
-  (cljfx/create-component
+(fx/on-fx-thread
+  (fx/create-component
     {:fx/type :stage
      :showing true
      :title "Pane examples"

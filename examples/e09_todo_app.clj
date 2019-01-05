@@ -1,5 +1,5 @@
 (ns e09-todo-app
-  (:require [cljfx.api :as cljfx])
+  (:require [cljfx.api :as fx])
   (:import [javafx.scene.input KeyCode]))
 
 (def *state
@@ -59,8 +59,8 @@
                                             :done false}))))
     nil))
 
-(cljfx/mount-app
+(fx/mount-app
   *state
-  (cljfx/create-app
-    :middleware (cljfx/wrap-map-desc assoc :fx/type root)
+  (fx/create-app
+    :middleware (fx/wrap-map-desc assoc :fx/type root)
     :opts {:fx.opt/map-event-handler map-event-handler}))

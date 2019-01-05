@@ -1,5 +1,5 @@
 (ns e04-state-with-context
-  (:require [cljfx.api :as cljfx]))
+  (:require [cljfx.api :as fx]))
 
 (def *state
   (atom {:first-name "Vlad"
@@ -29,11 +29,11 @@
                                 :key :last-name}]}}}))
 
 (def app
-  (cljfx/create-app
+  (fx/create-app
     :middleware (comp
-                  cljfx/wrap-set-desc-as-context
-                  (cljfx/wrap-map-desc (constantly {:fx/type root})))
-    :opts {:fx.opt/type->lifecycle #(or (cljfx/keyword->lifecycle %)
-                                        (cljfx/fn->lifecycle-with-context %))}))
+                  fx/wrap-set-desc-as-context
+                  (fx/wrap-map-desc (constantly {:fx/type root})))
+    :opts {:fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
+                                        (fx/fn->lifecycle-with-context %))}))
 
-(cljfx/mount-app *state app)
+(fx/mount-app *state app)
