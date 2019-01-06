@@ -277,7 +277,6 @@ TBD, need to consult my employer first
 
 - add proper context instead of naive one
 - add tests for various lifecycles and re-calculations
-- optional flatten in wrap-many
 - better support for multiple windows
 - expand on props and composite lifecycle. What's known about them:
   - ctor:
@@ -295,9 +294,6 @@ TBD, need to consult my employer first
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
 - controlled props (mostly in controls, also stage's `:showing`)
-- default `:managed` properties in controls
-- default focus traversable of controls!
-- default style classes!
 - default on-x-changed prop change listeners!
 - advanced docs: lifecycles, opts, contexts, styles etc.
 
@@ -306,5 +302,5 @@ TBD, need to consult my employer first
 - prop lifecycle
 - how to handle dialogs, animations and other possibly missed things?
 - escape hatch to force-re-render everything?
-- make jfx-media and jfx-web optional?
 - update to same desc should be identical (component-vec)
+- optional flatten in wrap-many for maps?

@@ -9,7 +9,9 @@
   (lifecycle.composite/describe Region
     :ctor []
     :extends [fx.node/lifecycle]
-    :props {:pick-on-bounds [:setter lifecycle/scalar :default true]
+    :props {;; overrides
+            :pick-on-bounds [:setter lifecycle/scalar :default true]
+            ;; definitions
             :background [:setter lifecycle/scalar :coerce coerce/background]
             :border [:setter lifecycle/scalar :coerce coerce/border]
             :cache-shape [:setter lifecycle/scalar :default true]

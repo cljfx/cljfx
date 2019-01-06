@@ -10,7 +10,11 @@
   (lifecycle.composite/describe SplitPane
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:divider-positions [:setter lifecycle/scalar
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                          :default "split-pane"]
+            ;; definitions
+            :divider-positions [:setter lifecycle/scalar
                                 :coerce #(into-array Double/TYPE %)
                                 :default []]
             :items [:list lifecycle/dynamics]

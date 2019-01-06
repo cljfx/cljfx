@@ -4,13 +4,19 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.media MediaView]
-           [javafx.scene.image ImageView]))
+           [javafx.scene.image ImageView]
+           [javafx.geometry NodeOrientation]))
 
 (def lifecycle
   (lifecycle.composite/describe MediaView
     :ctor []
     :extends [fx.node/lifecycle]
-    :props {:media-player [:setter lifecycle/dynamic]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "media-view"]
+            :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)
+                               :default :left-to-right]
+            ;; definitions
+            :media-player [:setter lifecycle/dynamic]
             :on-error [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :preserve-ratio [:setter lifecycle/scalar :default true]
             :smooth [:setter lifecycle/scalar :default ImageView/SMOOTH_DEFAULT]

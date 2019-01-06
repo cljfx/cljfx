@@ -9,5 +9,9 @@
   (lifecycle.composite/describe ColorPicker
     :ctor []
     :extends [fx.combo-box-base/lifecycle]
-    :props {:value [:setter lifecycle/scalar :coerce coerce/color]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                          :default "color-picker"]
+            ;; definitions
+            :value [:setter lifecycle/scalar :coerce coerce/color :default :white]
             :custom-colors [:list lifecycle/scalar :coerce #(map coerce/color %)]}))

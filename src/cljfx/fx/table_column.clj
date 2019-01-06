@@ -19,7 +19,10 @@
   (lifecycle.composite/describe TableColumn
     :ctor []
     :extends [fx.table-column-base/lifecycle]
-    :props {:cell-factory [:setter lifecycle/scalar :default TableColumn/DEFAULT_CELL_FACTORY]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "table-column"]
+            ;; definitions
+            :cell-factory [:setter lifecycle/scalar :default TableColumn/DEFAULT_CELL_FACTORY]
             :cell-value-factory [:setter lifecycle/scalar :coerce table-cell-value-factory]
             :columns [:list lifecycle/dynamics]
             :on-edit-cancel [:setter lifecycle/event-handler :coerce coerce/event-handler]

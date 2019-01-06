@@ -5,7 +5,8 @@
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control TableView SelectionMode]
-           [javafx.util Callback]))
+           [javafx.util Callback]
+           [javafx.scene AccessibleRole]))
 
 (defn- table-resize-policy [x]
   (cond
@@ -27,7 +28,12 @@
   (lifecycle.composite/describe TableView
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:column-resize-policy [:setter lifecycle/scalar :coerce table-resize-policy
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "table-view"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :table-view]
+            ;; definitions
+            :column-resize-policy [:setter lifecycle/scalar :coerce table-resize-policy
                                    :default :unconstrained]
             :columns [:list lifecycle/dynamics]
             :editable [:setter lifecycle/scalar :default false]

@@ -25,7 +25,10 @@
   (lifecycle.composite/describe TreeTableColumn
     :ctor []
     :extends [fx.table-column-base/lifecycle]
-    :props {:cell-factory [:setter lifecycle/scalar
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "table-column"]
+            ;; definitions
+            :cell-factory [:setter lifecycle/scalar
                            :default TreeTableColumn/DEFAULT_CELL_FACTORY]
             :cell-value-factory [:setter lifecycle/scalar
                                  :coerce tree-table-cell-value-factory]

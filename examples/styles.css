@@ -4,14 +4,14 @@ VBox {
 Label {
     -fx-text-fill: white;
 }
-TextField {
+.text-input {
     -fx-text-fill: white;
     -fx-background-color: #666;
     -fx-background-radius: 4 4 0 0;
     -fx-border-color: #333;
     -fx-border-width: 0 0 4 0;
 }
-TextField:focused {
+.text-input:focused {
     -fx-border-color: #f9a527;
 }
 

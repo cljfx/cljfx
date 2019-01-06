@@ -5,13 +5,19 @@
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control ListView SelectionMode]
-           [javafx.geometry Orientation]))
+           [javafx.geometry Orientation]
+           [javafx.scene AccessibleRole]))
 
 (def lifecycle
   (lifecycle.composite/describe ListView
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:cell-factory [:setter lifecycle/scalar]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "list-view"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :list-view]
+            ;; definitions
+            :cell-factory [:setter lifecycle/scalar]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]
             :items [:list lifecycle/scalar]

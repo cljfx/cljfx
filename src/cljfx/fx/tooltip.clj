@@ -10,7 +10,10 @@
   (lifecycle.composite/describe Tooltip
     :ctor []
     :extends [fx.popup-control/lifecycle]
-    :props {:content-display [:setter lifecycle/scalar
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tooltip"]
+            ;; definitions
+            :content-display [:setter lifecycle/scalar
                               :coerce (coerce/enum ContentDisplay)
                               :default :left]
             :font [:setter lifecycle/scalar :coerce coerce/font :default :default]

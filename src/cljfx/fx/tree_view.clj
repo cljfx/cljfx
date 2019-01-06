@@ -4,13 +4,19 @@
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TreeView SelectionMode]))
+  (:import [javafx.scene.control TreeView SelectionMode]
+           [javafx.scene AccessibleRole]))
 
 (def lifecycle
   (lifecycle.composite/describe TreeView
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:cell-factory [:setter lifecycle/scalar]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tree-view"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :tree-view]
+            ;; definitions
+            :cell-factory [:setter lifecycle/scalar]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]
             :on-edit-cancel [:setter lifecycle/event-handler :coerce coerce/event-handler]

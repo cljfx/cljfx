@@ -4,13 +4,19 @@
             [cljfx.coerce :as coerce]
             [cljfx.fx.shape :as fx.shape])
   (:import [javafx.scene.text Text TextBoundsType TextAlignment FontSmoothingType]
-           [javafx.geometry VPos]))
+           [javafx.geometry VPos]
+           [javafx.scene AccessibleRole]))
 
 (def lifecycle
   (lifecycle.composite/describe Text
     :ctor []
     :extends [fx.shape/lifecycle]
-    :props {:text [:setter lifecycle/scalar :default ""]
+    :props {;; overrides
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :text]
+            :pick-on-bounds [:setter lifecycle/scalar :default true]
+            ;; definitions
+            :text [:setter lifecycle/scalar :default ""]
             :x [:setter lifecycle/scalar :coerce double :default 0.0]
             :y [:setter lifecycle/scalar :coerce double :default 0.0]
             :font [:setter lifecycle/scalar :coerce coerce/font]

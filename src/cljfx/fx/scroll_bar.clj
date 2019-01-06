@@ -10,10 +10,15 @@
   (lifecycle.composite/describe ScrollBar
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:block-increment [:setter lifecycle/scalar :coerce double :default 10.0]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                          :default "scroll-bar"]
+            ;; definitions
+            :block-increment [:setter lifecycle/scalar :coerce double :default 10.0]
             :max [:setter lifecycle/scalar :coerce double :default 100.0]
             :min [:setter lifecycle/scalar :coerce double :default 0.0]
-            :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation) :default :horizontal]
+            :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
+                          :default :horizontal]
             :unit-increment [:setter lifecycle/scalar :coerce double :default 1.0]
             :value [:setter lifecycle/scalar :coerce double :default 0.0]
             :visible-amount [:setter lifecycle/scalar :coerce double :default 15.0]}))

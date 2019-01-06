@@ -4,13 +4,20 @@
             [cljfx.coerce :as coerce]
             [cljfx.fx.button-base :as fx.button-base])
   (:import [javafx.scene.control MenuButton]
-           [javafx.geometry Side]))
+           [javafx.geometry Side]
+           [javafx.scene AccessibleRole]))
 
 (def lifecycle
   (lifecycle.composite/describe MenuButton
     :ctor []
     :extends [fx.button-base/lifecycle]
-    :props {:items [:list lifecycle/dynamics]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-button"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :menu-button]
+            :mnemonic-parsing [:setter lifecycle/scalar :default true]
+            ;; definitions
+            :items [:list lifecycle/dynamics]
             :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]

@@ -5,7 +5,8 @@
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control TreeTableView SelectionMode TreeSortMode]
-           [javafx.util Callback]))
+           [javafx.util Callback]
+           [javafx.scene AccessibleRole]))
 
 (defn- tree-table-resize-policy [x]
   (cond
@@ -24,7 +25,13 @@
   (lifecycle.composite/describe TreeTableView
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:column-resize-policy [:setter lifecycle/scalar
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                          :default "tree-table-view"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :tree-table-view]
+            ;; definitions
+            :column-resize-policy [:setter lifecycle/scalar
                                    :coerce tree-table-resize-policy
                                    :default :unconstrained]
             :columns [:list lifecycle/dynamics]

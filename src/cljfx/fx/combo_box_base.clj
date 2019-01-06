@@ -8,7 +8,10 @@
 (def lifecycle
   (lifecycle.composite/describe ComboBoxBase
     :extends [fx.control/lifecycle]
-    :props {:editable [:setter lifecycle/scalar :default false]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "combo-box-base"]
+            ;; definitions
+            :editable [:setter lifecycle/scalar :default false]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]

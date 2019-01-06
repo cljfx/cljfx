@@ -4,7 +4,8 @@
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control ScrollPane ScrollPane$ScrollBarPolicy]
-           [javafx.geometry Bounds BoundingBox]))
+           [javafx.geometry Bounds BoundingBox]
+           [javafx.scene AccessibleRole]))
 
 (defn- bounds [x]
   (cond
@@ -29,7 +30,12 @@
   (lifecycle.composite/describe ScrollPane
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:content [:setter lifecycle/dynamic]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "scroll-pane"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :scroll-pane]
+            ;; definitions
+            :content [:setter lifecycle/dynamic]
             :fit-to-height [:setter lifecycle/scalar :default false]
             :fit-to-width [:setter lifecycle/scalar :default false]
             :hbar-policy [:setter lifecycle/scalar

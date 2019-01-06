@@ -14,7 +14,10 @@
 (def lifecycle
   (lifecycle.composite/describe TextInputControl
     :extends [fx.control/lifecycle]
-    :props {:editable [:setter lifecycle/scalar :default true]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "text-input"]
+            ;; definitions
+            :editable [:setter lifecycle/scalar :default true]
             :font [:setter lifecycle/scalar :coerce coerce/font :default :default]
             :prompt-text [:setter lifecycle/scalar :default ""]
             :text [(mutator/setter (fn [^TextInputControl control text]

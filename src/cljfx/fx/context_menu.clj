@@ -9,5 +9,11 @@
   (lifecycle.composite/describe ContextMenu
     :ctor []
     :extends [fx.popup-control/lifecycle]
-    :props {:items [:list lifecycle/dynamics]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                          :default "context-menu"]
+            :auto-hide [:setter lifecycle/scalar :default true]
+            :consume-auto-hiding-events [:setter lifecycle/scalar :default false]
+            ;; definitions
+            :items [:list lifecycle/dynamics]
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]}))

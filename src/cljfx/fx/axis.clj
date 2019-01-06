@@ -11,7 +11,10 @@
 (def lifecycle
   (lifecycle.composite/describe Axis
     :extends [fx.region/lifecycle]
-    :props {:side [:setter lifecycle/scalar :coerce (coerce/enum Side)]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "axis"]
+            ;; definitions
+            :side [:setter lifecycle/scalar :coerce (coerce/enum Side)]
             :label [:setter lifecycle/scalar]
             :tick-mark-visible [:setter lifecycle/scalar :default true]
             :tick-labels-visible [:setter lifecycle/scalar :default true]

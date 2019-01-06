@@ -17,7 +17,7 @@
             :on-closed [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-selection-changed [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :style [:setter lifecycle/scalar :coerce coerce/style]
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class]
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tab"]
             :text [:setter lifecycle/scalar]
             :tooltip [:setter lifecycle/dynamic]
             :user-data [:setter lifecycle/scalar]}))

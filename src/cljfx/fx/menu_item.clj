@@ -18,7 +18,8 @@
             :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-menu-validation [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :style [:setter lifecycle/scalar :coerce coerce/style :default ""]
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class]
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                          :default "menu-item"]
             :text [:setter lifecycle/scalar]
             :user-data [:setter lifecycle/scalar]
             :visible [:setter lifecycle/scalar :default true]}))

@@ -5,13 +5,19 @@
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control Slider]
-           [javafx.geometry Orientation]))
+           [javafx.geometry Orientation]
+           [javafx.scene AccessibleRole]))
 
 (def lifecycle
   (lifecycle.composite/describe Slider
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:block-increment [:setter lifecycle/scalar :coerce double :default 10.0]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "slider"]
+            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                              :default :slider]
+            ;; definitions
+            :block-increment [:setter lifecycle/scalar :coerce double :default 10.0]
             :label-formatter [:setter lifecycle/scalar :coerce coerce/string-converter]
             :major-tick-unit [:setter lifecycle/scalar :coerce double :default 25.0]
             :max [:setter lifecycle/scalar :coerce double :default 100.0]

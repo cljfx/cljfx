@@ -11,7 +11,12 @@
   (lifecycle.composite/describe ButtonBar
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:button-min-width [:setter lifecycle/scalar :coerce double]
+    :props {;; overrides
+            :style-class [:list lifecycle/scalar
+                          :coerce coerce/style-class
+                          :default "button-bar"]
+            ;; definitions
+            :button-min-width [:setter lifecycle/scalar :coerce double]
             :button-order [:setter lifecycle/scalar]
             :buttons [:list (-> lifecycle/dynamic
                                 (lifecycle/wrap-extra-props
