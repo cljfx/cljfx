@@ -16,12 +16,13 @@
 
 (Platform/setImplicitExit false)
 
-(def ^{:arglists '([fx-type])} keyword->lifecycle
-  "Map with default lifecycles for JavaFX library
+(defn keyword->lifecycle
+  "When given fitting keyword, returns lifecycle for corresponding JavaFX class
 
-  Keywords correspond to kebab-cased class names from JavaFX library, such as `:stage`,
+  Fitting keywords are kebab-cased class names from JavaFX library, such as `:stage`,
   `:v-box` or `:svg-path`"
-  fx/keyword->lifecycle)
+  [fx-type]
+  (fx/keyword->lifecycle fx-type))
 
 (defn fn->lifecycle
   "When given function, returns lifecycle that uses said function
@@ -95,7 +96,7 @@
       in descriptions to determine what lifecycle will be used for that description
     - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
       of change-listener, event-handler or any other callback-like prop. It receives that
-      map with `:cljfx/event` key containing appropriate event data"
+      map with `:fx/event` key containing appropriate event data"
   [& {:keys [middleware opts]
       :or {middleware identity
            opts {}}}]

@@ -1,25 +1,16 @@
-(ns cljfx.fx.web
+(ns cljfx.fx.web-view
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
-            [cljfx.fx.control :as fx.control]
-            [cljfx.fx.scene :as fx.scene]
-            [cljfx.coerce :as coerce]
+            [cljfx.fx.node :as fx.node]
             [cljfx.lifecycle :as lifecycle]
+            [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator])
-  (:import [javafx.scene.web HTMLEditor WebView]
+  (:import [javafx.scene.web WebView]
            [javafx.scene.text FontSmoothingType]))
 
-(def html-editor
-  (lifecycle.composite/describe HTMLEditor
-    :ctor []
-    :extends [fx.control/control]
-    :props {:html-text
-            [:setter lifecycle/scalar :default
-             "<html><head></head><body contenteditable=\"true\"></body></html>"]}))
-
-(def web-view
+(def lifecycle
   (lifecycle.composite/describe WebView
     :ctor []
-    :extends [fx.scene/node]
+    :extends [fx.node/lifecycle]
     :props {:context-menu-enabled [:setter lifecycle/scalar :default true]
             :font-scale [:setter lifecycle/scalar :coerce double :default 1.0]
             :font-smoothing-type [:setter lifecycle/scalar
@@ -33,7 +24,3 @@
             :zoom [:setter lifecycle/scalar :coerce double :default 1.0]
             :url [(mutator/setter #(.load (.getEngine ^WebView %1) %2))
                   lifecycle/scalar]}))
-
-(def keyword->lifecycle
-  {:html-editor html-editor
-   :web-view web-view})

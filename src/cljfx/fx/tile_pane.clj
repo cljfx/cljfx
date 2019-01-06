@@ -1,0 +1,30 @@
+(ns cljfx.fx.tile-pane
+  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+            [cljfx.lifecycle :as lifecycle]
+            [cljfx.coerce :as coerce]
+            [cljfx.fx.pane :as fx.pane])
+  (:import [javafx.scene.layout TilePane]
+           [javafx.geometry Pos Orientation]))
+
+(def lifecycle
+  (lifecycle.composite/describe TilePane
+    :ctor []
+    :extends [fx.pane/lifecycle]
+    :props {:children
+            [:list (-> lifecycle/dynamic
+                       (lifecycle/wrap-constraints
+                         {:tile-pane/margin ["tilepane-margin" coerce/insets]
+                          :tile-pane/alignment ["tilepane-alignment" (coerce/enum Pos)]})
+                       lifecycle/wrap-many)]
+            :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                        :default :top-left]
+            :hgap [:setter lifecycle/scalar :coerce double :default 0.0]
+            :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
+                          :default :horizontal]
+            :pref-columns [:setter lifecycle/scalar :coerce int :default 5]
+            :pref-rows [:setter lifecycle/scalar :coerce int :default 5]
+            :pref-tile-height [:setter lifecycle/scalar :coerce double :default -1.0]
+            :pref-tile-width [:setter lifecycle/scalar :coerce double :default -1.0]
+            :tile-alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
+                             :default :center]
+            :vgap [:setter lifecycle/scalar :coerce double :default 0.0]}))

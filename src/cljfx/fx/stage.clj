@@ -2,48 +2,17 @@
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.mutator :as mutator])
-  (:import [javafx.stage Window PopupWindow PopupWindow$AnchorLocation Stage StageStyle]))
+            [cljfx.mutator :as mutator]
+            [cljfx.fx.window :as fx.window])
+  (:import [javafx.stage Stage StageStyle]))
 
 (set! *warn-on-reflection* true)
 
-(def window
-  (lifecycle.composite/describe Window
-    :props {:event-dispatcher [:setter lifecycle/scalar]
-            :force-integer-render-scale [:setter lifecycle/scalar :default false]
-            :height [:setter lifecycle/scalar :coerce double :default Double/NaN]
-            :on-close-request [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :opacity [:setter lifecycle/scalar :coerce double :default 1]
-            :render-scale-x [:setter lifecycle/scalar :coerce double :default 1]
-            :render-scale-y [:setter lifecycle/scalar :coerce double :default 1]
-            :user-data [:setter lifecycle/scalar]
-            :width [:setter lifecycle/scalar :coerce double :default Double/NaN]
-            :x [:setter lifecycle/scalar :coerce double :default Double/NaN]
-            :y [:setter lifecycle/scalar :coerce double :default Double/NaN]}))
-
-(def popup-window
-  (lifecycle.composite/describe PopupWindow
-    :extends [window]
-    :props {:anchor-location [:setter lifecycle/scalar
-                              :coerce (coerce/enum PopupWindow$AnchorLocation)
-                              :default :window-top-left]
-            :anchor-x [:setter lifecycle/scalar :coerce double :default Double/NaN]
-            :anchor-y [:setter lifecycle/scalar :coerce double :default Double/NaN]
-            :auto-fix [:setter lifecycle/scalar :default true]
-            :auto-hide [:setter lifecycle/scalar :default false]
-            :consume-auto-hiding-events [:setter lifecycle/scalar :default true]
-            :hide-on-escape [:setter lifecycle/scalar :default true]
-            :on-auto-hide [:setter lifecycle/event-handler :coerce coerce/event-handler]}))
-
-(def stage
+(def lifecycle
   (-> Stage
       (lifecycle.composite/describe
         :ctor []
-        :extends [window]
+        :extends [fx.window/lifecycle]
         :prop-order {:showing 1}
         :props {:always-on-top [:setter lifecycle/scalar :default false]
                 :full-screen [:setter lifecycle/scalar :default false]
@@ -70,6 +39,3 @@
                           lifecycle/scalar
                           :default false]})
       (lifecycle/wrap-on-delete #(.hide ^Stage %))))
-
-(def keyword->lifecycle
-  {:stage stage})
