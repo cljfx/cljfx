@@ -2,7 +2,9 @@
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.fx.pane :as fx.pane])
+            [cljfx.fx.pane :as fx.pane]
+            [cljfx.mutator :as mutator]
+            [cljfx.prop :as prop])
   (:import [javafx.scene.layout GridPane Priority]
            [javafx.geometry HPos VPos Pos]))
 
@@ -12,18 +14,72 @@
     :extends [fx.pane/lifecycle]
     :props {:children
             [:list (-> lifecycle/dynamic
-                       (lifecycle/wrap-constraints
-                         {:grid-pane/margin ["gridpane-margin" coerce/insets]
-                          :grid-pane/halignment ["gridpane-halignment" (coerce/enum HPos)]
-                          :grid-pane/valignment ["gridpane-valignment" (coerce/enum VPos)]
-                          :grid-pane/hgrow ["gridpane-hgrow" (coerce/enum Priority)]
-                          :grid-pane/vgrow ["gridpane-vgrow" (coerce/enum Priority)]
-                          :grid-pane/row ["gridpane-row" int]
-                          :grid-pane/column ["gridpane-column" int]
-                          :grid-pane/row-span ["gridpane-row-span" int]
-                          :grid-pane/column-span ["gridpane-column-span" int]
-                          :grid-pane/full-width ["gridpane-fill-width" boolean]
-                          :grid-pane/full-height ["gridpane-fill-height" boolean]})
+                       (lifecycle/wrap-extra-props
+                         {:grid-pane/margin
+                          (prop/make
+                            (mutator/constraint "gridpane-margin")
+                            lifecycle/scalar
+                            :coerce coerce/insets)
+
+                          :grid-pane/halignment
+                          (prop/make
+                            (mutator/constraint "gridpane-halignment")
+                            lifecycle/scalar
+                            :coerce (coerce/enum HPos))
+
+                          :grid-pane/valignment
+                          (prop/make
+                            (mutator/constraint "gridpane-valignment")
+                            lifecycle/scalar
+                            :coerce (coerce/enum VPos))
+
+                          :grid-pane/hgrow
+                          (prop/make
+                            (mutator/constraint "gridpane-hgrow")
+                            lifecycle/scalar
+                            :coerce (coerce/enum Priority))
+
+                          :grid-pane/vgrow
+                          (prop/make
+                            (mutator/constraint "gridpane-vgrow")
+                            lifecycle/scalar
+                            :coerce (coerce/enum Priority))
+
+                          :grid-pane/row
+                          (prop/make
+                            (mutator/constraint "gridpane-row")
+                            lifecycle/scalar
+                            :coerce int)
+
+                          :grid-pane/column
+                          (prop/make
+                            (mutator/constraint "gridpane-column")
+                            lifecycle/scalar
+                            :coerce int)
+
+                          :grid-pane/row-span
+                          (prop/make
+                            (mutator/constraint "gridpane-row-span")
+                            lifecycle/scalar
+                            :coerce int)
+
+                          :grid-pane/column-span
+                          (prop/make
+                            (mutator/constraint "gridpane-column-span")
+                            lifecycle/scalar
+                            :coerce int)
+
+                          :grid-pane/full-width
+                          (prop/make
+                            (mutator/constraint "gridpane-fill-width")
+                            lifecycle/scalar
+                            :coerce boolean)
+
+                          :grid-pane/full-height
+                          (prop/make
+                            (mutator/constraint "gridpane-fill-height")
+                            lifecycle/scalar
+                            :coerce boolean)})
                        lifecycle/wrap-many)]
             :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
                         :default :top-left]

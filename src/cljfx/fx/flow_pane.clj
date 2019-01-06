@@ -2,7 +2,9 @@
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.fx.pane :as fx.pane])
+            [cljfx.fx.pane :as fx.pane]
+            [cljfx.prop :as prop]
+            [cljfx.mutator :as mutator])
   (:import [javafx.scene.layout FlowPane]
            [javafx.geometry Pos HPos Orientation VPos]))
 
@@ -11,8 +13,12 @@
     :ctor []
     :extends [fx.pane/lifecycle]
     :props {:children [:list (-> lifecycle/dynamic
-                                 (lifecycle/wrap-constraints
-                                   {:flow-pane/margin ["flowpane-margin" coerce/insets]})
+                                 (lifecycle/wrap-extra-props
+                                   {:flow-pane/margin
+                                    (prop/make
+                                      (mutator/constraint "flowpane-margin")
+                                      lifecycle/scalar
+                                      :coerce coerce/insets)})
                                  lifecycle/wrap-many)]
             :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos) :default :top-left]
             :column-halignment [:setter lifecycle/scalar :coerce (coerce/enum HPos)

@@ -2,7 +2,9 @@
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.fx.pane :as fx.pane])
+            [cljfx.fx.pane :as fx.pane]
+            [cljfx.mutator :as mutator]
+            [cljfx.prop :as prop])
   (:import [javafx.scene.layout TilePane]
            [javafx.geometry Pos Orientation]))
 
@@ -12,9 +14,18 @@
     :extends [fx.pane/lifecycle]
     :props {:children
             [:list (-> lifecycle/dynamic
-                       (lifecycle/wrap-constraints
-                         {:tile-pane/margin ["tilepane-margin" coerce/insets]
-                          :tile-pane/alignment ["tilepane-alignment" (coerce/enum Pos)]})
+                       (lifecycle/wrap-extra-props
+                         {:tile-pane/margin
+                          (prop/make
+                            (mutator/constraint "tilepane-margin")
+                            lifecycle/scalar
+                            :coerce coerce/insets)
+
+                          :tile-pane/alignment
+                          (prop/make
+                            (mutator/constraint "tilepane-alignment")
+                            lifecycle/scalar
+                            :coerce (coerce/enum Pos))})
                        lifecycle/wrap-many)]
             :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
                         :default :top-left]

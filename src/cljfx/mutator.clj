@@ -1,7 +1,8 @@
 (ns cljfx.mutator
   (:import [java.util Collection]
            [javafx.beans.value ObservableValue ChangeListener]
-           [javafx.collections ObservableList]))
+           [javafx.collections ObservableList]
+           [javafx.scene Node]))
 
 (set! *warn-on-reflection* true)
 
@@ -73,3 +74,16 @@
                  (replace! mutator instance coerce old-value new-value))
      `retract! (fn [_ instance coerce value]
                  (replace! mutator instance coerce value default))}))
+
+(defn constraint
+  "This mutator re-implements javafx.scene.layout.Pane/setConstraint (which is internal)"
+  [constraint-str]
+  (setter
+    (fn [^Node node value]
+      (let [properties (.getProperties node)
+            parent (.getParent node)]
+        (if (nil? value)
+          (.remove properties constraint-str)
+          (.put properties constraint-str value))
+        (when parent
+          (.requestLayout parent))))))

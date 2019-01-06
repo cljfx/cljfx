@@ -1,9 +1,7 @@
 (ns cljfx.lifecycle
   (:require [cljfx.component :as component]
-            [cljfx.mutator :as mutator]
             [cljfx.prop :as prop]
-            [clojure.set :as set])
-  (:import [javafx.scene Node]))
+            [clojure.set :as set]))
 
 (set! *warn-on-reflection* true)
 
@@ -279,29 +277,10 @@
                (log-fn `delete (:desc component))
                (delete lifecycle (:child component) opts))}))
 
-(defn- constraint-mutator
-  "This mutator re-implements javafx.scene.layout.Pane/setConstraint (which is internal)"
-  [constraint]
-  (mutator/setter
-    (fn [^Node node value]
-      (let [properties (.getProperties node)
-            parent (.getParent node)]
-        (if (nil? value)
-          (.remove properties constraint)
-          (.put properties constraint value))
-        (when parent
-          (.requestLayout parent))))))
-
-(defn- constraint+coerce->prop [[constraint coerce]]
-  (prop/make (constraint-mutator constraint) scalar :coerce coerce))
-
-(defn wrap-constraints [lifecycle kw->constraint+coerce]
-  (let [props-config (->> kw->constraint+coerce
-                          (map (juxt key #(-> % val constraint+coerce->prop)))
-                          (into {}))
-        prop-key-set (set (keys props-config))]
+(defn wrap-extra-props [lifecycle props-config]
+  (let [prop-key-set (set (keys props-config))]
     (with-meta
-      [::pane-child-node lifecycle kw->constraint+coerce]
+      [::pane-child-node lifecycle props-config]
       {`create
        (fn [_ desc opts]
          (let [child-desc (apply dissoc desc prop-key-set)

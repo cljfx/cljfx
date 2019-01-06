@@ -1,4 +1,4 @@
-(ns e07-panes
+(ns e07-extra-props
   (:require [cljfx.api :as fx]))
 
 (def anchor-pane
@@ -156,6 +156,16 @@
                :max-width Double/MAX_VALUE
                :text "expanded label"}]})
 
+(def button-bar
+  {:fx/type :button-bar
+   :button-min-width 100
+   :buttons [{:fx/type :button
+              :button-bar/button-data :yes
+              :text "Yes"}
+             {:fx/type :button
+              :button-bar/button-data :no
+              :text "No"}]})
+
 (fx/on-fx-thread
   (fx/create-component
     {:fx/type :stage
@@ -196,4 +206,8 @@
                            {:fx/type :tab
                             :text "VBox"
                             :closable false
-                            :content v-box}]}}}))
+                            :content v-box}
+                           {:fx/type :tab
+                            :text "Button Bar"
+                            :closable false
+                            :content button-bar}]}}}))

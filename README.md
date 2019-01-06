@@ -232,10 +232,12 @@ Some components accept specially treated keys. Main uses are:
    With `:fx/key`-s specified, advancing of this component reordered
    children of VBox, and didn't change text of any labels, because their
    descriptions stayed the same.
-2. Setting pane constraints. If node is placed inside a pane, pane can
-   layout it differently by looking into properties map of a node. These
-   properties can be specified via keywords namespaced by pane's
-   fx-type:
+2. Providing extra props available in certain contexts. If node is
+   placed inside a pane, pane can layout it differently by looking into
+   properties map of a node. Nodes placed in ButtonBar can have
+   OS-specific ordering depending on assigned ButtonData. These
+   properties can be specified via keywords namespaced by container's
+   fx-type. Example:
    ```clj
    (fx/on-fx-thread
      (fx/create-component
@@ -261,7 +263,7 @@ Some components accept specially treated keys. Main uses are:
    ![](doc/pane-example.png)
 
    For a more complete example of available pane keys, see
-   [examples/e07_panes.clj](examples/e07_panes.clj)
+   [examples/e07_extra_props.clj](examples/e07_extra_props.clj)
 
 ## More examples
 
