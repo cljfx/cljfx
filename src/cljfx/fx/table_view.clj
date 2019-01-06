@@ -4,13 +4,30 @@
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TableView SelectionMode]))
+  (:import [javafx.scene.control TableView SelectionMode]
+           [javafx.util Callback]))
+
+(defn- table-resize-policy [x]
+  (cond
+    (instance? Callback x) x
+    (= :unconstrained x) TableView/UNCONSTRAINED_RESIZE_POLICY
+    (= :constrained x) TableView/CONSTRAINED_RESIZE_POLICY
+    (fn? x) (reify Callback
+              (call [_ param]
+                (x param)))
+    :else (coerce/fail Callback x)))
+
+(defn- table-sort-policy [x]
+  (cond
+    (instance? Callback x) x
+    (= :default x) TableView/DEFAULT_SORT_POLICY
+    :else (coerce/fail Callback x)))
 
 (def lifecycle
   (lifecycle.composite/describe TableView
     :ctor []
     :extends [fx.control/lifecycle]
-    :props {:column-resize-policy [:setter lifecycle/scalar :coerce coerce/table-resize-policy
+    :props {:column-resize-policy [:setter lifecycle/scalar :coerce table-resize-policy
                                    :default :unconstrained]
             :columns [:list lifecycle/dynamics]
             :editable [:setter lifecycle/scalar :default false]
@@ -32,6 +49,6 @@
                              :coerce (coerce/enum SelectionMode)
                              :default :single]
             ; :sort-order [:list] ;; should be list of refs to columns
-            :sort-policy [:setter lifecycle/scalar :coerce coerce/table-sort-policy
+            :sort-policy [:setter lifecycle/scalar :coerce table-sort-policy
                           :default :default]
             :table-menu-button-visible [:setter lifecycle/scalar :default false]}))

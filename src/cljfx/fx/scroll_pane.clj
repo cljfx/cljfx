@@ -3,7 +3,27 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control ScrollPane ScrollPane$ScrollBarPolicy]))
+  (:import [javafx.scene.control ScrollPane ScrollPane$ScrollBarPolicy]
+           [javafx.geometry Bounds BoundingBox]))
+
+(defn- bounds [x]
+  (cond
+    (instance? Bounds x)
+    x
+
+    (= 0 x)
+    (BoundingBox. 0.0 0.0 0.0 0.0 0.0 0.0)
+
+    (and (vector? x) (= 4 (count x)))
+    (let [[x y w h] x]
+      (BoundingBox. x y w h))
+
+    (and (vector? x) (= 6 (count x)))
+    (let [[x y z w h d] x]
+      (BoundingBox. x y z w h d))
+
+    :else
+    (coerce/fail Bounds x)))
 
 (def lifecycle
   (lifecycle.composite/describe ScrollPane
@@ -26,7 +46,7 @@
             :vbar-policy [:setter lifecycle/scalar
                           :coerce (coerce/enum ScrollPane$ScrollBarPolicy)
                           :default :as-needed]
-            :viewport-bounds [:setter lifecycle/scalar :coerce coerce/bounds :default 0]
+            :viewport-bounds [:setter lifecycle/scalar :coerce bounds :default 0]
             :vmax [:setter lifecycle/scalar :coerce double :default 1.0]
             :vmin [:setter lifecycle/scalar :coerce double :default 0.0]
             :vvalue [:setter lifecycle/scalar :coerce double :default 0.0]}))

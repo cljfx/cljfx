@@ -300,7 +300,6 @@ TBD, need to consult my employer first
 - advanced docs: lifecycles, opts, contexts, styles etc.
 
 ## Food for thought
-- research lazy-loading of classes
 - wrap-factory may use some memoizing and advancing
 - prop lifecycle
 - how to handle dialogs, animations and other possibly missed things?

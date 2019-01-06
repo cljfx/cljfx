@@ -2,12 +2,19 @@
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
-  (:import [javafx.scene.shape TriangleMesh]))
+  (:import [javafx.scene.shape TriangleMesh VertexFormat]))
+
+(defn vertex-format [x]
+  (cond
+    (instance? VertexFormat x) x
+    (= :point-texcoord x) VertexFormat/POINT_TEXCOORD
+    (= :point-normal-texcoord) VertexFormat/POINT_NORMAL_TEXCOORD
+    :else (coerce/fail VertexFormat x)))
 
 (def lifecycle
   (lifecycle.composite/describe TriangleMesh
     :ctor []
-    :props {:vertex-format [:setter lifecycle/scalar :coerce coerce/vertex-format]
+    :props {:vertex-format [:setter lifecycle/scalar :coerce vertex-format]
             :faces [:list lifecycle/scalar :coerce #(map int %)]
             :face-smoothing-groups [:list lifecycle/scalar :coerce #(map int %)]
             :normals [:list lifecycle/scalar :coerce #(map float %)]

@@ -1,19 +1,17 @@
 (ns cljfx.coerce
   (:require [clojure.string :as str]
             [cljfx.event :as event])
-  (:import [java.util List Collection]
+  (:import [java.util List]
            [javafx.event EventHandler]
            [javafx.scene Cursor]
            [javafx.scene.image Image]
            [javafx.scene.paint Paint Color LinearGradient ImagePattern CycleMethod
                                RadialGradient Stop]
-           [javafx.scene.effect FloatMap]
-           [javafx.geometry Point3D Rectangle2D Insets Side Bounds BoundingBox]
+           [javafx.geometry Point3D Rectangle2D Insets Side]
            [javafx.scene.transform Rotate]
-           [javafx.scene.media AudioSpectrumListener]
            [javafx.util Duration StringConverter Callback]
            [javafx.scene.text Font FontWeight FontPosture]
-           [javafx.scene.shape VertexFormat StrokeType StrokeLineJoin StrokeLineCap]
+           [javafx.scene.shape StrokeType StrokeLineJoin StrokeLineCap]
            [javafx.scene.layout Background BackgroundFill CornerRadii BackgroundImage
                                 BackgroundRepeat BackgroundPosition BackgroundSize Border
                                 BorderStroke BorderStrokeStyle BorderWidths BorderImage
@@ -28,11 +26,6 @@
                                   LongStringConverter NumberStringConverter
                                   ShortStringConverter]
            [javafx.scene.input KeyCombination KeyCode]
-           [java.time.chrono Chronology IsoChronology HijrahChronology JapaneseChronology
-                             MinguoChronology ThaiBuddhistChronology]
-           [javafx.collections ObservableList FXCollections]
-           [javafx.scene.control TableView TableColumn$CellDataFeatures TextFormatter
-                                 TreeTableView TreeTableColumn$CellDataFeatures]
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.beans Observable InvalidationListener]))
 
@@ -44,7 +37,7 @@
       (str/replace "-" "_")
       str/upper-case))
 
-(defn- fail [target x]
+(defn fail [target x]
   (throw (ex-info "Don't know how to coerce" {:target target :x x})))
 
 (defn enum
@@ -148,18 +141,6 @@
     :else
     (throw (fail Runnable x))))
 
-(defn- map->float-map [m]
-  (let [ret (FloatMap. (:width m 1) (:height m 1))]
-    (doseq [{x :x y :y [s0 s1] :s} (:samples m)]
-      (.setSamples ret x y s0 s1))
-    ret))
-
-(defn float-map [x]
-  (cond
-    (instance? FloatMap x) x
-    (map? x) (map->float-map x)
-    :else (fail FloatMap x)))
-
 (defn point-3d [x]
   (cond
     (instance? Point3D x) x
@@ -202,22 +183,6 @@
     (map? x) (Rectangle2D. (:min-x x) (:min-y x) (:width x) (:height x))
     :else (fail Rectangle2D x)))
 
-(defn audio-spectrum-listener [x]
-  (cond
-    (instance? AudioSpectrumListener x)
-    x
-
-    (fn? x)
-    (reify AudioSpectrumListener
-      (spectrumDataUpdate [_ timestamp duration magnitudes phases]
-        (x {:timestamp timestamp
-            :duration duration
-            :magnitudes (into [] magnitudes)
-            :phases (into [] phases)})))
-
-    :else
-    (fail AudioSpectrumListener x)))
-
 (defn duration [x]
   (cond
     (instance? Duration x) x
@@ -258,14 +223,7 @@
                  (Font/font ^String family)))
     :else (fail Font x)))
 
-(defn vertex-format [x]
-  (cond
-    (instance? VertexFormat x) x
-    (= :point-texcoord x) VertexFormat/POINT_TEXCOORD
-    (= :point-normal-texcoord) VertexFormat/POINT_NORMAL_TEXCOORD
-    :else (fail VertexFormat x)))
-
-(defn corner-radii [x]
+(defn- corner-radii [x]
   (cond
     (instance? CornerRadii x) x
     (= :empty x) CornerRadii/EMPTY
@@ -503,85 +461,7 @@
     (instance? Callback x) x
     :else (fail Callback x)))
 
-(defn page-factory [x]
-  (cond
-    (instance? Callback x)
-    x
-
-    (fn? x)
-    (reify Callback
-      (call [_ param]
-        (x param)))
-
-    :else
-    (fail Callback x)))
-
-(defn chronology [x]
-  (if (instance? Chronology x)
-    x
-    (case x
-      :iso IsoChronology/INSTANCE
-      :hijrah HijrahChronology/INSTANCE
-      :japanese JapaneseChronology/INSTANCE
-      :minguo MinguoChronology/INSTANCE
-      :thai-buddhist ThaiBuddhistChronology/INSTANCE
-      (fail Chronology x))))
-
-(defn bounds [x]
-  (cond
-    (instance? Bounds x)
-    x
-
-    (= 0 x)
-    (BoundingBox. 0.0 0.0 0.0 0.0 0.0 0.0)
-
-    (and (vector? x) (= 4 (count x)))
-    (let [[x y w h] x]
-      (BoundingBox. x y w h))
-
-    (and (vector? x) (= 6 (count x)))
-    (let [[x y z w h d] x]
-      (BoundingBox. x y z w h d))
-
-    :else
-    (fail Bounds x)))
-
-(defn observable-list [x]
-  (cond
-    (instance? ObservableList x) x
-    (instance? Collection x) (FXCollections/observableArrayList ^Collection x)
-    :else (fail ObservableList x)))
-
-(defn table-resize-policy [x]
-  (cond
-    (instance? Callback x) x
-    (= :unconstrained x) TableView/UNCONSTRAINED_RESIZE_POLICY
-    (= :constrained x) TableView/CONSTRAINED_RESIZE_POLICY
-    (fn? x) (reify Callback
-              (call [_ param]
-                (x param)))
-    :else (fail Callback x)))
-
-(defn tree-table-resize-policy [x]
-  (cond
-    (instance? Callback x) x
-    (= :unconstrained x) TreeTableView/UNCONSTRAINED_RESIZE_POLICY
-    (= :constrained x) TreeTableView/CONSTRAINED_RESIZE_POLICY
-    :else (fail Callback "x")))
-
-(defn table-sort-policy [x]
-  (cond
-    (instance? Callback x) x
-    (= :default x) TableView/DEFAULT_SORT_POLICY
-    :else (fail Callback x)))
-
-(defn tree-table-sort-policy [x]
-  (cond
-    (instance? Callback x) x
-    (= :default x) TreeTableView/DEFAULT_SORT_POLICY
-    :else (fail Callback x)))
-
-(defn- constant-observable-value [x]
+(defn constant-observable-value [x]
   (reify ObservableValue
     (^void addListener [_ ^ChangeListener _])
     (^void removeListener [_ ^ChangeListener _])
@@ -602,29 +482,6 @@
 
     :else
     (fail ChangeListener x)))
-
-(defn table-cell-value-factory [x]
-  (cond
-    (instance? Callback x) x
-    (fn? x) (reify Callback
-              (call [_ param]
-                (let [^TableColumn$CellDataFeatures features param]
-                  (constant-observable-value (x (.getValue features))))))
-    :else (fail Callback x)))
-
-(defn tree-table-cell-value-factory [x]
-  (cond
-    (instance? Callback x) x
-    (fn? x) (reify Callback
-              (call [_ param]
-                (let [^TreeTableColumn$CellDataFeatures features param]
-                  (constant-observable-value (x (.getValue (.getValue features)))))))
-    :else (fail Callback x)))
-
-(defn text-formatter [x]
-  (cond
-    (instance? TextFormatter x) x
-    :else (fail TextFormatter x)))
 
 (defn style-class [x]
   (if (string? x) [x] x))

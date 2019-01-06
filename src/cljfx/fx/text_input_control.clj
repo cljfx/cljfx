@@ -4,7 +4,12 @@
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TextInputControl]))
+  (:import [javafx.scene.control TextInputControl TextFormatter]))
+
+(defn- text-formatter [x]
+  (cond
+    (instance? TextFormatter x) x
+    :else (coerce/fail TextFormatter x)))
 
 (def lifecycle
   (lifecycle.composite/describe TextInputControl
@@ -19,4 +24,4 @@
             :on-text-changed [:property-change-listener
                               (lifecycle/wrap-coerce lifecycle/event-handler
                                                      coerce/change-listener)]
-            :text-formatter [:setter lifecycle/scalar :coerce coerce/text-formatter]}))
+            :text-formatter [:setter lifecycle/scalar :coerce text-formatter]}))

@@ -3,7 +3,23 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.table-column-base :as fx.table-column-base])
-  (:import [javafx.scene.control TreeTableColumn TreeTableColumn$SortType]))
+  (:import [javafx.scene.control TreeTableColumn TreeTableColumn$SortType
+                                 TreeTableColumn$CellDataFeatures]
+           [javafx.util Callback]))
+
+(defn- tree-table-cell-value-factory [x]
+  (cond
+    (instance? Callback x)
+    x
+
+    (fn? x)
+    (reify Callback
+      (call [_ param]
+        (let [^TreeTableColumn$CellDataFeatures features param]
+          (coerce/constant-observable-value (x (.getValue (.getValue features)))))))
+
+    :else
+    (coerce/fail Callback x)))
 
 (def lifecycle
   (lifecycle.composite/describe TreeTableColumn
@@ -12,7 +28,7 @@
     :props {:cell-factory [:setter lifecycle/scalar
                            :default TreeTableColumn/DEFAULT_CELL_FACTORY]
             :cell-value-factory [:setter lifecycle/scalar
-                                 :coerce coerce/tree-table-cell-value-factory]
+                                 :coerce tree-table-cell-value-factory]
             :columns [:list lifecycle/dynamics]
             :on-edit-cancel [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-edit-commit [:setter lifecycle/event-handler :coerce coerce/event-handler] ;; has private default

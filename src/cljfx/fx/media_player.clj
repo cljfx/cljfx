@@ -3,7 +3,23 @@
             [cljfx.mutator :as mutator]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
-  (:import [javafx.scene.media MediaPlayer]))
+  (:import [javafx.scene.media MediaPlayer AudioSpectrumListener]))
+
+(defn- audio-spectrum-listener [x]
+  (cond
+    (instance? AudioSpectrumListener x)
+    x
+
+    (fn? x)
+    (reify AudioSpectrumListener
+      (spectrumDataUpdate [_ timestamp duration magnitudes phases]
+        (x {:timestamp timestamp
+            :duration duration
+            :magnitudes (into [] magnitudes)
+            :phases (into [] phases)})))
+
+    :else
+    (coerce/fail AudioSpectrumListener x)))
 
 (def lifecycle
   (-> MediaPlayer
@@ -18,7 +34,7 @@
                         :default :stopped]
                 :audio-spectrum-interval [:setter lifecycle/scalar :coerce double :default 0.1]
                 :audio-spectrum-listener [:setter lifecycle/event-handler
-                                          :coerce coerce/audio-spectrum-listener]
+                                          :coerce audio-spectrum-listener]
                 :audio-spectrum-num-bands [:setter lifecycle/scalar :coerce int :default 128]
                 :audio-spectrum-threshold [:setter lifecycle/scalar :coerce int :default -60]
                 :auto-play [:setter lifecycle/scalar :default false]

@@ -4,14 +4,28 @@
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TreeTableView SelectionMode TreeSortMode]))
+  (:import [javafx.scene.control TreeTableView SelectionMode TreeSortMode]
+           [javafx.util Callback]))
+
+(defn- tree-table-resize-policy [x]
+  (cond
+    (instance? Callback x) x
+    (= :unconstrained x) TreeTableView/UNCONSTRAINED_RESIZE_POLICY
+    (= :constrained x) TreeTableView/CONSTRAINED_RESIZE_POLICY
+    :else (coerce/fail Callback "x")))
+
+(defn- tree-table-sort-policy [x]
+  (cond
+    (instance? Callback x) x
+    (= :default x) TreeTableView/DEFAULT_SORT_POLICY
+    :else (coerce/fail Callback x)))
 
 (def lifecycle
   (lifecycle.composite/describe TreeTableView
     :ctor []
     :extends [fx.control/lifecycle]
     :props {:column-resize-policy [:setter lifecycle/scalar
-                                   :coerce coerce/tree-table-resize-policy
+                                   :coerce tree-table-resize-policy
                                    :default :unconstrained]
             :columns [:list lifecycle/dynamics]
             :editable [:setter lifecycle/scalar :default false]
@@ -36,7 +50,7 @@
             :sort-mode [:setter lifecycle/scalar :coerce (coerce/enum TreeSortMode)
                         :default :all-descendants]
             ; :sort-order [:list] ;; should be list of refs to columns
-            :sort-policy [:setter lifecycle/scalar :coerce coerce/tree-table-sort-policy
+            :sort-policy [:setter lifecycle/scalar :coerce tree-table-sort-policy
                           :default :default]
             ; :tree-column [:setter lifecycle/many-dynamic-hiccups] ;; should be a ref to column
             :table-menu-button-visible [:setter lifecycle/scalar :default false]}))
