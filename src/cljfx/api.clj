@@ -45,6 +45,11 @@
   (fn [lifecycle]
     (apply lifecycle/wrap-map-desc lifecycle f args)))
 
+(defn wrap-many
+  "Middleware function that allows to use multiple components instead of a single one"
+  [lifecycle]
+  (lifecycle/wrap-many lifecycle))
+
 (defmacro on-fx-thread
   "Execute body (in implicit do) on fx thread
 

@@ -276,8 +276,18 @@ TBD, need to consult my employer first
 ## TODO
 
 - add proper context instead of naive one
+- default on-x-changed prop change listeners!
+- advanced docs: lifecycles, opts, contexts, styles etc.
+
+## Food for thought
+- controlled props (mostly in controls, also stage's `:showing`)
+- wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations
-- better support for multiple windows
+- prop lifecycle
+- how to handle dialogs, animations and other possibly missed things?
+- escape hatch to force-re-render everything?
+- update to same desc should be identical (component-vec)
+- optional flatten in wrap-many for maps?
 - expand on props and composite lifecycle. What's known about them:
   - ctor:
     - scene requires root, root can be replaced afterwards
@@ -293,14 +303,3 @@ TBD, need to consult my employer first
   - changing media should re-create media player
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
-- controlled props (mostly in controls, also stage's `:showing`)
-- default on-x-changed prop change listeners!
-- advanced docs: lifecycles, opts, contexts, styles etc.
-
-## Food for thought
-- wrap-factory may use some memoizing and advancing
-- prop lifecycle
-- how to handle dialogs, animations and other possibly missed things?
-- escape hatch to force-re-render everything?
-- update to same desc should be identical (component-vec)
-- optional flatten in wrap-many for maps?
