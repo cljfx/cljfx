@@ -1,6 +1,7 @@
 (ns cljfx.lifecycle
   (:require [cljfx.component :as component]
             [cljfx.prop :as prop]
+            [cljfx.context :as context]
             [clojure.set :as set]))
 
 (set! *warn-on-reflection* true)
@@ -371,29 +372,6 @@
                (delete lifecycle component opts)
                (f (component/instance component)))}))
 
-(defn- inject-context [desc opts]
-  (assoc desc :fx/context (::context opts)))
-
-(def dynamic-fn-with-context->dynamic
-  (with-meta
-    [::dynamic-fn-with-context->dynamic]
-    {`create (fn [_ desc opts]
-               (create dynamic-fn->dynamic (inject-context desc opts) opts))
-     `advance (fn [_ component desc opts]
-                (advance dynamic-fn->dynamic component (inject-context desc opts) opts))
-     `delete (fn [_ component opts]
-               (delete dynamic-fn->dynamic component opts))}))
-
-(defn wrap-desc-as-context [lifecycle]
-  (with-meta
-    [::context lifecycle]
-    {`create (fn [_ desc opts]
-               (create lifecycle desc (assoc opts ::context desc)))
-     `advance (fn [_ component desc opts]
-                (advance lifecycle component desc (assoc opts ::context desc)))
-     `delete (fn [_ component opts]
-               (delete lifecycle component opts))}))
-
 (defn wrap-map-desc [lifecycle f & args]
   (with-meta
     [::map-desc lifecycle f]
@@ -403,3 +381,38 @@
                 (advance lifecycle component (apply f desc args) opts))
      `delete (fn [_ component opts]
                (delete lifecycle component opts))}))
+
+(defn wrap-context-desc [lifecycle]
+  (with-meta
+    [::desc->context lifecycle]
+    {`create (fn [_ desc opts]
+               (with-meta
+                 {:context desc
+                  :child (create lifecycle desc (assoc opts :fx/context desc))}
+                 {`component/instance #(-> % :child component/instance)}))
+     `advance (fn [_ component desc opts]
+                (-> component
+                    (assoc :context desc)
+                    (update :child #(advance lifecycle % desc (assoc opts :fx/context desc)))))
+     `delete (fn [_ component opts]
+               (context/clear-cache! (:context component))
+               (delete lifecycle (:child component) opts))}))
+
+(def ^:private call-context-fn
+  ^:fx/cached
+  (fn [context desc]
+    ((:fx/type desc) (-> desc (dissoc :fx/type) (assoc :fx/context context)))))
+
+(defn- sub-context-fn [desc opts]
+  (let [context (:fx/context opts)]
+    (context/sub context call-context-fn desc)))
+
+(def context-fn->dynamic
+  (with-meta
+    [::context-fn->dynamic]
+    {`create (fn [_ desc opts]
+               (create dynamic (sub-context-fn desc opts) opts))
+     `advance (fn [_ component desc opts]
+                (advance dynamic component (sub-context-fn desc opts) opts))
+     `delete (fn [_ component opts]
+               (delete dynamic component opts))}))

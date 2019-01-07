@@ -4,6 +4,8 @@
             [cljfx.fx.transform :as fx.transform])
   (:import [javafx.scene.transform Translate]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Translate
     :ctor []

@@ -3,6 +3,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.chart XYChart$Data]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe XYChart$Data
     :ctor []

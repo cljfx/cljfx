@@ -6,6 +6,8 @@
   (:import [javafx.scene.control Separator]
            [javafx.geometry HPos Orientation VPos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Separator
     :ctor []

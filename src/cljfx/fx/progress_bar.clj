@@ -5,6 +5,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import (javafx.scene.control ProgressBar)))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe ProgressBar
     :ctor []

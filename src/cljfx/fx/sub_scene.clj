@@ -5,6 +5,8 @@
             [cljfx.fx.node :as fx.node])
   (:import [javafx.scene SubScene]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe SubScene
     :ctor [:root :width :height]

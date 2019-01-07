@@ -8,6 +8,8 @@
   (:import [javafx.geometry Pos]
            [javafx.scene.layout BorderPane]))
 
+(set! *warn-on-reflection* true)
+
 (def ^:private border-pane-constrained-dynamic
   (lifecycle/wrap-extra-props
     lifecycle/dynamic

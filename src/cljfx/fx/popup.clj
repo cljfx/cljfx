@@ -4,6 +4,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.stage Popup]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Popup
     :ctor []

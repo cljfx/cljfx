@@ -6,6 +6,8 @@
   (:import [javafx.scene.control TableColumn TableColumn$SortType TableColumn$CellDataFeatures]
            [javafx.util Callback]))
 
+(set! *warn-on-reflection* true)
+
 (defn table-cell-value-factory [x]
   (cond
     (instance? Callback x) x

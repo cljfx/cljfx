@@ -4,6 +4,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.shape TriangleMesh VertexFormat]))
 
+(set! *warn-on-reflection* true)
+
 (defn vertex-format [x]
   (cond
     (instance? VertexFormat x) x

@@ -5,6 +5,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.control Accordion]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Accordion
     :ctor []

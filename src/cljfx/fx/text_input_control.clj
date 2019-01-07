@@ -6,6 +6,8 @@
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control TextInputControl TextFormatter]))
 
+(set! *warn-on-reflection* true)
+
 (defn- text-formatter [x]
   (cond
     (instance? TextFormatter x) x

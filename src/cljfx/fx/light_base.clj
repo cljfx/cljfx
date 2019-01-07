@@ -5,6 +5,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene LightBase]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe LightBase
     :extends [fx.node/lifecycle]

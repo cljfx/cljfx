@@ -5,6 +5,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.shape Arc ArcType]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Arc
     :ctor []

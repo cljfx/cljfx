@@ -5,6 +5,8 @@
   (:import [javafx.scene.layout ColumnConstraints Priority]
            [javafx.geometry HPos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe ColumnConstraints
     :ctor []

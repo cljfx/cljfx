@@ -3,6 +3,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.chart PieChart$Data]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe PieChart$Data
     :ctor [:name :pie-value]

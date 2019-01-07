@@ -4,6 +4,8 @@
             [cljfx.fx.shape :as fx.shape])
   (:import [javafx.scene.shape QuadCurve]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe QuadCurve
     :ctor []

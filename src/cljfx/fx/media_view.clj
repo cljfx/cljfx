@@ -7,6 +7,8 @@
            [javafx.scene.image ImageView]
            [javafx.geometry NodeOrientation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe MediaView
     :ctor []

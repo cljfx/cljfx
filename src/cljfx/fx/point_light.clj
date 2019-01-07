@@ -3,6 +3,8 @@
             [cljfx.fx.light-base :as fx.light-base])
   (:import [javafx.scene PointLight]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe PointLight
     :ctor []

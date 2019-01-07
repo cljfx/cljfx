@@ -5,6 +5,8 @@
             [cljfx.fx.menu-item :as fx.menu-item])
   (:import [javafx.scene.control Menu]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Menu
     :ctor []

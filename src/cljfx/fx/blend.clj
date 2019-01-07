@@ -4,6 +4,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.effect Blend BlendMode]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Blend
     :ctor []

@@ -3,6 +3,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect BoxBlur]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe BoxBlur
     :ctor []

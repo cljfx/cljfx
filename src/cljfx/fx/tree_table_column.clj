@@ -7,6 +7,8 @@
                                  TreeTableColumn$CellDataFeatures]
            [javafx.util Callback]))
 
+(set! *warn-on-reflection* true)
+
 (defn- tree-table-cell-value-factory [x]
   (cond
     (instance? Callback x)

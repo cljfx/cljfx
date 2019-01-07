@@ -4,6 +4,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.web HTMLEditor]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe HTMLEditor
     :ctor []

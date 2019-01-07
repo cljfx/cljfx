@@ -3,6 +3,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.control TreeItem]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe TreeItem
     :ctor []

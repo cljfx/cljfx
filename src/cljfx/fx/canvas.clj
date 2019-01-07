@@ -7,6 +7,8 @@
   (:import [javafx.scene.canvas Canvas]
            [javafx.geometry NodeOrientation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Canvas
     :ctor []

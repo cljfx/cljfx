@@ -3,6 +3,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect MotionBlur]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe MotionBlur
     :ctor []

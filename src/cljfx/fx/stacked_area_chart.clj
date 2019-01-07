@@ -4,6 +4,8 @@
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart StackedAreaChart]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe StackedAreaChart
     :ctor [:x-axis :y-axis]

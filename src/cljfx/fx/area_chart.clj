@@ -4,6 +4,8 @@
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart AreaChart]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe AreaChart
     :ctor [:x-axis :y-axis]

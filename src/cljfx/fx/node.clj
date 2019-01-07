@@ -7,6 +7,8 @@
            [javafx.scene.effect BlendMode]
            [javafx.geometry NodeOrientation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Node
     :props {:accessible-help [:setter lifecycle/scalar]

@@ -6,6 +6,8 @@
   (:import [javafx.scene.control Tooltip ContentDisplay OverrunStyle]
            [javafx.scene.text TextAlignment]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Tooltip
     :ctor []

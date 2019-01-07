@@ -4,6 +4,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.control SpinnerValueFactory]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe SpinnerValueFactory
     :props {:converter [:setter lifecycle/scalar :coerce coerce/string-converter]

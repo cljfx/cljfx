@@ -4,6 +4,8 @@
             [cljfx.fx.node :as fx.node])
   (:import [javafx.scene Group]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Group
     :ctor []

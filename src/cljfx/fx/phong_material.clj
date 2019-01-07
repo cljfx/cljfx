@@ -4,6 +4,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.paint PhongMaterial]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe PhongMaterial
     :ctor []

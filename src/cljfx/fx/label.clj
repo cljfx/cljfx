@@ -6,6 +6,8 @@
   (:import [javafx.scene.control Label]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   ;; TODO label has label-for prop - a component ref
   (lifecycle.composite/describe Label

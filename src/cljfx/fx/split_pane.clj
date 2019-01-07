@@ -6,6 +6,8 @@
   (:import [javafx.scene.control SplitPane]
            [javafx.geometry Orientation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe SplitPane
     :ctor []

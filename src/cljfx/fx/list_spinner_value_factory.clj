@@ -7,6 +7,8 @@
            [javafx.collections ObservableList FXCollections]
            [java.util Collection]))
 
+(set! *warn-on-reflection* true)
+
 (defn- observable-list [x]
   (cond
     (instance? ObservableList x) x

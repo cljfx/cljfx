@@ -7,6 +7,8 @@
            [javafx.geometry Pos]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe TextField
     :ctor []

@@ -5,6 +5,8 @@
             [cljfx.mutator :as mutator])
   (:import [javafx.scene.control MenuItem]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe MenuItem
     :ctor []

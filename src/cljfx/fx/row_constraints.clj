@@ -5,6 +5,8 @@
   (:import [javafx.scene.layout RowConstraints Priority]
            [javafx.geometry VPos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe RowConstraints
     :ctor []

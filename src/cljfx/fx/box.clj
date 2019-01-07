@@ -4,6 +4,8 @@
             [cljfx.fx.shape3d :as fx.shape3d])
   (:import [javafx.scene.shape Box]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Box
     :ctor []

@@ -7,6 +7,8 @@
            [javafx.geometry VPos]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Text
     :ctor []

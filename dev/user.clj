@@ -43,7 +43,7 @@
                           boolean ['lifecycle/scalar]
                           java.lang.Object ['lifecycle/scalar]
                           java.lang.String ['lifecycle/scalar]
-                          javafx.scene.Node ['lifecycle/dynamic-hiccup]
+                          javafx.scene.Node ['lifecycle/dynamic]
                           javafx.scene.paint.Color ['lifecycle/scalar :coerce 'coerce/color]
                           javafx.event.EventHandler ['lifecycle/scalar
                                                      :coerce 'coerce/event-handler]

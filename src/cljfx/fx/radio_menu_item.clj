@@ -5,6 +5,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.control RadioMenuItem]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe RadioMenuItem
     :ctor []

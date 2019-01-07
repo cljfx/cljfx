@@ -8,6 +8,8 @@
   (:import [javafx.scene.layout FlowPane]
            [javafx.geometry Pos HPos Orientation VPos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe FlowPane
     :ctor []

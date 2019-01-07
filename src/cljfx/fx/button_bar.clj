@@ -7,6 +7,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.control ButtonBar ButtonBar$ButtonData]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe ButtonBar
     :ctor []

@@ -6,6 +6,8 @@
             [cljfx.mutator :as mutator])
   (:import [javafx.scene.layout AnchorPane]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe AnchorPane
     :ctor []

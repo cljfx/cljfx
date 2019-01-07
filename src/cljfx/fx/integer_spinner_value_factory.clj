@@ -4,6 +4,8 @@
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.control SpinnerValueFactory$IntegerSpinnerValueFactory]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe SpinnerValueFactory$IntegerSpinnerValueFactory
     :ctor [:min :max]

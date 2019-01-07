@@ -6,6 +6,8 @@
   (:import [javafx.scene.control MenuBar]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe MenuBar
     :ctor []

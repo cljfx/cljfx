@@ -6,6 +6,8 @@
   (:import [javafx.scene.text TextFlow TextAlignment]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe TextFlow
     :ctor []

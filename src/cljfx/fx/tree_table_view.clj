@@ -8,6 +8,8 @@
            [javafx.util Callback]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (defn- tree-table-resize-policy [x]
   (cond
     (instance? Callback x) x
@@ -59,5 +61,5 @@
             ; :sort-order [:list] ;; should be list of refs to columns
             :sort-policy [:setter lifecycle/scalar :coerce tree-table-sort-policy
                           :default :default]
-            ; :tree-column [:setter lifecycle/many-dynamic-hiccups] ;; should be a ref to column
+            ; :tree-column [:setter lifecycle/dynamics] ;; should be a ref to column
             :table-menu-button-visible [:setter lifecycle/scalar :default false]}))

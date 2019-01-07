@@ -208,12 +208,12 @@ Another useful aspect of app function that should be used during development is
 refresh functionality: you can call app function with zero args and it will
 recreate all the components with current description.
 
-See wall-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
+See walk-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
 as an example of how to iterate on cljfx app in REPL.
 
 ### Special keys
 
-Some components accept specially treated keys. Main uses are:
+Sometimes components accept specially treated keys. Main uses are:
 
 1. Reordering of nodes (instead of re-creating them) in parents that may
    have many children. Descriptions that have `:fx/key` during
@@ -289,7 +289,6 @@ TBD, need to consult my employer first
 
 ## TODO
 
-- add proper context instead of naive one
 - default on-x-changed prop change listeners!
 - advanced docs: lifecycles, opts, contexts, lack of local state, styles etc.
 - :use-pref-size and :use-computed-size

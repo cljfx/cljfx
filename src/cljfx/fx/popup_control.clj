@@ -6,6 +6,8 @@
   (:import [javafx.scene.control PopupControl]
            [javafx.stage PopupWindow$AnchorLocation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe PopupControl
     :ctor []

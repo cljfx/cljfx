@@ -8,6 +8,8 @@
   (:import [javafx.scene.layout GridPane Priority]
            [javafx.geometry HPos VPos Pos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe GridPane
     :ctor []

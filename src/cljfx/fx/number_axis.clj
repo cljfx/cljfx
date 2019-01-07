@@ -4,6 +4,8 @@
             [cljfx.fx.value-axis :as fx.value-axis])
   (:import [javafx.scene.chart NumberAxis]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe NumberAxis
     :ctor []

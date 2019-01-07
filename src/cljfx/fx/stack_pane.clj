@@ -8,6 +8,8 @@
   (:import [javafx.scene.layout StackPane]
            [javafx.geometry Pos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe StackPane
     :ctor []

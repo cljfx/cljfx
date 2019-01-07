@@ -7,6 +7,8 @@
            [javafx.geometry Orientation]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe ToolBar
     :ctor []

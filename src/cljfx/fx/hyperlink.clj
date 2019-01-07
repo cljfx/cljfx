@@ -6,6 +6,8 @@
   (:import [javafx.scene.control Hyperlink]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Hyperlink
     :ctor []

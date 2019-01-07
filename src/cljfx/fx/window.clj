@@ -4,6 +4,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.stage Window]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Window
     :props {:event-dispatcher [:setter lifecycle/scalar]

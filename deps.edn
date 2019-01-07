@@ -5,5 +5,8 @@
         org.openjfx/javafx-media {:mvn/version "11"}
         org.openjfx/javafx-web {:mvn/version "11"}}
  :aliases {:examples {:extra-paths ["examples"]}
+           :cache {:extra-deps {org.clojure/core.cache {:mvn/version "0.7.1"}}}
            :dev {:extra-paths ["dev"]}
-           :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}}}
+           :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
+           :test {:extra-paths ["test"]
+                  :extra-deps {metosin/testit {:mvn/version "0.2.0"}}}}}

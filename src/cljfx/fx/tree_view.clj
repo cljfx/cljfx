@@ -7,6 +7,8 @@
   (:import [javafx.scene.control TreeView SelectionMode]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe TreeView
     :ctor []

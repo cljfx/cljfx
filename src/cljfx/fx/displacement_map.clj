@@ -4,6 +4,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.effect DisplacementMap FloatMap]))
 
+(set! *warn-on-reflection* true)
+
 (defn- map->float-map [m]
   (let [ret (FloatMap. (:width m 1) (:height m 1))]
     (doseq [{x :x y :y [s0 s1] :s} (:samples m)]

@@ -7,6 +7,8 @@
            [javafx.geometry Pos]
            [javafx.scene.text TextAlignment]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Labeled
     :extends [fx.control/lifecycle]

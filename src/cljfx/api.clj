@@ -4,7 +4,8 @@
             [cljfx.defaults :as defaults]
             [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.platform :as platform])
+            [cljfx.platform :as platform]
+            [cljfx.context :as context])
   (:import [javafx.application Platform]))
 
 (defonce initialized
@@ -31,13 +32,6 @@
   functions as fx-types to describe layout"
   [fx-type]
   (defaults/fn->lifecycle fx-type))
-
-(defn fn->lifecycle-with-context [fx-type]
-  (when (fn? fx-type) lifecycle/dynamic-fn-with-context->dynamic))
-
-(def wrap-set-desc-as-context
-  (fn [lifecycle]
-    (lifecycle/wrap-desc-as-context lifecycle)))
 
 (defn wrap-map-desc
   "Returns middleware function that applies f to passed description and passes it further"
@@ -101,7 +95,10 @@
       in descriptions to determine what lifecycle will be used for that description
     - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
       of change-listener, event-handler or any other callback-like prop. It receives that
-      map with `:fx/event` key containing appropriate event data"
+      map with `:fx/event` key containing appropriate event data
+
+  Calling app function with 0 arguments will re-render current state, which is useful
+  during development"
   [& {:keys [middleware opts]
       :or {middleware identity
            opts {}}}]
@@ -114,3 +111,72 @@
   with `deref`-ed value"
   [*ref app]
   (app/mount *ref app))
+
+(defn create-context
+  "Create a memoizing context for a map
+
+  Context should be treated as a black box with `sub` being an interface to access
+  context's content. Accessing content is possible via keys or subscription functions
+
+  Key is any value except functions that will be `get` from context map
+
+  Subscription function is a function that expects context as first argument.
+  If `:fx/cached` is `true` on such function's metadata, returned value will be memoized
+  in this context, resulting in cache lookups for subsequent `sub` calls on that function.
+
+  Cache will be reused on contexts derived by `swap-context` and `reset-context`
+  to minimize recalculations. To make it efficient, all calls to `sub` by subscription
+  functions are tracked, thus calling `sub` from subscription function on received context
+  is not allowed after said function returns. For example, all lazy sequences that may
+  call `sub` during computing of elements have to be realized."
+  ([m]
+   (create-context m identity))
+  ([m cache-factory]
+   (context/create m cache-factory)))
+
+(defn swap-context
+  "Create new context with context map being (apply f current-map args), reusing existing
+  cache"
+  [context f & args]
+  (apply context/swap context f args))
+
+(defn reset-context
+  "Create new context with context map being m, reusing existing cache"
+  [context m]
+  (context/reset context m))
+
+(defn unbind-context
+  "Frees context from tracking subscription functions
+
+  During debugging it may be useful to save context from subscription function to some
+  temporary state and then explore it. In that case context should be freed from tracking
+  debugged subscription function by calling `unbind-context` on it"
+  [context]
+  (context/unbind context))
+
+(defn sub
+  "Subscribe to key or subscription function in this context
+
+  Subscribing to key (which may be anything except functions) will return value
+  corresponding to that key in underlying context map
+
+  Subscription function is any function that expects context as it's first argument"
+  [context k-or-f & args]
+  (apply context/sub context k-or-f args))
+
+(defn fn->lifecycle-with-context
+  "When given function, returns lifecycle that uses said function with context
+
+  This function is supposed to be used as part of `:fx.opt/type->lifecycle` in conjunction
+  with `wrap-context-desc` being part of middleware"
+  [fx-type]
+  (when (fn? fx-type) lifecycle/context-fn->dynamic))
+
+(defn wrap-context-desc
+  "Middleware function that passes context description as option to lifecycle
+
+  This middleware is supposed to be used in conjunction with `fn->lifecycle-with-context`
+  which will then pass context to every function. Context is a black box wrapping
+  description map, with `sub` being an interface to that black box"
+  [lifecycle]
+  (lifecycle/wrap-context-desc lifecycle))

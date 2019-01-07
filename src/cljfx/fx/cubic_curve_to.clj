@@ -4,6 +4,8 @@
             [cljfx.fx.path-element :as fx.path-element])
   (:import [javafx.scene.shape CubicCurveTo]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe CubicCurveTo
     :ctor []

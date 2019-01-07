@@ -4,6 +4,8 @@
             [cljfx.fx.chart :as fx.chart])
   (:import [javafx.scene.chart PieChart]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe PieChart
     :ctor []

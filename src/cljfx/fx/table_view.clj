@@ -8,6 +8,8 @@
            [javafx.util Callback]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (defn- table-resize-policy [x]
   (cond
     (instance? Callback x) x

@@ -2,19 +2,21 @@
   (:require [cljfx.api :as fx]))
 
 (def *state
-  (atom {:first-name "Vlad"
-         :last-name "Protsenko"}))
+  (atom (fx/create-context
+          {:first-name "Vlad"
+           :last-name "Protsenko"})))
 
 (defn text-input [{:keys [fx/context label-text key]}]
   {:fx/type :v-box
    :children [{:fx/type :label
                :text label-text}
               {:fx/type :text-field
-               :on-text-changed #(swap! *state assoc key %)
-               :text (get context key)}]})
+               :on-text-changed #(swap! *state fx/swap-context assoc key %)
+               :text (fx/sub context key)}]})
 
 (defn root [{:keys [fx/context]}]
-  (let [{:keys [first-name last-name]} context]
+  (let [first-name (fx/sub context :first-name)
+        last-name (fx/sub context :last-name)]
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene
@@ -31,8 +33,9 @@
 (def app
   (fx/create-app
     :middleware (comp
-                  fx/wrap-set-desc-as-context
-                  (fx/wrap-map-desc (constantly {:fx/type root})))
+                  fx/wrap-context-desc
+                  (fx/wrap-map-desc (fn [_]
+                                      {:fx/type root})))
     :opts {:fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
                                         (fx/fn->lifecycle-with-context %))}))
 

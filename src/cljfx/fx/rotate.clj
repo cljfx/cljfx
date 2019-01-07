@@ -5,6 +5,8 @@
             [cljfx.fx.transform :as fx.transform])
   (:import [javafx.scene.transform Rotate]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Rotate
     :ctor []

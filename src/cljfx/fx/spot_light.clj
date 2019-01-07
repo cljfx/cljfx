@@ -4,6 +4,8 @@
             [cljfx.fx.point-light-effect :as fx.point-light-effect])
   (:import [javafx.scene.effect Light$Spot]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Light$Spot
     :ctor []

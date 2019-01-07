@@ -5,6 +5,8 @@
             [cljfx.fx.shape :as fx.shape])
   (:import [javafx.scene.shape Path FillRule]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Path
     :ctor []

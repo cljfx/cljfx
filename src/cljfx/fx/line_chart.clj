@@ -5,6 +5,8 @@
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart LineChart LineChart$SortingPolicy]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe LineChart
     :ctor [:x-axis :y-axis]

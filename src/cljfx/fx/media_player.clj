@@ -5,6 +5,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.media MediaPlayer AudioSpectrumListener]))
 
+(set! *warn-on-reflection* true)
+
 (defn- audio-spectrum-listener [x]
   (cond
     (instance? AudioSpectrumListener x)

@@ -8,6 +8,8 @@
                              MinguoChronology ThaiBuddhistChronology]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (defn- chronology [x]
   (if (instance? Chronology x)
     x

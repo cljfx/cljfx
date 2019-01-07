@@ -8,6 +8,8 @@
            [javafx.scene.text FontSmoothingType]
            [javafx.geometry NodeOrientation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe WebView
     :ctor []

@@ -5,6 +5,8 @@
             [cljfx.coerce :as coerce])
   (:import [javafx.stage PopupWindow PopupWindow$AnchorLocation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe PopupWindow
     :extends [fx.window/lifecycle]

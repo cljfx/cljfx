@@ -8,6 +8,8 @@
   (:import [javafx.scene.layout TilePane]
            [javafx.geometry Pos Orientation]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe TilePane
     :ctor []

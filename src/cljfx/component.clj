@@ -7,4 +7,7 @@
 
 (extend-protocol Component
   Object
+  (instance [this] this)
+
+  nil
   (instance [this] this))

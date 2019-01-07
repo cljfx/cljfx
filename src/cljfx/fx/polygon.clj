@@ -4,6 +4,8 @@
             [cljfx.fx.shape :as fx.shape])
   (:import [javafx.scene.shape Polygon]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Polygon
     :ctor []

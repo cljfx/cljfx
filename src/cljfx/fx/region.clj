@@ -5,6 +5,8 @@
             [cljfx.fx.node :as fx.node])
   (:import [javafx.scene.layout Region]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe Region
     :ctor []
