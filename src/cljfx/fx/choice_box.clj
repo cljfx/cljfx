@@ -6,6 +6,8 @@
   (:import [javafx.scene.control ChoiceBox]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe ChoiceBox
     :ctor []
@@ -22,4 +24,7 @@
             :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :value [:setter lifecycle/scalar]}))
+            :value [:setter lifecycle/scalar]
+            :on-value-changed [:property-change-listener
+                               (lifecycle/wrap-coerce lifecycle/event-handler
+                                                      coerce/change-listener)]}))

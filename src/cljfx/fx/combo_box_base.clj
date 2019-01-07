@@ -5,6 +5,8 @@
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control ComboBoxBase]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe ComboBoxBase
     :extends [fx.control/lifecycle]
@@ -18,4 +20,7 @@
             :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
             :prompt-text [:setter lifecycle/scalar]
-            :value [:setter lifecycle/scalar]}))
+            :value [:setter lifecycle/scalar]
+            :on-value-changed [:property-change-listener
+                               (lifecycle/wrap-coerce lifecycle/event-handler
+                                                      coerce/change-listener)]}))

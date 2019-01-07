@@ -159,7 +159,7 @@
                  {`component/instance :value}))
      `advance (fn [this component desc opts]
                 (if (and (= desc (:desc component))
-                         (= opts (:opts opts)))
+                         (= opts (:opts component)))
                   component
                   (create this desc opts)))
      `delete (fn [_ _ _])}))

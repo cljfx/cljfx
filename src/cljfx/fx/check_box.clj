@@ -7,6 +7,8 @@
            [javafx.scene AccessibleRole]
            [javafx.geometry Pos]))
 
+(set! *warn-on-reflection* true)
+
 (def lifecycle
   (lifecycle.composite/describe CheckBox
     :ctor []

@@ -2,11 +2,12 @@
   (:require [cljfx.lifecycle.composite :as lifecycle.composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control Slider]
            [javafx.geometry Orientation]
            [javafx.scene AccessibleRole]))
+
+(set! *warn-on-reflection* true)
 
 (def lifecycle
   (lifecycle.composite/describe Slider
@@ -29,8 +30,7 @@
             :show-tick-marks [:setter lifecycle/scalar :default false]
             :snap-to-ticks [:setter lifecycle/scalar :default false]
             :value [:setter lifecycle/scalar :coerce double :default 0.0]
-            :on-value-changed [(mutator/property-change-listener
-                                 #(.valueProperty ^Slider %))
+            :on-value-changed [:property-change-listener
                                (lifecycle/wrap-coerce lifecycle/event-handler
                                                       coerce/change-listener)]
             :value-changing [:setter lifecycle/scalar :default false]}))

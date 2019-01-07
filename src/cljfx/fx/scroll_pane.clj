@@ -7,6 +7,8 @@
            [javafx.geometry Bounds BoundingBox]
            [javafx.scene AccessibleRole]))
 
+(set! *warn-on-reflection* true)
+
 (defn- bounds [x]
   (cond
     (instance? Bounds x)
@@ -44,6 +46,9 @@
             :hmax [:setter lifecycle/scalar :coerce double :default 1.0]
             :hmin [:setter lifecycle/scalar :coerce double :default 0.0]
             :hvalue [:setter lifecycle/scalar :coerce double :default 0.0]
+            :on-hvalue-changed [:property-change-listener
+                                (lifecycle/wrap-coerce lifecycle/event-handler
+                                                       coerce/change-listener)]
             :min-viewport-height [:setter lifecycle/scalar :coerce double :default 0.0]
             :min-viewport-width [:setter lifecycle/scalar :coerce double :default 0.0]
             :pannable [:setter lifecycle/scalar :default false]
@@ -55,4 +60,7 @@
             :viewport-bounds [:setter lifecycle/scalar :coerce bounds :default 0]
             :vmax [:setter lifecycle/scalar :coerce double :default 1.0]
             :vmin [:setter lifecycle/scalar :coerce double :default 0.0]
-            :vvalue [:setter lifecycle/scalar :coerce double :default 0.0]}))
+            :vvalue [:setter lifecycle/scalar :coerce double :default 0.0]
+            :on-vvalue-changed [:property-change-listener
+                                (lifecycle/wrap-coerce lifecycle/event-handler
+                                                       coerce/change-listener)]}))
