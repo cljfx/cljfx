@@ -291,9 +291,11 @@ TBD, need to consult my employer first
 
 - add proper context instead of naive one
 - default on-x-changed prop change listeners!
-- advanced docs: lifecycles, opts, contexts, styles etc.
+- advanced docs: lifecycles, opts, contexts, lack of local state, styles etc.
+- :use-pref-size and :use-computed-size
 
 ## Food for thought
+- make exceptions more informative
 - controlled props (mostly in controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations
