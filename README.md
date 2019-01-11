@@ -90,10 +90,6 @@ received description, so it is safe to call many times at once. Calls to app
 function return derefable that will contain component value with most recent
 description.
 
-Another useful aspect of app function that should be used during development is
-refresh functionality: you can call app function with zero args and it will
-recreate all the components with current description.
-
 ### Atoms
 
 Example above works, but it's not very convenient: what we'd really like
@@ -205,6 +201,15 @@ dispatched event):
 ```
 
 You can see full example at [examples/e09_todo_app.clj](examples/e09_todo_app.clj).
+
+### Interactive development
+
+Another useful aspect of app function that should be used during development is
+refresh functionality: you can call app function with zero args and it will
+recreate all the components with current description.
+
+See wall-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
+as an example of how to iterate on cljfx app in REPL.
 
 ### Special keys
 
