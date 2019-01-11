@@ -85,6 +85,15 @@ Evaluating this code will show this:
 
 Clicking `close` button will hide this window.
 
+App batches descriptions and re-renders views on fx thread only with last
+received description, so it is safe to call many times at once. Calls to app
+function return derefable that will contain component value with most recent
+description.
+
+Another useful aspect of app function that should be used during development is
+refresh functionality: you can call app function with zero args and it will
+recreate all the components with current description.
+
 ### Atoms
 
 Example above works, but it's not very convenient: what we'd really like
@@ -285,7 +294,6 @@ TBD, need to consult my employer first
 - add tests for various lifecycles and re-calculations
 - prop lifecycle
 - how to handle dialogs, animations and other possibly missed things?
-- escape hatch to force-re-render everything?
 - update to same desc should be identical (component-vec)
 - optional flatten in wrap-many for maps?
 - expand on props and composite lifecycle. What's known about them:

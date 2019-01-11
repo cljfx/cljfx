@@ -2,6 +2,11 @@
   (:require [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]))
 
+(defn complete-rendering [app desc component]
+  (cond-> app
+    :always (assoc :component component)
+    (= desc (:desc app)) (dissoc :request)))
+
 (defn- perform-render
   "Re-renders app on fx thread
 
@@ -9,17 +14,26 @@
   may retry it. During advancing new render request may arrive, in that case we
   immediately re-render app to always view it's actual state"
   [*app]
-  (let [{:keys [desc component render-fn]} @*app
+  (let [{:keys [desc component render-fn request]} @*app
         new-component (render-fn component desc)
-        new-app (swap! *app #(assoc % :component new-component
-                                      :request-rendering (not= desc (:desc %))))]
-    (when (:request-rendering new-app)
-      (recur *app))))
+        new-app (swap! *app complete-rendering desc new-component)]
+    (if (:request new-app)
+      (recur *app)
+      (deliver request new-component))))
+
+(defn- or-new-promise [x]
+  (or x (promise)))
+
+(defn- request-rendering-with-desc [app desc]
+  (-> app
+      (assoc :desc desc)
+      (update :request or-new-promise)))
 
 (defn- request-render [*app desc]
-  (let [[old _] (swap-vals! *app assoc :desc desc :request-rendering true)]
-    (when-not (:request-rendering old)
-      (platform/on-fx-thread (perform-render *app)))))
+  (let [[old new] (swap-vals! *app request-rendering-with-desc desc)]
+    (when-not (:request old)
+      (platform/run-later (perform-render *app)))
+    (:request new)))
 
 (defn- render-app-component
   "Advance rendered component with special semantics for nil (meaning absence)
@@ -42,11 +56,14 @@
 (defn create [middleware opts]
   (let [lifecycle (middleware lifecycle/root)
         *app (atom {:component nil
-                    :render-fn #(render-app-component lifecycle %1 %2 opts)
-                    :request-rendering false})]
-    (fn [desc]
-      (request-render *app desc)
-      nil)))
+                    :render-fn #(render-app-component lifecycle %1 %2 opts)})]
+    (fn app
+      ([]
+       (let [desc (:desc @*app)]
+         @(app nil)
+         (app desc)))
+      ([desc]
+       (request-render *app desc)))))
 
 (defn mount [*ref app]
   (add-watch *ref [`mount app] #(app %4))
