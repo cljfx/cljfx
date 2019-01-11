@@ -135,6 +135,7 @@
    :menu-bar (lazy-load cljfx.fx.menu-bar/lifecycle)
    :pagination (lazy-load cljfx.fx.pagination/lifecycle)
    :progress-indicator (lazy-load cljfx.fx.progress-indicator/lifecycle)
+   :progress-bar (lazy-load cljfx.fx.progress-bar/lifecycle)
    :scroll-bar (lazy-load cljfx.fx.scroll-bar/lifecycle)
    :scroll-pane (lazy-load cljfx.fx.scroll-pane/lifecycle)
    :separator (lazy-load cljfx.fx.separator/lifecycle)
