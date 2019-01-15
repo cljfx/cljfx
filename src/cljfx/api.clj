@@ -121,8 +121,8 @@
   Key is any value except functions that will be `get` from context map
 
   Subscription function is a function that expects context as first argument.
-  If `:fx/cached` is `true` on such function's metadata, returned value will be memoized
-  in this context, resulting in cache lookups for subsequent `sub` calls on that function.
+  Returned value will be memoized in this context, resulting in cache lookups for
+  subsequent `sub` calls on that function with same arguments.
 
   Cache will be reused on contexts derived by `swap-context` and `reset-context`
   to minimize recalculations. To make it efficient, all calls to `sub` by subscription

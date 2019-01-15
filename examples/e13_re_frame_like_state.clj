@@ -41,19 +41,42 @@
 (defn sub-id->ingredient [context id]
   (get (fx/sub context :id->ingredient) id))
 
-(def sub-ingredient-id->potion-ids-map
-  ^:fx/cached
-  (fn [context]
-    (->> (fx/sub context :id->potion)
-         vals
-         (mapcat (fn [potion]
-                   (map (fn [ingredient-id]
-                          [(:id potion) ingredient-id])
-                        (:ingredient-ids potion))))
-         (group-by second)
-         (map (juxt key
-                    #(->> % val (map first) sort)))
-         (into {}))))
+(defmulti event-handler :event/type)
+
+(defmethod event-handler ::remove-ingredient [{:keys [potion-id ingredient-id]}]
+  (swap! *state
+         fx/swap-context
+         update-in
+         [:id->potion potion-id :ingredient-ids]
+         #(vec (remove #{ingredient-id} %))))
+
+(defn close-icon [{:keys [on-remove]}]
+  {:fx/type :stack-pane
+   :on-mouse-clicked on-remove
+   :children
+   [{:fx/type :svg-path
+     :fill :gray
+     :scale-x 0.75
+     :scale-y 0.75
+     :content (str "M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,"
+                   "4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,"
+                   "4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,"
+                   "0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,"
+                   "4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,"
+                   "0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4."
+                   "711C16.172,4.759,16.172,4.317,15.898,4.045z")}]})
+
+(defn sub-ingredient-id->potion-ids-map [context]
+  (->> (fx/sub context :id->potion)
+       vals
+       (mapcat (fn [potion]
+                 (map (fn [ingredient-id]
+                        [(:id potion) ingredient-id])
+                      (:ingredient-ids potion))))
+       (group-by second)
+       (map (juxt key
+                  #(->> % val (map first) sort)))
+       (into {})))
 
 (defn sub-ingredient-id->potion-ids [context id]
   (get (fx/sub context sub-ingredient-id->potion-ids-map) id))
@@ -74,8 +97,10 @@
            :-fx-text-fill :grey}
    :text text})
 
-(defn badge [{:keys [text]}]
-  {:fx/type :label
+(defn badge [{:keys [text on-remove]}]
+  {:fx/type :h-box
+   :alignment :center
+   :spacing 2
    :style {:-fx-font [12 :sans-serif]
            :-fx-text-fill :grey
            :-fx-border-width 1
@@ -83,11 +108,16 @@
            :-fx-border-color :lightgray
            :-fx-border-radius 4
            :-fx-padding [0 2 0 2]}
-   :text text})
+   :children [{:fx/type :label :text text}
+              {:fx/type close-icon
+               :on-remove on-remove}]})
 
-(defn ingredient-badge [{:keys [fx/context id]}]
+(defn ingredient-badge [{:keys [fx/context id potion-id]}]
   {:fx/type badge
-   :text (:name (fx/sub context sub-id->ingredient id))})
+   :text (:name (fx/sub context sub-id->ingredient id))
+   :on-remove {:event/type ::remove-ingredient
+               :potion-id potion-id
+               :ingredient-id id}})
 
 (defn potion-view [{:keys [fx/context id]}]
   (let [potion (fx/sub context sub-id->potion id)]
@@ -99,9 +129,10 @@
                  :children (concat
                              [{:fx/type small-label
                                :text "needs"}]
-                             (for [id (:ingredient-ids potion)]
+                             (for [ingredient-id (:ingredient-ids potion)]
                                {:fx/type ingredient-badge
-                                :id id}))}]}))
+                                :potion-id id
+                                :id ingredient-id}))}]}))
 
 (defn potion-list [{:keys [fx/context]}]
   {:fx/type :v-box
@@ -115,23 +146,31 @@
                            {:fx/type potion-view
                             :id id})}]})
 
-(defn potion-badge [{:keys [fx/context id]}]
+(defn potion-badge [{:keys [fx/context id ingredient-id]}]
   {:fx/type badge
-   :text (:name (fx/sub context sub-id->potion id))})
+   :text (:name (fx/sub context sub-id->potion id))
+   :on-remove {:event/type ::remove-ingredient
+               :potion-id id
+               :ingredient-id ingredient-id}})
 
 (defn ingredient-view [{:keys [fx/context id]}]
-  (let [ingredient (fx/sub context sub-id->ingredient id)]
+  (let [ingredient (fx/sub context sub-id->ingredient id)
+        potion-ids (fx/sub context sub-ingredient-id->potion-ids id)]
     {:fx/type :v-box
      :children [{:fx/type item-title
                  :text (:name ingredient)}
                 {:fx/type :h-box
                  :spacing 2
-                 :children (concat
+                 :children (if (empty? potion-ids)
                              [{:fx/type small-label
-                               :text "used in"}]
-                             (for [id (fx/sub context sub-ingredient-id->potion-ids id)]
-                               {:fx/type potion-badge
-                                :id id}))}]}))
+                               :text "unused"}]
+                             (concat
+                               [{:fx/type small-label
+                                 :text "used in"}]
+                               (for [potion-id potion-ids]
+                                 {:fx/type potion-badge
+                                  :ingredient-id id
+                                  :id potion-id})))}]}))
 
 (defn ingredient-list [{:keys [fx/context]}]
   {:fx/type :v-box
@@ -163,6 +202,7 @@
                   fx/wrap-context-desc
                   (fx/wrap-map-desc (fn [_] {:fx/type root-view})))
     :opts {:fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
-                                        (fx/fn->lifecycle-with-context %))}))
+                                        (fx/fn->lifecycle-with-context %))
+           :fx.opt/map-event-handler event-handler}))
 
 (fx/mount-app *state app)

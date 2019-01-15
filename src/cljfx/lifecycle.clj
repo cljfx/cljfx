@@ -398,10 +398,8 @@
                (context/clear-cache! (:context component))
                (delete lifecycle (:child component) opts))}))
 
-(def ^:private call-context-fn
-  ^:fx/cached
-  (fn [context desc]
-    ((:fx/type desc) (-> desc (dissoc :fx/type) (assoc :fx/context context)))))
+(defn- call-context-fn [context desc]
+  ((:fx/type desc) (-> desc (dissoc :fx/type) (assoc :fx/context context))))
 
 (defn- sub-context-fn [desc opts]
   (let [context (:fx/context opts)]

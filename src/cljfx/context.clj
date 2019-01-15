@@ -52,41 +52,35 @@ Possible reasons:
         {:keys [*cache *deps]} context
         cache @*cache
         ret (if (fn? k)
-              (if (:fx/cached (meta k))
-                (-> (cond
-                      (has? cache sub-id)
-                      (do (swap! *cache hit sub-id)
-                          cache)
+              (-> (cond
+                    (has? cache sub-id)
+                    (do (swap! *cache hit sub-id)
+                        cache)
 
-                      (has? cache [::dirty sub-id])
-                      (let [dirty-sub (lookup cache [::dirty sub-id])
-                            deps (:depends-on dirty-sub)
-                            unbound-context (unbind context)]
-                        (if (= deps
-                               (->> deps
-                                    keys
-                                    (map (juxt identity
-                                               #(apply sub unbound-context %)))
-                                    (into {})))
+                    (has? cache [::dirty sub-id])
+                    (let [dirty-sub (lookup cache [::dirty sub-id])
+                          deps (:depends-on dirty-sub)
+                          unbound-context (unbind context)]
+                      (if (= deps
+                             (->> deps
+                                  keys
+                                  (map (juxt identity
+                                             #(apply sub unbound-context %)))
+                                  (into {})))
+                        (swap! *cache (fn [cache]
+                                        (-> cache
+                                            (evict [::dirty sub-id])
+                                            (miss sub-id dirty-sub))))
+                        (let [v (calc-cached-value context sub-id)]
                           (swap! *cache (fn [cache]
                                           (-> cache
                                               (evict [::dirty sub-id])
-                                              (miss sub-id dirty-sub))))
-                          (let [v (calc-cached-value context sub-id)]
-                            (swap! *cache (fn [cache]
-                                            (-> cache
-                                                (evict [::dirty sub-id])
-                                                (miss sub-id v)))))))
+                                              (miss sub-id v)))))))
 
-                      :else
-                      (swap! *cache miss sub-id (calc-cached-value context sub-id)))
-                    (lookup sub-id)
-                    :value)
-                (apply k
-                       (-> context
-                           (assoc :parent-sub-id sub-id)
-                           (dissoc :*deps))
-                       args))
+                    :else
+                    (swap! *cache miss sub-id (calc-cached-value context sub-id)))
+                  (lookup sub-id)
+                  :value)
               (do
                 (when (seq args)
                   (throw (ex-info "Subscribing to keys does not allow additional args"
@@ -131,8 +125,8 @@ Possible reasons:
   (let [changed-sub-ids (->> old-m
                              keys
                              (remove #(= (old-m %) (new-m %)))
-                             set
-                             (map vector))
+                             (map vector)
+                             set)
         reverse-deps (make-reverse-deps cache)
         sub-ids-to-remove (set/union changed-sub-ids (reverse-deps ::context #{}))
         dirty-sub-ids (gather-dirty-deps sub-ids-to-remove reverse-deps)
