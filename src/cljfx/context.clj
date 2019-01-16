@@ -1,6 +1,7 @@
 (ns cljfx.context
   (:require [clojure.set :as set])
-  (:import [clojure.lang IPersistentMap]))
+  (:import [clojure.lang IPersistentMap Seqable]
+           [java.io FileNotFoundException]))
 
 (defprotocol Cache
   "Cache protocol that copycats clojure.core.cache/CacheProtocol to make it easy to use
@@ -28,6 +29,39 @@
     (assoc this k v))
   (evict [this k]
     (dissoc this k)))
+
+(def ^:private ->cache
+  (try
+    (let [core-cache-protocol @(requiring-resolve 'clojure.core.cache/CacheProtocol)
+          core-cache-lookup @(requiring-resolve 'clojure.core.cache/lookup)
+          core-cache-has? @(requiring-resolve 'clojure.core.cache/has?)
+          core-cache-hit @(requiring-resolve 'clojure.core.cache/hit)
+          core-cache-miss @(requiring-resolve 'clojure.core.cache/miss)
+          core-cache-evict @(requiring-resolve 'clojure.core.cache/evict)
+          f (fn wrap [cache]
+              (reify
+                Cache
+                (lookup [_ k] (core-cache-lookup cache k))
+                (has? [_ k] (core-cache-has? cache k))
+                (hit [this k]
+                  (let [new-cache (core-cache-hit cache k)]
+                    (if (identical? new-cache cache)
+                      this
+                      (wrap new-cache))))
+                (miss [_ k v]
+                  (wrap (core-cache-miss cache k v)))
+                (evict [this k]
+                  (let [new-cache (core-cache-evict cache k)]
+                    (if (identical? new-cache cache)
+                      this
+                      (wrap new-cache))))
+                Seqable
+                (seq [_] (seq cache))))]
+      #(if (satisfies? core-cache-protocol %)
+         (f %)
+         %))
+    (catch FileNotFoundException _
+      identity)))
 
 (defn- assert-not-leaked [cache sub-id]
   (assert (not (has? cache sub-id))
@@ -147,7 +181,7 @@ Possible reasons:
 
 (defn create [m cache-factory]
   {::m m
-   ::*cache (atom (cache-factory {}))})
+   ::*cache (atom (->cache (cache-factory {})))})
 
 (defn clear-cache! [context]
   (swap! (::*cache context) #(reduce evict % (keys %))))
