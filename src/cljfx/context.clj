@@ -4,7 +4,7 @@
 
 (defprotocol Cache
   "Cache protocol that copycats clojure.core.cache/CacheProtocol to make it easy to use
-  core.cache while not requiring unnecessary dependency"
+  core.cache while not requiring unnecessary dependency if context is unused"
   (lookup [this k]
     "Retrieve the value associated with `k` if it exists, else `nil`")
   (has? [this k]
@@ -34,125 +34,120 @@
           (str (first sub-id) " is attempting to subscribe to bound context which already has value
 
 Possible reasons:
-- you return lazy seq which uses `cljfx.api/sub`
+- you return lazy seq which uses `cljfx.api/sub` while calculating elements
 - you leaked context from subscription function's scope without unbinding it first (call `cljfx.api/unbind-context` on it in that case)")))
 
 (defn unbind [context]
-  (dissoc context :*deps :parent-sub-id))
+  (dissoc context ::*direct-deps ::*key-deps ::parent-sub-id))
 
-(defn- calc-cached-value [context sub-id]
+(defn- calc-cache-entry [context sub-id]
   (let [[sub-fn & args] sub-id
-        *deps (atom {})
-        bound-context (assoc context :*deps *deps :parent-sub-id sub-id)]
-    {:value (apply sub-fn bound-context args)
-     :depends-on @*deps}))
+        *direct-deps (atom {})
+        *key-deps (atom #{})
+        bound-context (assoc context
+                        ::parent-sub-id sub-id
+                        ::*direct-deps *direct-deps
+                        ::*key-deps *key-deps)
+        value (apply sub-fn bound-context args)]
+    {::value value
+     ::direct-deps @*direct-deps
+     ::key-deps @*key-deps}))
+
+(declare sub)
+
+(defn- sub-from-dirty [context *cache cache sub-id]
+  (let [dirty-sub (lookup cache [::dirty sub-id])
+        deps (::direct-deps dirty-sub)
+        unbound-context (unbind context)]
+    (if (every? #(= (get deps %) (apply sub unbound-context %)) (keys deps))
+      (swap! *cache (fn [cache]
+                      (-> cache
+                          (evict [::dirty sub-id])
+                          (miss sub-id dirty-sub))))
+      (let [v (calc-cache-entry context sub-id)]
+        (swap! *cache (fn [cache]
+                        (-> cache
+                            (evict [::dirty sub-id])
+                            (miss sub-id v))))))))
+
+(defn- add-dep [deps k v]
+  (if (= ::context deps)
+    ::context
+    (assoc deps k v)))
 
 (defn sub [context k & args]
   (let [sub-id (apply vector k args)
-        {:keys [*cache *deps]} context
+        {::keys [*cache *direct-deps *key-deps]} context
         cache @*cache
         ret (if (fn? k)
-              (-> (cond
-                    (has? cache sub-id)
-                    (do (swap! *cache hit sub-id)
-                        cache)
+              (let [entry (-> (cond
+                                (has? cache sub-id)
+                                (do (swap! *cache hit sub-id)
+                                    cache)
 
-                    (has? cache [::dirty sub-id])
-                    (let [dirty-sub (lookup cache [::dirty sub-id])
-                          deps (:depends-on dirty-sub)
-                          unbound-context (unbind context)]
-                      (if (= deps
-                             (->> deps
-                                  keys
-                                  (map (juxt identity
-                                             #(apply sub unbound-context %)))
-                                  (into {})))
-                        (swap! *cache (fn [cache]
-                                        (-> cache
-                                            (evict [::dirty sub-id])
-                                            (miss sub-id dirty-sub))))
-                        (let [v (calc-cached-value context sub-id)]
-                          (swap! *cache (fn [cache]
-                                          (-> cache
-                                              (evict [::dirty sub-id])
-                                              (miss sub-id v)))))))
+                                (has? cache [::dirty sub-id])
+                                (sub-from-dirty context *cache cache sub-id)
 
-                    :else
-                    (swap! *cache miss sub-id (calc-cached-value context sub-id)))
-                  (lookup sub-id)
-                  :value)
+                                :else
+                                (swap! *cache miss sub-id (calc-cache-entry context sub-id)))
+                              (lookup sub-id))]
+                (when *key-deps
+                  (swap! *key-deps set/union (::key-deps entry)))
+                (::value entry))
               (do
                 (when (seq args)
                   (throw (ex-info "Subscribing to keys does not allow additional args"
                                   {:k k :args args})))
-                (get-in context [:m k])))]
-    (when *deps
-      (assert-not-leaked cache (:parent-sub-id context))
-      (swap! *deps (fn [deps]
-                     (if (= ::context deps)
-                       ::context
-                       (assoc deps sub-id ret)))))
+                (when *key-deps
+                  (swap! *key-deps conj k))
+                (get-in context [::m k])))]
+    (when *direct-deps
+      (assert-not-leaked cache (::parent-sub-id context))
+      (swap! *direct-deps add-dep sub-id ret))
     ret))
 
-(defn- make-reverse-deps [cache]
-  (reduce (fn [acc [sub-id {:keys [depends-on]}]]
-            (if (= ::context depends-on)
-              (update acc ::context (fnil conj #{}) sub-id)
-              (reduce (fn [acc dep-sub-id]
-                        (update acc dep-sub-id (fnil conj #{}) sub-id))
-                      acc
-                      (keys depends-on))))
-          {}
-          cache))
-
-(defn- gather-dirty-deps-impl [acc sub-ids reverse-deps]
-  (reduce (fn [acc sub-id]
-            (if (contains? acc sub-id)
-              acc
-              (-> acc
-                  (conj sub-id)
-                  (gather-dirty-deps-impl (reverse-deps sub-id) reverse-deps))))
-          acc
-          sub-ids))
-
-(defn- gather-dirty-deps [sub-ids reverse-deps]
-  (reduce (fn [acc sub-id]
-            (gather-dirty-deps-impl acc (reverse-deps sub-id) reverse-deps))
-          #{}
-          sub-ids))
+(defn- intersects? [s1 s2]
+  (if (< (count s2) (count s1))
+    (recur s2 s1)
+    (some #(contains? s2 %) s1)))
 
 (defn invalidate-cache [cache old-m new-m]
-  (let [changed-sub-ids (->> old-m
-                             keys
-                             (remove #(= (old-m %) (new-m %)))
-                             (map vector)
-                             set)
-        reverse-deps (make-reverse-deps cache)
-        sub-ids-to-remove (set/union changed-sub-ids (reverse-deps ::context #{}))
-        dirty-sub-ids (gather-dirty-deps sub-ids-to-remove reverse-deps)
-        cache-with-removed-sub-ids (reduce evict cache sub-ids-to-remove)]
-    (reduce (fn [acc sub-id]
-              (-> acc
-                  (evict sub-id)
-                  (miss [::dirty sub-id] (lookup acc sub-id))))
-            cache-with-removed-sub-ids
-            dirty-sub-ids)))
+  (let [changed-keys (into #{} (remove #(= (old-m %) (new-m %))) (keys old-m))
+        changed-sub-ids (into #{} (map vector) changed-keys)]
+    (reduce (fn [acc [k v]]
+              (let [direct-deps (::direct-deps v)]
+                (cond
+                  (= ::context direct-deps)
+                  (evict acc k)
+
+                  (intersects? changed-sub-ids (set (keys direct-deps)))
+                  (evict acc k)
+
+                  (intersects? changed-keys (::key-deps v))
+                  (-> acc
+                      (evict k)
+                      (miss [::dirty k] v))
+
+                  :else
+                  acc)))
+            cache
+            cache)))
 
 (defn reset [context new-m]
-  (let [{:keys [m *cache *deps]} context
+  (let [{::keys [m *cache *direct-deps]} context
         cache @*cache]
-    (when *deps
-      (assert-not-leaked cache (:parent-sub-id context))
-      (reset! *deps ::context))
-    {:m new-m
-     :*cache (atom (invalidate-cache cache m new-m))}))
+    (when *direct-deps
+      (assert-not-leaked cache (::parent-sub-id context))
+      (reset! *direct-deps ::context))
+    {::m new-m
+     ::*cache (atom (invalidate-cache cache m new-m))}))
 
 (defn swap [context f & args]
-  (reset context (apply f (:m context) args)))
+  (reset context (apply f (::m context) args)))
 
 (defn create [m cache-factory]
-  {:m m
-   :*cache (atom (cache-factory {}))})
+  {::m m
+   ::*cache (atom (cache-factory {}))})
 
 (defn clear-cache! [context]
-  (swap! (:*cache context) #(reduce evict % (keys %))))
+  (swap! (::*cache context) #(reduce evict % (keys %))))
