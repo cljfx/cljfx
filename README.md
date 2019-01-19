@@ -7,7 +7,7 @@ applications.
 
 I wanted to have an elegant, declarative and composable UI
 library for JVM and couldn't find one. Cljfx is inspired by react,
-reagent and fn-fx.
+reagent, re-frame and fn-fx.
 
 Like react, it allows to specify only desired layout, and handles
 all actual changes underneath. Unlike react (and web in general) it does
@@ -19,10 +19,15 @@ constructs such as data and functions. Unlike reagent, it rejects using
 multiple stateful reactive atoms for state and instead prefers composing
 ui in more pure manner.
 
+Like re-frame, it provides an approach to building large applications
+using subscriptions and events to separate view from logic. Unlike
+re-frame, it has no hard-coded global state, and subscriptions work on
+referentially transparent values instead of ever-changing atoms.
+
 Like fn-fx, it wraps underlying JavaFX library so developer can describe
-everything with just data. Unlike fn-fx, it is more dynamic, allowing
-users to build prop maps for components in runtime, and has more
-explicit and extensible lifecycle for components.
+everything with clojure data. Unlike fn-fx, it is more dynamic, allowing
+users to use maps and functions instead of macros and deftypes, and has
+more explicit and extensible lifecycle for components.
 
 ## Introduction
 
@@ -289,8 +294,16 @@ TBD, need to consult my employer first
 
 ## TODO
 
-- default on-x-changed prop change listeners!
-- advanced docs: lifecycles, opts, contexts, lack of local state, styles etc.
+- advanced docs:
+  - subs / contexts
+  - lifecycles
+  - opts
+  - contexts
+  - lack of local state
+  - why no :fx/type on insets (descs of immutable vs mutable values)
+  - where to put :fx/key
+  - fx/sub and lazy seqs
+  - styles etc.
 - :use-pref-size and :use-computed-size
 
 ## Food for thought
