@@ -485,3 +485,14 @@
 
 (defn style-class [x]
   (if (string? x) [x] x))
+
+(defn pref-or-computed-size-double [x]
+  (case x
+    :use-pref-size Double/NEGATIVE_INFINITY
+    :use-computed-size -1.0
+    (double x)))
+
+(defn computed-size-double [x]
+  (case x
+    :use-computed-size -1.0
+    (double x)))

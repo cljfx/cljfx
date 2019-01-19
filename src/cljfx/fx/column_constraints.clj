@@ -13,7 +13,15 @@
     :props {:fill-width [:setter lifecycle/scalar :default true]
             :halignment [:setter lifecycle/scalar :coerce (coerce/enum HPos)]
             :hgrow [:setter lifecycle/scalar :coerce (coerce/enum Priority)]
-            :max-width [:setter lifecycle/scalar :coerce double :default -1.0]
-            :min-width [:setter lifecycle/scalar :coerce double :default -1.0]
-            :percent-width [:setter lifecycle/scalar :coerce double :default -1.0]
-            :pref-width [:setter lifecycle/scalar :coerce double :default -1.0]}))
+            :max-width [:setter lifecycle/scalar
+                        :coerce coerce/pref-or-computed-size-double
+                        :default :use-computed-size]
+            :min-width [:setter lifecycle/scalar
+                        :coerce coerce/pref-or-computed-size-double
+                        :default :use-computed-size]
+            :percent-width [:setter lifecycle/scalar
+                            :coerce coerce/computed-size-double
+                            :default :use-computed-size]
+            :pref-width [:setter lifecycle/scalar
+                         :coerce coerce/computed-size-double
+                         :default :use-computed-size]}))

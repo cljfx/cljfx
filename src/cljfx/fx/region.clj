@@ -18,14 +18,26 @@
             :border [:setter lifecycle/scalar :coerce coerce/border]
             :cache-shape [:setter lifecycle/scalar :default true]
             :center-shape [:setter lifecycle/scalar :default true]
-            :max-height [:setter lifecycle/scalar :coerce double :default -1.0]
-            :max-width [:setter lifecycle/scalar :coerce double :default -1.0]
-            :min-height [:setter lifecycle/scalar :coerce double :default -1.0]
-            :min-width [:setter lifecycle/scalar :coerce double :default -1.0]
+            :max-height [:setter lifecycle/scalar
+                         :coerce coerce/pref-or-computed-size-double
+                         :default :use-computed-size]
+            :max-width [:setter lifecycle/scalar
+                        :coerce coerce/pref-or-computed-size-double
+                        :default :use-computed-size]
+            :min-height [:setter lifecycle/scalar
+                         :coerce coerce/pref-or-computed-size-double
+                         :default :use-computed-size]
+            :min-width [:setter lifecycle/scalar
+                        :coerce coerce/pref-or-computed-size-double
+                        :default :use-computed-size]
             :opaque-insets [:setter lifecycle/scalar :coerce coerce/insets]
             :padding [:setter lifecycle/scalar :coerce coerce/insets]
-            :pref-height [:setter lifecycle/scalar :coerce double :default -1.0]
-            :pref-width [:setter lifecycle/scalar :coerce double :default -1.0]
+            :pref-height [:setter lifecycle/scalar
+                          :coerce coerce/computed-size-double
+                          :default :use-computed-size]
+            :pref-width [:setter lifecycle/scalar
+                         :coerce coerce/computed-size-double
+                         :default :use-computed-size]
             :scale-shape [:setter lifecycle/scalar :default true]
             :shape [:setter lifecycle/dynamic]
             :snap-to-pixel [:setter lifecycle/scalar :default true]}))
