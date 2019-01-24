@@ -71,13 +71,13 @@
                             lifecycle/scalar
                             :coerce int)
 
-                          :grid-pane/full-width
+                          :grid-pane/fill-width
                           (prop/make
                             (mutator/constraint "gridpane-fill-width")
                             lifecycle/scalar
                             :coerce boolean)
 
-                          :grid-pane/full-height
+                          :grid-pane/fill-height
                           (prop/make
                             (mutator/constraint "gridpane-fill-height")
                             lifecycle/scalar

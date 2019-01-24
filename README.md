@@ -284,6 +284,29 @@ Sometimes components accept specially treated keys. Main uses are:
    For a more complete example of available pane keys, see
    [examples/e07_extra_props.clj](examples/e07_extra_props.clj)
 
+### Subscriptions and contexts
+
+Once application becomes complex enough, you can find yourself passing
+very big chunks of state everywhere. Consider this example: you develop
+a task tracker for an organization. A typical task view on a dashboard
+displays a description of that task and an assignee. Required state for
+this view is plain and simple, just a simple data like that:
+```clj
+{:title "Fix NPE on logout during full moon"
+ :state :todo
+ :assignee {:id 42 :name "Fred"}}
+```
+Then one day comes a requirement: users of this task tracker should be
+able to change assignee from the dashboard. Now, we need a combo-box
+with all assignable users to render such a view, and then you find
+yourself tediously passing data all over the place just to render one
+view. Instead of doing this cljfx allows to have root description of the
+application to be passed to every function component. Usually function
+components get re-rendered when their arguments change, so passing root
+description would trigger re-rendering of everything whenever this
+description changes, which is undesired. This is why cljfx introduces
+abstraction called **context**, inspired by re-frame's subscriptions.
+
 ## More examples
 
 There are various examples available in [examples](examples) folder.
@@ -304,7 +327,6 @@ TBD, need to consult my employer first
   - where to put :fx/key
   - fx/sub and lazy seqs
   - styles etc.
-- :use-pref-size and :use-computed-size
 
 ## Food for thought
 - make exceptions more informative

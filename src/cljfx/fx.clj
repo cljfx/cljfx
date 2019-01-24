@@ -156,7 +156,12 @@
    :tree-table-view (lazy-load cljfx.fx.tree-table-view/lifecycle)
    :tree-item (lazy-load cljfx.fx.tree-item/lifecycle)
    :tree-table-column (lazy-load cljfx.fx.tree-table-column/lifecycle)
-   :tree-view (lazy-load cljfx.fx.tree-view/lifecycle)})
+   :tree-view (lazy-load cljfx.fx.tree-view/lifecycle)
+   ;; cells
+   :cell (lazy-load cljfx.fx.cell/lifecycle)
+   :indexed-cell (lazy-load cljfx.fx.indexed-cell/lifecycle)
+   :list-cell (lazy-load cljfx.fx.list-cell/lifecycle)
+   :combo-box-list-cell (lazy-load cljfx.fx.combo-box-list-cell/lifecycle)})
 
 (defn keyword->lifecycle [kw]
   (when-let [delay (keyword->lifecycle-delay kw)]

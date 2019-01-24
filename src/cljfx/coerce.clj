@@ -193,10 +193,10 @@
     (number? x) (Duration. (double x))
     (string? x) (Duration/valueOf x)
     (vector? x) (case (second x)
-                  (:millis :milli :ms) (Duration/millis (double (first x)))
-                  (:seconds :second :s) (Duration/seconds (double (first x)))
-                  (:minutes :minute :m) (Duration/minutes (double (first x)))
-                  (:hours :hour :h) (Duration/hours (double (first x))))
+                  :ms (Duration/millis (double (first x)))
+                  :s (Duration/seconds (double (first x)))
+                  :m (Duration/minutes (double (first x)))
+                  :h (Duration/hours (double (first x))))
     :else (fail Duration x)))
 
 (defn font [x]

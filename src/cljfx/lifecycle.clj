@@ -165,6 +165,54 @@
                   (create this desc opts)))
      `delete (fn [_ _ _])}))
 
+(defn advance-prop-map [props props-desc props-config instance opts]
+  (reduce
+    (fn [acc k]
+      (let [old-e (find props k)
+            new-e (find props-desc k)]
+        (cond
+          (and (some? old-e) (some? new-e))
+          (let [component (val old-e)
+                desc (val new-e)
+                prop-config (get props-config k)
+                new-component (advance (prop/lifecycle prop-config) component desc opts)]
+            (prop/replace! prop-config instance component new-component)
+            (assoc acc k new-component))
+
+          (some? old-e)
+          (let [prop-config (get props-config k)]
+            (prop/retract! prop-config instance (val old-e))
+            (delete (prop/lifecycle prop-config) (val old-e) opts)
+            (dissoc acc k))
+
+          :else
+          (let [prop-config (get props-config k)
+                component (create (prop/lifecycle prop-config) (val new-e) opts)]
+            (prop/assign! prop-config instance component)
+            (assoc acc k component)))))
+    props
+    (set/union (set (keys props)) (set (keys props-desc)))))
+
+(defn detached-prop-map [props-config]
+  (with-meta
+    [::detached-prop props-config]
+    {`create (fn [_ desc opts]
+               (with-meta
+                 {:desc desc
+                  :opts opts
+                  :value (if (fn? desc)
+                           (fn [props instance item empty]
+                             (let [props-desc (if empty {} (desc item))]
+                               (advance-prop-map props props-desc props-config instance opts)))
+                           desc)}
+                 {`component/instance :value}))
+     `advance (fn [this component desc opts]
+                (if (and (= desc (:desc component))
+                         (= opts (:opts component)))
+                  component
+                  (create this desc opts)))
+     `delete (fn [_ _ _])}))
+
 (defn- ordered-keys+key->val
   "Return a vec of ordered calculated keys and a map of calculated keys to components
 
@@ -281,7 +329,7 @@
 (defn wrap-extra-props [lifecycle props-config]
   (let [prop-key-set (set (keys props-config))]
     (with-meta
-      [::pane-child-node lifecycle props-config]
+      [::extra-props lifecycle props-config]
       {`create
        (fn [_ desc opts]
          (let [child-desc (apply dissoc desc prop-key-set)
@@ -311,45 +359,7 @@
                with-child (assoc component :child new-child)
                props-desc (select-keys desc prop-key-set)]
            (if (identical? instance new-instance)
-             (update
-               with-child
-               :props
-               (fn [props]
-                 (reduce
-                   (fn [acc k]
-                     (let [old-e (find props k)
-                           new-e (find props-desc k)]
-                       (cond
-                         (and (some? old-e) (some? new-e))
-                         (let [old-component (val old-e)
-                               desc (val new-e)
-                               prop-config (get props-config k)
-                               new-component (advance (prop/lifecycle prop-config)
-                                                      old-component
-                                                      desc
-                                                      opts)]
-                           (prop/replace! prop-config
-                                          instance
-                                          old-component
-                                          new-component)
-                           (assoc acc k new-component))
-
-                         (some? old-e)
-                         (let [prop-config (get props-config k)]
-                           (prop/retract! prop-config instance (val old-e))
-                           (delete (prop/lifecycle prop-config) (val old-e) opts)
-                           (dissoc acc k))
-
-                         :else
-                         (let [prop-config (get props-config k)
-                               component (create (prop/lifecycle prop-config)
-                                                 (val new-e)
-                                                 opts)]
-                           (prop/assign! prop-config instance component)
-                           (assoc acc k component)))))
-                   props
-                   (set/union (set (keys props))
-                              (set (keys props-desc))))))
+             (update with-child :props advance-prop-map props-desc props-config instance opts)
              (do
                (doseq [[k v] props-desc]
                  (prop/assign! (get props-config k) new-instance v))
