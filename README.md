@@ -1,7 +1,7 @@
 # Cljfx
 
-Cljfx is a declarative, dynamic and extensible wrapper for JavaFX
-applications.
+Cljfx is a declarative, functional and extensible wrapper of JavaFX
+mutability soup.
 
 ## Rationale
 
@@ -298,14 +298,146 @@ this view is plain and simple, just a simple data like that:
 ```
 Then one day comes a requirement: users of this task tracker should be
 able to change assignee from the dashboard. Now, we need a combo-box
-with all assignable users to render such a view, and then you find
-yourself tediously passing data all over the place just to render one
-view. Instead of doing this cljfx allows to have root description of the
-application to be passed to every function component. Usually function
-components get re-rendered when their arguments change, so passing root
-description would trigger re-rendering of everything whenever this
-description changes, which is undesired. This is why cljfx introduces
-abstraction called **context**, inspired by re-frame's subscriptions.
+with all assignable users to render such a view, and required data becomes
+this:
+```clj
+{:title "Fix NPE on logout during full moon"
+ :state :todo
+ :assignee {:id 42 :name "Fred"}
+ :users [{:id 42 :name "Fred"}
+         {:id 43 :name "Alice"}
+         {:id 44 :name "Rick"}]}
+```
+And you need to compute it once in one place and then pass it along
+multiple layers of ui to this view. This is undesirable:
+- it will lead to unnecessary re-renderings of views that just pass data
+  further when it changes
+- it complects reasoning about what actually a view needs: is it just a
+  task? or a task with some precomputed attributes?
+
+To mitigate this problem, cljfx introduces optional abstraction called
+**context**, which is inspired by re-frame's subscriptions. Context is a
+black-box wrapper around application state map, with an api
+function `fx/sub` to look inside wrapped state. `fx/sub` usage has 2
+flavors:
+1. Keys: anything except function, will return corresponding value from
+   wrapped map.
+2. Subscription functions: any function that receives context as first
+   argument. `fx/sub`-scribing to such functions will lead to a call to
+   this function, and it in turn may subscribe to other keys and
+   subscription functions.
+
+Returned values from subscription functions are memoized in this context
+(so it actually is a *memoization* context), and subsequent `sub` calls
+will result in cache lookup. The best thing about context is that not
+only it supports updating wrapped values via `swap-context` and
+`reset-context`, it also reuses this memoization cache to minimize
+re-calculation of subscription functions in successors of this context.
+This is done via tracking of `fx/sub` calls inside subscription
+functions, and checking if their dependencies changed. Example:
+```clj
+(def context-1
+  (fx/create-context
+    {:tasks [{:text "Buy milk" :done false}
+             {:text "Buy socks" :done true}]}))
+
+;; Simple subscription function that depends on :tasks key of wrapped map. Whenever value
+;; of :tasks key "changes" (meaning whenever there will be created new context with
+;; different value on :tasks key), subscribing to this function will lead to a call to
+;; this function instead of cache lookup
+(defn task-count [context]
+  (count (fx/sub context :tasks)))
+
+;; Using subscription functions:
+(fx/sub context-1 task-count) ; => 2
+
+;; Another subscription function depending on :tasks key of wrapped map
+(defn remaining-task-count [context]
+  (count (remove :done (fx/sub context :tasks))))
+
+(fx/sub context-1 remaining-task-count) ; => 1
+
+;; Indirect subscription function: it depends on 2 previously defined subscription
+;; functions, which means that whenever value returned by `task-count` or
+;; `remaining-task-count` changes, subscribing to this function will lead to a call
+;; instead of cache lookup
+(defn task-summary [context]
+  (prn :task-summary)
+  (format "Tasks: %d/%d"
+          (fx/sub context remaining-task-count)
+          (fx/sub context task-count)))
+
+(fx/sub context-1 task-summary) ; (prints :task-summary) => "Tasks: 1/2"
+
+;; Creating derived context that reuses cache from `context-1`
+(def context-2
+  (fx/swap-context context-1 assoc-in [:tasks 0 :text] "Buy bread"))
+
+;; Validating that cache entry is reused. Even though we updated :tasks key, there is no
+;; reason to call `task-summary` again, because it's dependencies, even though
+;; recalculated, return the same values
+(fx/sub context-2 task-summary) ; (does not print anything) => "Tasks: 1/2"
+```
+
+This tracking imposes a restriction on subscription functions: they
+should not call `fx/sub` after they return (which is possible if they
+return lazy sequence which may call `fx/sub` during element
+calculation).
+
+Using context in cljfx application requires 2 things:
+- passing context to all lifecycles in description graph, which is done
+  by using `fx/wrap-context-desc` middleware
+- using special lifecycle (`fx/fn->lifecycle-with-context`) for function
+  fx-types that uses this context
+
+Minimal app example using contexts:
+```clj
+;; Define application state as context
+
+(def *state
+  (atom (fx/create-context {:title "Hello world"})))
+
+;; Every description function receives context at `:fx/context` key
+
+(defn root [{:keys [fx/context]}]
+  {:fx/type :stage
+   :showing true
+   :scene {:fx/type :scene
+           :root {:fx/type :h-box
+                  :children [{:fx/type :label
+                              :text (fx/sub context :title)}]}}})
+
+(def app
+  (fx/create-app
+    :middleware (comp
+                  ;; Pass context to every lifecycle as part of option map
+                  fx/wrap-context-desc
+                  (fx/wrap-map-desc (fn [_] {:fx/type root})))
+    :opts {:fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
+                                        ;; For functions in `:fx/type` values, pass
+                                        ;; context from option map to these functions
+                                        (fx/fn->lifecycle-with-context %))}))
+
+(fx/mount-app *state app)
+```
+
+Using contexts effectively makes every fx-type function a subscription
+function, so no-lazy-fx-subs-in-returns restriction applies to them too.
+On a plus side, it makes re-rendering very efficient: fx-type components
+get re-rendered only when their subscription values change.
+
+For a bigger example see
+[examples/e15_task_tracker.clj](examples/e15_task_tracker.clj).
+
+Another point of concern for context is cache. By default it will grow
+forever, which at certain point might become problematic, and we may
+want to trade some cpu cycles for recalculations to decrease memory
+consumption. There is a perfect library for it:
+[core.cache](https://github.com/clojure/core.cache). `fx/create-context`
+supports cache factory (a function taking initial cache map and
+returning cache) as a second argument. What kind of cache
+to use is a question with no easy answer, you probably should try
+different caches and see what is a better fit for your app.
 
 ## More examples
 
@@ -318,7 +450,6 @@ TBD, need to consult my employer first
 ## TODO
 
 - advanced docs:
-  - subs / contexts
   - lifecycles
   - opts
   - contexts

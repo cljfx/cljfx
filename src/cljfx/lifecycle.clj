@@ -394,7 +394,7 @@
 
 (defn wrap-context-desc [lifecycle]
   (with-meta
-    [::desc->context lifecycle]
+    [::context-desc lifecycle]
     {`create (fn [_ desc opts]
                (with-meta
                  {:context desc

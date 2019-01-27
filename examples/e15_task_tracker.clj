@@ -6,10 +6,14 @@
     (fx/create-context
       {:tasks {0 {:id 0
                   :title "Fix NPE on logout during full moon"
-                  :state :todo
+                  :state :in-progress
                   :assignee 0}
                1 {:id 1
                   :title "Allow changing task state"
+                  :state :done
+                  :assignee 1}
+               2 {:id 2
+                  :title "Allow creating tasks"
                   :state :todo}}
        :users {0 {:id 0
                   :name "Fred"}
@@ -30,6 +34,9 @@
 (defn sub-task-state->task-ids [context task-state]
   (get (fx/sub context sub-make-task-state->task-ids) task-state))
 
+(defn sub-task-count [context task-state]
+  (count (fx/sub context sub-task-state->task-ids task-state)))
+
 (defn sub-task-by-id [context i]
   (get (fx/sub context :tasks) i))
 
@@ -48,13 +55,16 @@
 (defmethod event-handler ::assign-user [{:keys [task-id fx/event]}]
   (swap! *state fx/swap-context assoc-in [:tasks task-id :assignee] (:id event)))
 
+(defmethod event-handler ::set-state [{:keys [task-id fx/event]}]
+  (swap! *state fx/swap-context assoc-in [:tasks task-id :state] event))
+
 (defmethod event-handler :default [x] (prn x))
 
 ;; views
 
 (defn column-task-count [{:keys [fx/context task-state]}]
   {:fx/type :label
-   :text (str (count (fx/sub context sub-task-state->task-ids task-state)))})
+   :text (str (fx/sub context sub-task-count task-state))})
 
 (defn assignee-view [{:keys [fx/context task-id id]}]
   (let [user (fx/sub context sub-user-by-id id)]
@@ -70,6 +80,18 @@
                  :on-value-changed {:event/type ::assign-user :task-id task-id}
                  :items (fx/sub context sub-all-users)}]}))
 
+(defn task-state-view [{:keys [fx/context id]}]
+  (let [task (fx/sub context sub-task-by-id id)]
+    {:fx/type :h-box
+     :alignment :center
+     :spacing 5
+     :children [{:fx/type :label
+                 :text "State:"}
+                {:fx/type :combo-box
+                 :value (:state task)
+                 :on-value-changed {:event/type ::set-state :task-id id}
+                 :items [:todo :in-progress :done]}]}))
+
 (defn task-view [{:keys [fx/context id]}]
   (let [task (fx/sub context sub-task-by-id id)]
     {:fx/type :v-box
@@ -84,9 +106,13 @@
                  :style {:-fx-font [16 :sans-serif]}
                  :text (:title task)}
                 {:fx/type :flow-pane
+                 :hgap 10
+                 :vgap 5
                  :children [{:fx/type assignee-view
                              :task-id id
-                             :id (:assignee task)}]}]}))
+                             :id (:assignee task)}
+                            {:fx/type task-state-view
+                             :id id}]}]}))
 
 (defn column-tasks [{:keys [fx/context task-state]}]
   {:fx/type :v-box
@@ -125,14 +151,17 @@
                                        {:fx/type :column-constraints
                                         :percent-width 100/3}]
                   :children [{:fx/type column
+                              :grid-pane/vgrow :always
                               :grid-pane/column 0
                               :grid-pane/margin 5
                               :task-state :todo}
                              {:fx/type column
+                              :grid-pane/vgrow :always
                               :grid-pane/column 1
                               :grid-pane/margin 5
                               :task-state :in-progress}
                              {:fx/type column
+                              :grid-pane/vgrow :always
                               :grid-pane/column 2
                               :grid-pane/margin 5
                               :task-state :done}]}}})
