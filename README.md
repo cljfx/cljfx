@@ -29,7 +29,7 @@ everything with clojure data. Unlike fn-fx, it is more dynamic, allowing
 users to use maps and functions instead of macros and deftypes, and has
 more explicit and extensible lifecycle for components.
 
-## Introduction
+## Overview
 
 ### Hello world
 
@@ -439,6 +439,114 @@ returning cache) as a second argument. What kind of cache
 to use is a question with no easy answer, you probably should try
 different caches and see what is a better fit for your app.
 
+### How does it actually work
+
+There are 3 main building blocks of cljfx: components, lifecycles and
+mutators. Each are represented by protocols, here they are:
+```clj
+(defprotocol Component
+  :extend-via-metadata true
+  (instance [this]))
+
+(defprotocol Lifecycle
+  :extend-via-metadata true
+  (create [this desc opts])
+  (advance [this component desc opts])
+  (delete [this component opts]))
+
+(defprotocol Mutator
+  :extend-via-metadata true
+  (assign! [this instance coerce value])
+  (replace! [this instance coerce old-value new-value])
+  (retract! [this instance coerce value]))
+```
+Component is an immutable value representing some object and in some
+state (that object may be mutable — usually it's a javafx object), that
+also has a reference to said object instance.
+
+Lifecycle is well, a lifecycle of a component. It gets created from a
+description once, advanced to new description zero or more times, and
+then deleted. Cljfx is a composition of multiple different lifecycles,
+each useful in their own place. `opts` is a map that contains some data
+used by different lifecycles. 2 opt keys that are used by
+default in cljfx are:
+- `:fx.opt/type->lifecycle` — used in `dynamic` lifecycle to select what
+  lifecycle will be actually used for description based by value in
+  `:fx/type` key.
+- `:fx.opt/map-event-handler` — used in `event-handler` lifecycle that
+  checks if event handler is a map, and if it is, call function provided
+  by this key when event happens. It should be noted, that such event
+  handlers receive additional key in a map (`:fx/event`) that contains
+  event object, which may be context dependent: for JavaFX change
+  listeners it's a new value, for JavaFX event handlers it's an event,
+  for runnables it's `nil`, etc.
+
+Another notable lifecycle is `cljfx.lifecycle.composite/lifecycle`: it
+manages mutable JavaFX objects: creates instance in `create`, advances
+any changes to props (each individual prop may be seen as lifecycle +
+mutator), and has some useful macros to simplify generating composite
+lifecycles for concrete classes.
+
+Finally, mutator is a part of prop in composite lifecycles that
+performs actual mutation on instance when values change. It also
+receives `coerce` function which is called on value before applying it.
+Most common mutator is `setter`, but there are some other, for example,
+`property-change-listener`, which uses `addListener` and
+`removeListener`.
+
+### Gotchas
+
+#### `:fx/key` should be put on descriptions in a list, not inside these descriptions
+
+For example:
+```clj
+;; Don't do it, this won't work:
+
+(defn item-view [{:keys [item]}]
+  {:fx/type :label
+   ;; Do not specify `:fx/key` here!
+   :fx/key (:id item)
+   :text (:title item)})
+
+(defn item-list-view [items]
+  {:fx/type :v-box
+   :children (for [i items]
+               {:fx/type item-view
+                :item i})})
+```
+Lifecycle that manages lists of things (`dynamics`) can't see how it's
+elements will unfold, so it needs to have `:fx/key`-s where it can see
+them — in the element descriptions that it gets:
+```clj
+;; Do this to specify `:fx/key`-s:
+
+(defn item-view [{:keys [item]}]
+  {:fx/type :label
+   :text (:title item)})
+
+(defn item-list-view [items]
+  {:fx/type :v-box
+   :children (for [i items]
+               {:fx/type item-view
+                ;; Put `:fx/key` to description that is a part of a list
+                :fx/key (:id i)
+                :item i})})
+```
+#### Only mutable objects are described with `:fx/type`
+
+Lifecycles describe how things change, and some things in JavaFX don't
+change. For example, `Insets` class represents an immutable value, so
+when describing padding you don't need a map with `:fx/type` key:
+```clj
+{:fx/type :region
+ :padding {:top 10 :bottom 10 :left 10 :right 10}}
+```
+It doesn't have to be a map at all:
+```clj
+{:fx/type :region
+ :padding 10}
+```
+
 ## More examples
 
 There are various examples available in [examples](examples) folder.
@@ -450,13 +558,7 @@ TBD, need to consult my employer first
 ## TODO
 
 - advanced docs:
-  - lifecycles
-  - opts
-  - contexts
   - lack of local state
-  - why no :fx/type on insets (descs of immutable vs mutable values)
-  - where to put :fx/key
-  - fx/sub and lazy seqs
   - styles etc.
 
 ## Food for thought
@@ -464,7 +566,6 @@ TBD, need to consult my employer first
 - controlled props (mostly in controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations
-- prop lifecycle
 - how to handle dialogs, animations and other possibly missed things?
 - update to same desc should be identical (component-vec)
 - optional flatten in wrap-many for maps?
@@ -474,10 +575,6 @@ TBD, need to consult my employer first
     - xy-chart requires axis, they can't be replaced afterwards
   - some props do not create instances, they use provided instead
     (dialog pane in dialog)
-  - is it possible to inject components/lifecycles into cells? they are
-    a bit different (triggered via updateItem), and instances are
-    created for us, but otherwise it's just a node and we have props for
-    them
   - prop in composite lifecycle may be a map or a function taking
     instance and returning prop!
   - changing media should re-create media player

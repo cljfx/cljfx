@@ -86,7 +86,7 @@
     (doseq [[k v] (:props component)]
       (lifecycle/delete (prop/lifecycle (get props-config k)) v opts))))
 
-(defn component [m]
+(defn lifecycle [m]
   (with-meta
     m
     {`lifecycle/create create-composite-component
@@ -153,7 +153,7 @@
 (defmacro describe [type-expr & kvs]
   (let [kv-map (apply hash-map kvs)
         wrap-lifecycle (if (contains? kv-map :ctor)
-                         (fn [x] `(component ~x))
+                         (fn [x] `(lifecycle ~x))
                          identity)
         extend-bindings (->> kv-map
                              :extends
