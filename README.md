@@ -58,6 +58,14 @@ Evaluating this code will create and show this window:
 
 ![](doc/hello-world.png)
 
+The overall mental model of these descriptions is this:
+- whenever you need a JavaFX class, use map where `:fx/type` key has a
+  value of keyword which is a kebab-cased version of needed class;
+- other keys in this map represent JavaFX properties of that class (also
+  in kebab-case);
+- if property x can be changed by user, there is a corresponding
+  `:on-x-changed` prop for observing these changes
+
 ### App
 
 To be truly useful, there should be some state and changes over time,
@@ -460,9 +468,9 @@ mutators. Each are represented by protocols, here they are:
   (replace! [this instance coerce old-value new-value])
   (retract! [this instance coerce value]))
 ```
-Component is an immutable value representing some object and in some
-state (that object may be mutable — usually it's a javafx object), that
-also has a reference to said object instance.
+Component is an immutable value representing some object in some state
+(that object may be mutable — usually it's a javafx object), that also
+has a reference to said object instance.
 
 Lifecycle is well, a lifecycle of a component. It gets created from a
 description once, advanced to new description zero or more times, and
@@ -546,6 +554,73 @@ It doesn't have to be a map at all:
 {:fx/type :region
  :padding 10}
 ```
+How does it work? Instead of using lifecycle there is a coercion
+mechanism that transforms values before assigning them to a model, most
+of them are in `cljfx.coerce` namespace.
+
+#### Coercion
+
+Some notable coercion examples and approaches:
+- all enums and enum-like things can be expressed as kebab-cased
+  keywords, for example `:red` for colors, `:crosshair` for cursors
+- you still can use actual instances of target classes, for example
+  `Cursor/CROSSHAIR` for cursors
+- for classes with 1-arg constructors you can supply just that, for
+  example url string for images
+- for classes with multi-arg constructors you can supply args as a map,
+  for example map with `:url` and `:background-loading` for images
+- styles can be specified as maps, for example
+  `{:-fx-background-color :lightgray}`
+- durations can be specified as vector like `[10 :ms]` or `[2 :h]`
+- key combinations can be vectors. There are 2 flavors of key
+  combinations in JavaFX: KeyCodeCombination, created if last element of
+  that vector is keyword, for example, `[:ctrl :period]`, and
+  KeyCharacterCombination, created if last element of that vector is
+  string, for example `[:ctrl "."]`
+
+#### Differences with JavaFX
+
+There are some differences in naming:
+- `disabled` property is read-only in JavaFX, and to make something
+disabled you have to use `disable` property, but in `cljfx` you use
+`:disabled` anyway.
+- inner classes like `Light$Distant` are called like `:distant-light`,
+  except `Light$Point`, which is a `:point-light-effect`, because there
+  is also a node class `PointLight`, which in turn is `:point-light`
+
+There are some "synthetic" properties that provide needed functionality
+usually used through some other API:
+- canvas has a `:draw` prop that is a function that receives Canvas as
+  an argument and should use it to draw on it
+- media player has `:state` prop that can be either `:playing`,
+  `:paused` or `:stopped`, and will call `play`/`pause`/`stop` methods
+  on media player when this prop is changed
+- `:selection-mode` prop set selection mode enum on selection model of a
+  control
+- `:url` prop of web view will call `load` method on this view's web
+  engine
+
+#### No local state
+
+One thing that is easy to do in react/reagent, but actually complects
+things, is local state: every component can have it's own mutable state
+that lives independently from overall app state. This makes reasoning
+about state of the app harder: you need to take lots of small pieces
+into account. Another problem is this state is unreliable, because it is
+only here when a component is here. And if it gets recreated, for
+example, after closing some panel it resides in and reopening it back,
+this state will be lost. Sometimes we want this behavior, sometimes we
+don't, and it's possible to choose whether this state will be retained
+or not only if it's a part of a global app state.
+
+#### No controlled props
+
+In react, setting `value` prop on text input makes it controlled,
+meaning it can't be changed unless there is also a change listener
+updating this value on typing. This is much harder to do in JavaFX, so
+there is no such thing. But you still can keep typed text in sync with
+internal model by having both `:text` and `:on-text-changed` props (see
+example in [examples/e09_todo_app.clj](examples/e09_todo_app.clj))
 
 ## More examples
 
@@ -557,13 +632,11 @@ TBD, need to consult my employer first
 
 ## TODO
 
-- advanced docs:
-  - lack of local state
-  - styles etc.
+- remaining cell factories and button cells
 
 ## Food for thought
 - make exceptions more informative
-- controlled props (mostly in controls, also stage's `:showing`)
+- are controlled props possible? (controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations
 - how to handle dialogs, animations and other possibly missed things?
