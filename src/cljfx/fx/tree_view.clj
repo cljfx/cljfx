@@ -3,11 +3,21 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
+            [cljfx.fx.tree-cell :as fx.tree-cell]
             [cljfx.fx.control :as fx.control])
   (:import [javafx.scene.control TreeView SelectionMode]
-           [javafx.scene AccessibleRole]))
+           [javafx.scene AccessibleRole]
+           [javafx.util Callback]))
 
 (set! *warn-on-reflection* true)
+
+(defn cell-factory [x]
+  (cond
+    (instance? Callback x) x
+    (fn? x) (reify Callback
+              (call [_ _]
+                (fx.tree-cell/create x)))
+    :else (coerce/fail Callback x)))
 
 (def lifecycle
   (lifecycle.composite/describe TreeView
@@ -18,7 +28,9 @@
             :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
                               :default :tree-view]
             ;; definitions
-            :cell-factory [:setter lifecycle/scalar]
+            :cell-factory [:setter (lifecycle/detached-prop-map
+                                     (:props fx.tree-cell/lifecycle))
+                           :coerce cell-factory]
             :editable [:setter lifecycle/scalar :default false]
             :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]
             :on-edit-cancel [:setter lifecycle/event-handler :coerce coerce/event-handler]

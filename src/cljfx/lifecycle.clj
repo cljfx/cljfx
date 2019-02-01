@@ -195,7 +195,7 @@
 
 (defn detached-prop-map [props-config]
   (with-meta
-    [::detached-prop props-config]
+    [::detached-prop-map props-config]
     {`create (fn [_ desc opts]
                (with-meta
                  {:desc desc

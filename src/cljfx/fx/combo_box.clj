@@ -6,33 +6,22 @@
             [cljfx.fx.text-field-list-cell :as fx.text-field-list-cell])
   (:import [javafx.scene.control ComboBox ListCell]
            [javafx.scene AccessibleRole]
-           [javafx.util Callback]
-           [javafx.scene.control.cell TextFieldListCell]))
+           [javafx.util Callback]))
 
 (set! *warn-on-reflection* true)
-
-(defn- create-cell [f]
-  (let [*props (volatile! {})]
-    (proxy [TextFieldListCell] []
-      (updateItem [item empty]
-        (let [^TextFieldListCell this this
-              props @*props]
-          (proxy-super updateItem item empty)
-          (f (select-keys props [:text :graphic]) this {} empty)
-          (vreset! *props (f (dissoc props :text :graphic) this item empty)))))))
 
 (defn cell-factory [x]
   (cond
     (instance? Callback x) x
     (fn? x) (reify Callback
               (call [_ _]
-                (create-cell x)))
+                (fx.text-field-list-cell/create x)))
     :else (coerce/fail Callback x)))
 
 (defn list-cell [x]
   (cond
     (instance? ListCell x) x
-    (fn? x) (create-cell x)
+    (fn? x) (fx.text-field-list-cell/create x)
     :else (coerce/fail ListCell x)))
 
 

@@ -60,10 +60,10 @@ Evaluating this code will create and show this window:
 
 The overall mental model of these descriptions is this:
 - whenever you need a JavaFX class, use map where `:fx/type` key has a
-  value of keyword which is a kebab-cased version of needed class;
+  value of a kebab-cased keyword derived from that class name
 - other keys in this map represent JavaFX properties of that class (also
   in kebab-case);
-- if property x can be changed by user, there is a corresponding
+- if prop x can be changed by user, there is a corresponding
   `:on-x-changed` prop for observing these changes
 
 ### App
@@ -291,6 +291,22 @@ Sometimes components accept specially treated keys. Main uses are:
 
    For a more complete example of available pane keys, see
    [examples/e07_extra_props.clj](examples/e07_extra_props.clj)
+
+### Factory props
+
+There are some props in JavaFX that represent not a value, but a way to
+construct a value from some input:
+- `:page-factory` in pagination, you can use function receiving page
+  index and returning any component description for this prop (see
+  example in [examples/e06_pagination.clj](examples/e06_pagination.clj))
+- various versions of `:cell-factory` in controls designed to display
+  multiples of items (table views, list views etc.). You can use
+  functions that receive items and return descriptions for these props,
+  but they are a bit different: created cells have they own lifecycle
+  for performance reasons, and that imposes a restriction that you can't
+  specify `:fx/type` in returned cell descriptions. There are various
+  usage examples available in
+  [examples/e16_cell_factories.clj](examples/e16_cell_factories.clj)
 
 ### Subscriptions and contexts
 
@@ -582,11 +598,11 @@ Some notable coercion examples and approaches:
 
 There are some differences in naming:
 - `disabled` property is read-only in JavaFX, and to make something
-disabled you have to use `disable` property, but in `cljfx` you use
+disabled you have to use `disable` property, but in cljfx you use
 `:disabled` anyway.
 - inner classes like `Light$Distant` are called like `:distant-light`,
-  except `Light$Point`, which is a `:point-light-effect`, because there
-  is also a node class `PointLight`, which in turn is `:point-light`
+  except for `Light$Point`, which is a `:point-light-effect`, because there
+  is also a node class `PointLight`, which in turn is a `:point-light`
 
 There are some "synthetic" properties that provide needed functionality
 usually used through some other API:
@@ -600,18 +616,18 @@ usually used through some other API:
 - `:url` prop of web view will call `load` method on this view's web
   engine
 
-#### No local state
+#### No local mutable state
 
 One thing that is easy to do in react/reagent, but actually complects
-things, is local state: every component can have it's own mutable state
-that lives independently from overall app state. This makes reasoning
-about state of the app harder: you need to take lots of small pieces
-into account. Another problem is this state is unreliable, because it is
-only here when a component is here. And if it gets recreated, for
-example, after closing some panel it resides in and reopening it back,
-this state will be lost. Sometimes we want this behavior, sometimes we
-don't, and it's possible to choose whether this state will be retained
-or not only if it's a part of a global app state.
+things, is local mutable state: every component can have it's own
+mutable state that lives independently from overall app state. This
+makes reasoning about state of the app harder: you need to take lots of
+small pieces into account. Another problem is this state is unreliable,
+because it is only here when a component is here. And if it gets
+recreated, for example, after closing some panel it resides in and
+reopening it back, this state will be lost. Sometimes we want this
+behavior, sometimes we don't, and it's possible to choose whether this
+state will be retained or not only if it's a part of a global app state.
 
 #### No controlled props
 
@@ -619,20 +635,12 @@ In react, setting `value` prop on text input makes it controlled,
 meaning it can't be changed unless there is also a change listener
 updating this value on typing. This is much harder to do in JavaFX, so
 there is no such thing. But you still can keep typed text in sync with
-internal model by having both `:text` and `:on-text-changed` props (see
+internal state by having both `:text` and `:on-text-changed` props (see
 example in [examples/e09_todo_app.clj](examples/e09_todo_app.clj))
 
 ## More examples
 
 There are various examples available in [examples](examples) folder.
-
-## License
-
-TBD, need to consult my employer first
-
-## TODO
-
-- remaining cell factories and button cells
 
 ## Food for thought
 - make exceptions more informative
