@@ -62,10 +62,7 @@
   {:fx/type :tree-view
    :cell-factory (fn [x]
                    {:text (str x)})
-   :root (->tree-item
-           [:div
-            [:h1 {:class "blink"} "Breaking news!"]
-            [:p "There is no hiccup in cljfx!"]])})
+   :root (->tree-item table-view)})
 
 (fx/on-fx-thread
   (fx/create-component
