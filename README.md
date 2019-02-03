@@ -1,4 +1,5 @@
 # Cljfx
+[![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg)](https://clojars.org/cljfx)
 
 Cljfx is a declarative, functional and extensible wrapper of JavaFX
 mutability soup.
@@ -302,7 +303,7 @@ construct a value from some input:
 - various versions of `:cell-factory` in controls designed to display
   multiples of items (table views, list views etc.). You can use
   functions that receive items and return descriptions for these props,
-  but they are a bit different: created cells have they own lifecycle
+  but they are a bit different: created cells have their own lifecycle
   for performance reasons, and that imposes a restriction that you can't
   specify `:fx/type` in returned cell descriptions. There are various
   usage examples available in
@@ -654,8 +655,6 @@ There are various examples available in [examples](examples) folder.
   - ctor:
     - scene requires root, root can be replaced afterwards
     - xy-chart requires axis, they can't be replaced afterwards
-  - some props do not create instances, they use provided instead
-    (dialog pane in dialog)
   - prop in composite lifecycle may be a map or a function taking
     instance and returning prop!
   - changing media should re-create media player

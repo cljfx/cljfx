@@ -45,7 +45,7 @@
                           java.lang.String ['lifecycle/scalar]
                           javafx.scene.Node ['lifecycle/dynamic]
                           javafx.scene.paint.Color ['lifecycle/scalar :coerce 'coerce/color]
-                          javafx.event.EventHandler ['lifecycle/scalar
+                          javafx.event.EventHandler ['lifecycle/event-handler
                                                      :coerce 'coerce/event-handler]
                           java.lang.Runnable ['lifecycle/scalar :coerce 'coerce/runnable]
                           javafx.geometry.Point3D ['lifecycle/scalar :coerce 'coerce/point-3d]
