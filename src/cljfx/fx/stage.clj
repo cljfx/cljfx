@@ -4,7 +4,7 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
             [cljfx.fx.window :as fx.window])
-  (:import [javafx.stage Stage StageStyle]))
+  (:import [javafx.stage Stage StageStyle Modality]))
 
 (set! *warn-on-reflection* true)
 
@@ -28,6 +28,10 @@
                 :maximized [:setter lifecycle/scalar :default false]
                 :min-height [:setter lifecycle/scalar :coerce double :default 0.0]
                 :min-width [:setter lifecycle/scalar :coerce double :default 0.0]
+                :modality [(mutator/setter #(.initModality ^Stage %1 %2))
+                           lifecycle/scalar
+                           :coerce (coerce/enum Modality)
+                           :default :none]
                 :resizable [:setter lifecycle/scalar :default true]
                 :scene [:setter lifecycle/dynamic]
                 :title [:setter lifecycle/scalar]

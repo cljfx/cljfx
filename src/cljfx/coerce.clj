@@ -1,6 +1,5 @@
 (ns cljfx.coerce
-  (:require [clojure.string :as str]
-            [cljfx.event :as event])
+  (:require [clojure.string :as str])
   (:import [java.util List]
            [javafx.event EventHandler]
            [javafx.scene Cursor]
@@ -124,7 +123,7 @@
     (fn? x)
     (reify EventHandler
       (handle [_ event]
-        (x (event/datafy event))))
+        (x event)))
 
     :else
     (throw (fail EventHandler x))))

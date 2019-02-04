@@ -1,6 +1,6 @@
 (ns e09-todo-app
   (:require [cljfx.api :as fx])
-  (:import [javafx.scene.input KeyCode]))
+  (:import [javafx.scene.input KeyCode KeyEvent]))
 
 (def *state
   (atom {:typed-text ""
@@ -50,7 +50,7 @@
   (case (:event/type event)
     ::set-done (swap! *state assoc-in [:by-id (:id event) :done] (:fx/event event))
     ::type (swap! *state assoc :typed-text (:fx/event event))
-    ::press (when (= KeyCode/ENTER (:code (:fx/event event)))
+    ::press (when (= KeyCode/ENTER (.getCode ^KeyEvent (:fx/event event)))
               (swap! *state #(-> %
                                  (assoc :typed-text "")
                                  (assoc-in [:by-id (count (:by-id %))]

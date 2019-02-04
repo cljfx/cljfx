@@ -161,7 +161,13 @@
    :cell (lazy-load cljfx.fx.cell/lifecycle)
    :indexed-cell (lazy-load cljfx.fx.indexed-cell/lifecycle)
    :list-cell (lazy-load cljfx.fx.list-cell/lifecycle)
-   :combo-box-list-cell (lazy-load cljfx.fx.combo-box-list-cell/lifecycle)})
+   :combo-box-list-cell (lazy-load cljfx.fx.combo-box-list-cell/lifecycle)
+   ;; dialogs
+   :alert (lazy-load cljfx.fx.alert/lifecycle)
+   :choice-dialog (lazy-load cljfx.fx.choice-dialog/lifecycle)
+   :dialog (lazy-load cljfx.fx.dialog/lifecycle)
+   :dialog-pane (lazy-load cljfx.fx.dialog-pane/lifecycle)
+   :text-input-dialog (lazy-load cljfx.fx.text-input-dialog/lifecycle)})
 
 (defn keyword->lifecycle [kw]
   (when-let [delay (keyword->lifecycle-delay kw)]

@@ -10,8 +10,7 @@
            :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
            :test {:extra-paths ["test"]
                   :extra-deps {metosin/testit {:mvn/version "0.2.0"}}}
-           :depstar {:extra-deps
-                     {seancorfield/depstar {:mvn/version "0.1.5"}}
+           :depstar {:extra-deps {seancorfield/depstar {:mvn/version "0.1.5"}}
                      :main-opts ["-m" "hf.depstar.jar" "cljfx.jar"]}
            :deploy {:extra-deps {deps-deploy {:mvn/version "0.0.9"}}
                     :main-opts ["-m" "deps-deploy.deps-deploy" "deploy" "cljfx.jar"]}}}

@@ -1,6 +1,6 @@
 (ns e03-map-event-handler
   (:require [cljfx.api :as fx])
-  (:import [javafx.scene.input KeyCode]))
+  (:import [javafx.scene.input KeyCode KeyEvent]))
 
 (def *state
   (atom {:fx/type :stage
@@ -17,7 +17,7 @@
 
 (defn map-event-handler [e]
   (when (and (= :event/scene-key-press (:event/type e))
-             (= KeyCode/ESCAPE (-> e :fx/event :code)))
+             (= KeyCode/ESCAPE (.getCode ^KeyEvent (:fx/event e))))
     (reset! *state nil)))
 
 (def app

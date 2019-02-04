@@ -1,5 +1,6 @@
 (ns e11-mouse-dragging
-  (:require [cljfx.api :as fx]))
+  (:require [cljfx.api :as fx])
+  (:import [javafx.scene.input MouseEvent]))
 
 (def *state
   (atom [{:x 100 :y 100}
@@ -9,8 +10,8 @@
 
 (defmethod event-handler ::mouse-dragged [e]
   (let [index (:index e)
-        fx-event (:fx/event e)]
-    (swap! *state update index assoc :x (:scene-x fx-event) :y (:scene-y fx-event))))
+        fx-event ^MouseEvent (:fx/event e)]
+    (swap! *state update index assoc :x (.getSceneX fx-event) :y (.getSceneY fx-event))))
 
 (defmethod event-handler :default [e]
   (prn e))

@@ -643,6 +643,11 @@ example in [examples/e09_todo_app.clj](examples/e09_todo_app.clj))
 
 There are various examples available in [examples](examples) folder.
 
+## TODO
+
+- measure performance
+- cofx stuff from re-frame?
+
 ## Food for thought
 - make exceptions more informative
 - are controlled props possible? (controls, also stage's `:showing`)
