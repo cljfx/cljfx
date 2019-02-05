@@ -645,6 +645,7 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
+- hide dialogs on delete
 - measure performance
 - cofx stuff from re-frame?
 
@@ -653,7 +654,7 @@ There are various examples available in [examples](examples) folder.
 - are controlled props possible? (controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations
-- how to handle dialogs, animations and other possibly missed things?
+- how to handle animations and other possibly missed things?
 - update to same desc should be identical (component-vec)
 - optional flatten in wrap-many for maps?
 - expand on props and composite lifecycle. What's known about them:
