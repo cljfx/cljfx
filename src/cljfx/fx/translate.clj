@@ -6,10 +6,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.transform/props
+    (lifecycle.composite/props Translate
+      :x [:setter lifecycle/scalar :coerce double :default 0.0]
+      :y [:setter lifecycle/scalar :coerce double :default 0.0]
+      :z [:setter lifecycle/scalar :coerce double :default 0.0])))
+
 (def lifecycle
   (lifecycle.composite/describe Translate
     :ctor []
-    :extends [fx.transform/lifecycle]
-    :props {:x [:setter lifecycle/scalar :coerce double :default 0.0]
-            :y [:setter lifecycle/scalar :coerce double :default 0.0]
-            :z [:setter lifecycle/scalar :coerce double :default 0.0]}))
+    :props props))

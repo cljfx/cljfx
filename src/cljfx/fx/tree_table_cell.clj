@@ -8,15 +8,20 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.indexed-cell/props
+    (lifecycle.composite/props TreeTableCell
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["cell" "indexed-cell" "tree-table-cell"]]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :tree-table-cell])))
+
 (def lifecycle
   (lifecycle.composite/describe TreeTableCell
     :ctor []
-    :extends [fx.indexed-cell/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["cell" "indexed-cell" "tree-table-cell"]]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :tree-table-cell]}))
+    :props props))
 
 (defn create [f]
   (let [*props (volatile! {})]

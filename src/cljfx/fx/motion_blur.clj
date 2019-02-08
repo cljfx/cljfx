@@ -5,9 +5,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props MotionBlur
+    :input [:setter lifecycle/dynamic]
+    :radius [:setter lifecycle/scalar :coerce double :default 10]
+    :angle [:setter lifecycle/scalar :coerce double :default 0]))
+
 (def lifecycle
   (lifecycle.composite/describe MotionBlur
     :ctor []
-    :props {:input [:setter lifecycle/dynamic]
-            :radius [:setter lifecycle/scalar :coerce double :default 10]
-            :angle [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

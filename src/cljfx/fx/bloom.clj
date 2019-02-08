@@ -5,8 +5,12 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props Bloom
+    :input [:setter lifecycle/dynamic]
+    :threshold [:setter lifecycle/scalar :coerce double :default 0.3]))
+
 (def lifecycle
   (lifecycle.composite/describe Bloom
     :ctor []
-    :props {:input [:setter lifecycle/dynamic]
-            :threshold [:setter lifecycle/scalar :coerce double :default 0.3]}))
+    :props props))

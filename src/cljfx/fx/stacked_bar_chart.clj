@@ -7,12 +7,18 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.xy-chart/props
+    (lifecycle.composite/props StackedBarChart
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default "stacked-bar-chart"]
+      ;; definitions
+      :category-gap [:setter lifecycle/scalar :coerce double :default 10])))
+
+
 (def lifecycle
   (lifecycle.composite/describe StackedBarChart
     :ctor [:x-axis :y-axis]
-    :extends [fx.xy-chart/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default "stacked-bar-chart"]
-            ;; definitions
-            :category-gap [:setter lifecycle/scalar :coerce double :default 10]}))
+    :props props))

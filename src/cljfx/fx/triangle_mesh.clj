@@ -13,12 +13,16 @@
     (= :point-normal-texcoord) VertexFormat/POINT_NORMAL_TEXCOORD
     :else (coerce/fail VertexFormat x)))
 
+(def props
+  (lifecycle.composite/props TriangleMesh
+    :vertex-format [:setter lifecycle/scalar :coerce vertex-format]
+    :faces [:list lifecycle/scalar :coerce #(map int %)]
+    :face-smoothing-groups [:list lifecycle/scalar :coerce #(map int %)]
+    :normals [:list lifecycle/scalar :coerce #(map float %)]
+    :points [:list lifecycle/scalar :coerce #(map float %)]
+    :tex-coords [:list lifecycle/scalar :coerce #(map float %)]))
+
 (def lifecycle
   (lifecycle.composite/describe TriangleMesh
     :ctor []
-    :props {:vertex-format [:setter lifecycle/scalar :coerce vertex-format]
-            :faces [:list lifecycle/scalar :coerce #(map int %)]
-            :face-smoothing-groups [:list lifecycle/scalar :coerce #(map int %)]
-            :normals [:list lifecycle/scalar :coerce #(map float %)]
-            :points [:list lifecycle/scalar :coerce #(map float %)]
-            :tex-coords [:list lifecycle/scalar :coerce #(map float %)]}))
+    :props props))

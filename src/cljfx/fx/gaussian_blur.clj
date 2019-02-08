@@ -5,8 +5,12 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props GaussianBlur
+    :input [:setter lifecycle/dynamic]
+    :radius [:setter lifecycle/scalar :coerce double :default 10]))
+
 (def lifecycle
   (lifecycle.composite/describe GaussianBlur
     :ctor []
-    :props {:input [:setter lifecycle/dynamic]
-            :radius [:setter lifecycle/scalar :coerce double :default 10]}))
+    :props props))

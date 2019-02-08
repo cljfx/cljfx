@@ -7,12 +7,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape/props
+    (lifecycle.composite/props Path
+      :elements [:list lifecycle/dynamics]
+      :fill [:setter lifecycle/scalar :coerce coerce/paint]
+      :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
+      :fill-rule [:setter lifecycle/scalar :coerce (coerce/enum FillRule)
+                  :default :non-zero])))
+
 (def lifecycle
   (lifecycle.composite/describe Path
     :ctor []
-    :extends [fx.shape/lifecycle]
-    :props {:elements [:list lifecycle/dynamics]
-            :fill [:setter lifecycle/scalar :coerce coerce/paint]
-            :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
-            :fill-rule [:setter lifecycle/scalar :coerce (coerce/enum FillRule)
-                        :default :non-zero]}))
+    :props props))

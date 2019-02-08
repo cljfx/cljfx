@@ -22,12 +22,17 @@
                               lifecycle/scalar
                               :coerce (coerce/enum Pos))}))
 
+(def props
+  (merge
+    fx.pane/props
+    (lifecycle.composite/props BorderPane
+      :bottom [:setter border-pane-constrained-dynamic]
+      :center [:setter border-pane-constrained-dynamic]
+      :left [:setter border-pane-constrained-dynamic]
+      :right [:setter border-pane-constrained-dynamic]
+      :top [:setter border-pane-constrained-dynamic])))
+
 (def lifecycle
   (lifecycle.composite/describe BorderPane
     :ctor []
-    :extends [fx.pane/lifecycle]
-    :props {:bottom [:setter border-pane-constrained-dynamic]
-            :center [:setter border-pane-constrained-dynamic]
-            :left [:setter border-pane-constrained-dynamic]
-            :right [:setter border-pane-constrained-dynamic]
-            :top [:setter border-pane-constrained-dynamic]}))
+    :props props))

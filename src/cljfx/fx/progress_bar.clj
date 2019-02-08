@@ -7,9 +7,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.progress-indicator/props
+    (lifecycle.composite/props ProgressBar
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default "progress-bar"])))
+
 (def lifecycle
   (lifecycle.composite/describe ProgressBar
     :ctor []
-    :extends [fx.progress-indicator/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "progress-bar"]}))
+    :props props))

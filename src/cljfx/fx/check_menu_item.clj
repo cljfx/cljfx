@@ -7,12 +7,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.menu-item/props
+    (lifecycle.composite/props CheckMenuItem
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["check-menu-item" "menu-item"]]
+      ;; definitions
+      :selected [:setter lifecycle/scalar :default false])))
+
 (def lifecycle
   (lifecycle.composite/describe CheckMenuItem
     :ctor []
-    :extends [fx.menu-item/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["check-menu-item" "menu-item"]]
-            ;; definitions
-            :selected [:setter lifecycle/scalar :default false]}))
+    :props props))

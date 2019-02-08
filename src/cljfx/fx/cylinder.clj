@@ -6,9 +6,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape3d/props
+    (lifecycle.composite/props Cylinder
+      :height [:setter lifecycle/scalar :coerce double :default 2.0]
+      :radius [:setter lifecycle/scalar :coerce double :default 1.0])))
+
 (def lifecycle
   (lifecycle.composite/describe Cylinder
     :ctor []
-    :extends [fx.shape3d/lifecycle]
-    :props {:height [:setter lifecycle/scalar :coerce double :default 2.0]
-            :radius [:setter lifecycle/scalar :coerce double :default 1.0]}))
+    :props props))

@@ -6,11 +6,16 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape/props
+    (lifecycle.composite/props Ellipse
+      :center-x [:setter lifecycle/scalar :coerce double :default 0]
+      :center-y [:setter lifecycle/scalar :coerce double :default 0]
+      :radius-x [:setter lifecycle/scalar :coerce double :default 0]
+      :radius-y [:setter lifecycle/scalar :coerce double :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe Ellipse
     :ctor []
-    :extends [fx.shape/lifecycle]
-    :props {:center-x [:setter lifecycle/scalar :coerce double :default 0]
-            :center-y [:setter lifecycle/scalar :coerce double :default 0]
-            :radius-x [:setter lifecycle/scalar :coerce double :default 0]
-            :radius-y [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

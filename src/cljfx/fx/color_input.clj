@@ -6,11 +6,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props ColorInput
+    :width [:setter lifecycle/scalar :coerce double :default 0]
+    :height [:setter lifecycle/scalar :coerce double :default 0]
+    :x [:setter lifecycle/scalar :coerce double :default 0]
+    :y [:setter lifecycle/scalar :coerce double :default 0]
+    :paint [:setter lifecycle/scalar :coerce coerce/paint]))
+
 (def lifecycle
   (lifecycle.composite/describe ColorInput
     :ctor []
-    :props {:width [:setter lifecycle/scalar :coerce double :default 0]
-            :height [:setter lifecycle/scalar :coerce double :default 0]
-            :x [:setter lifecycle/scalar :coerce double :default 0]
-            :y [:setter lifecycle/scalar :coerce double :default 0]
-            :paint [:setter lifecycle/scalar :coerce coerce/paint]}))
+    :props props))

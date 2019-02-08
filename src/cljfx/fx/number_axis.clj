@@ -6,9 +6,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.value-axis/props
+    (lifecycle.composite/props NumberAxis
+      :force-zero-in-range [:setter lifecycle/scalar :default true]
+      :tick-unit [:setter lifecycle/scalar :coerce double :default 5.0])))
+
 (def lifecycle
   (lifecycle.composite/describe NumberAxis
     :ctor []
-    :extends [fx.value-axis/lifecycle]
-    :props {:force-zero-in-range [:setter lifecycle/scalar :default true]
-            :tick-unit [:setter lifecycle/scalar :coerce double :default 5.0]}))
+    :props props))

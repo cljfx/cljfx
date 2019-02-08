@@ -7,8 +7,9 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe LightBase
-    :extends [fx.node/lifecycle]
-    :props {:color [:setter lifecycle/scalar :coerce coerce/color :default :white]
-            :light-on [:setter lifecycle/scalar :default true]}))
+(def props
+  (merge
+    fx.node/props
+    (lifecycle.composite/props LightBase
+      :color [:setter lifecycle/scalar :coerce coerce/color :default :white]
+      :light-on [:setter lifecycle/scalar :default true])))

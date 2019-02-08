@@ -8,17 +8,22 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.control/props
+    (lifecycle.composite/props SplitPane
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default "split-pane"]
+      ;; definitions
+      :divider-positions [:setter lifecycle/scalar
+                          :coerce #(into-array Double/TYPE %)
+                          :default []]
+      :items [:list lifecycle/dynamics]
+      :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
+                    :default :horizontal])))
+
 (def lifecycle
   (lifecycle.composite/describe SplitPane
     :ctor []
-    :extends [fx.control/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default "split-pane"]
-            ;; definitions
-            :divider-positions [:setter lifecycle/scalar
-                                :coerce #(into-array Double/TYPE %)
-                                :default []]
-            :items [:list lifecycle/dynamics]
-            :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
-                          :default :horizontal]}))
+    :props props))

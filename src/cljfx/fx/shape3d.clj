@@ -7,9 +7,10 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe Shape3D
-    :extends [fx.node/lifecycle]
-    :props {:cull-face [:setter lifecycle/scalar :coerce (coerce/enum CullFace) :default :back]
-            :draw-mode [:setter lifecycle/scalar :coerce (coerce/enum DrawMode) :default :fill]
-            :material [:setter lifecycle/dynamic]}))
+(def props
+  (merge
+    fx.node/props
+    (lifecycle.composite/props Shape3D
+      :cull-face [:setter lifecycle/scalar :coerce (coerce/enum CullFace) :default :back]
+      :draw-mode [:setter lifecycle/scalar :coerce (coerce/enum DrawMode) :default :fill]
+      :material [:setter lifecycle/dynamic])))

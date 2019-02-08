@@ -6,10 +6,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape3d/props
+    (lifecycle.composite/props Box
+      :depth [:setter lifecycle/scalar :coerce double :default 2.0]
+      :height [:setter lifecycle/scalar :coerce double :default 2.0]
+      :width [:setter lifecycle/scalar :coerce double :default 2.0])))
+
 (def lifecycle
   (lifecycle.composite/describe Box
     :ctor []
-    :extends [fx.shape3d/lifecycle]
-    :props {:depth [:setter lifecycle/scalar :coerce double :default 2.0]
-            :height [:setter lifecycle/scalar :coerce double :default 2.0]
-            :width [:setter lifecycle/scalar :coerce double :default 2.0]}))
+    :props props))

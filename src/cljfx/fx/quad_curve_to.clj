@@ -6,11 +6,16 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.path-element/props
+    (lifecycle.composite/props QuadCurveTo
+      :control-x [:setter lifecycle/scalar :coerce double :default 0]
+      :control-y [:setter lifecycle/scalar :coerce double :default 0]
+      :x [:setter lifecycle/scalar :coerce double :default 0]
+      :y [:setter lifecycle/scalar :coerce double :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe QuadCurveTo
     :ctor []
-    :extends [fx.path-element/lifecycle]
-    :props {:control-x [:setter lifecycle/scalar :coerce double :default 0]
-            :control-y [:setter lifecycle/scalar :coerce double :default 0]
-            :x [:setter lifecycle/scalar :coerce double :default 0]
-            :y [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

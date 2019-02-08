@@ -6,13 +6,18 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape/props
+    (lifecycle.composite/props Rectangle
+      :arc-height [:setter lifecycle/scalar :coerce double :default 0.0]
+      :arc-width [:setter lifecycle/scalar :coerce double :default 0.0]
+      :height [:setter lifecycle/scalar :coerce double :default 0.0]
+      :width [:setter lifecycle/scalar :coerce double :default 0.0]
+      :x [:setter lifecycle/scalar :coerce double :default 0.0]
+      :y [:setter lifecycle/scalar :coerce double :default 0.0])))
+
 (def lifecycle
   (lifecycle.composite/describe Rectangle
     :ctor []
-    :extends [fx.shape/lifecycle]
-    :props {:arc-height [:setter lifecycle/scalar :coerce double :default 0.0]
-            :arc-width [:setter lifecycle/scalar :coerce double :default 0.0]
-            :height [:setter lifecycle/scalar :coerce double :default 0.0]
-            :width [:setter lifecycle/scalar :coerce double :default 0.0]
-            :x [:setter lifecycle/scalar :coerce double :default 0.0]
-            :y [:setter lifecycle/scalar :coerce double :default 0.0]}))
+    :props props))

@@ -7,14 +7,18 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.list-cell/props
+    (lifecycle.composite/props ComboBoxListCell
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["cell" "indexed-cell" "list-cell" "combo-box-list-cell"]]
+      ;; definitions
+      :combo-box-editable [:setter lifecycle/scalar :default false]
+      :converter [:setter lifecycle/scalar :coerce coerce/string-converter])))
+
 (def lifecycle
   (lifecycle.composite/describe ComboBoxListCell
     :ctor []
-    :extends [fx.list-cell/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default
-                          ["cell" "indexed-cell" "list-cell" "combo-box-list-cell"]]
-            ;; definitions
-            :combo-box-editable [:setter lifecycle/scalar :default false]
-            :converter [:setter lifecycle/scalar :coerce coerce/string-converter]}))
+    :props props))

@@ -7,13 +7,18 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.combo-box-base/props
+    (lifecycle.composite/props ColorPicker
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default "color-picker"]
+      ;; definitions
+      :value [:setter lifecycle/scalar :coerce coerce/color :default :white]
+      :custom-colors [:list lifecycle/scalar :coerce #(map coerce/color %)])))
+
 (def lifecycle
   (lifecycle.composite/describe ColorPicker
     :ctor []
-    :extends [fx.combo-box-base/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default "color-picker"]
-            ;; definitions
-            :value [:setter lifecycle/scalar :coerce coerce/color :default :white]
-            :custom-colors [:list lifecycle/scalar :coerce #(map coerce/color %)]}))
+    :props props))

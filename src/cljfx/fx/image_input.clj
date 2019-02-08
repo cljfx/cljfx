@@ -6,9 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props ImageInput
+    :source [:setter lifecycle/scalar :coerce coerce/image]
+    :x [:setter lifecycle/scalar :coerce double :default 0]
+    :y [:setter lifecycle/scalar :coerce double :default 0]))
+
 (def lifecycle
   (lifecycle.composite/describe ImageInput
     :ctor []
-    :props {:source [:setter lifecycle/scalar :coerce coerce/image]
-            :x [:setter lifecycle/scalar :coerce double :default 0]
-            :y [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

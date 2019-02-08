@@ -8,12 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.cell/props
+    (lifecycle.composite/props DateCell
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["cell" "date-cell"]]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :text])))
+
 (def lifecycle
   (lifecycle.composite/describe DateCell
     :ctor []
-    :extends [fx.cell/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["cell" "date-cell"]]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :text]}))
+    :props props))

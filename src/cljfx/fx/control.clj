@@ -6,8 +6,10 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe Control
-    :extends [fx.region/lifecycle]
-    :props {:context-menu [:setter lifecycle/dynamic]
-            :tooltip [:setter lifecycle/dynamic]}))
+(def props
+  (merge
+    fx.region/props
+    (lifecycle.composite/props Control
+      :context-menu [:setter lifecycle/dynamic]
+      :tooltip [:setter lifecycle/dynamic])))
+

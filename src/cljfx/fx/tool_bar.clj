@@ -9,16 +9,21 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.control/props
+    (lifecycle.composite/props ToolBar
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tool-bar"]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :tool-bar]
+      ;; definitions
+      :items [:list lifecycle/dynamics]
+      :orientation [:setter lifecycle/scalar
+                    :coerce (coerce/enum Orientation)
+                    :default :horizontal])))
+
 (def lifecycle
   (lifecycle.composite/describe ToolBar
     :ctor []
-    :extends [fx.control/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tool-bar"]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :tool-bar]
-            ;; definitions
-            :items [:list lifecycle/dynamics]
-            :orientation [:setter lifecycle/scalar
-                          :coerce (coerce/enum Orientation)
-                          :default :horizontal]}))
+    :props props))

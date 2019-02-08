@@ -6,8 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.xy-chart/props
+    (lifecycle.composite/props AreaChart
+      :create-symbols [:setter lifecycle/scalar :default true])))
+
 (def lifecycle
   (lifecycle.composite/describe AreaChart
     :ctor [:x-axis :y-axis]
-    :extends [fx.xy-chart/lifecycle]
-    :props {:create-symbols [:setter lifecycle/scalar :default true]}))
+    :props props))

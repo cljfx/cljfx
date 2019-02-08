@@ -6,9 +6,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.dialog/props
+    (lifecycle.composite/props ChoiceDialog
+      :items [:list lifecycle/scalar]
+      :selected-item [:setter lifecycle/scalar])))
+
 (def lifecycle
   (lifecycle.composite/describe ChoiceDialog
     :ctor []
-    :extends [fx.dialog/lifecycle]
-    :props {:items [:list lifecycle/scalar]
-            :selected-item [:setter lifecycle/scalar]}))
+    :props props))

@@ -5,8 +5,12 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props PieChart$Data
+    :name [:setter lifecycle/scalar]
+    :pie-value [:setter lifecycle/scalar :coerce double :default 0]))
+
 (def lifecycle
   (lifecycle.composite/describe PieChart$Data
     :ctor [:name :pie-value]
-    :props {:name [:setter lifecycle/scalar]
-            :pie-value [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

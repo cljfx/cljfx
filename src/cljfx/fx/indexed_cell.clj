@@ -7,10 +7,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.cell/props
+    (lifecycle.composite/props IndexedCell
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["cell" "indexed-cell"]])))
+
 (def lifecycle
   (lifecycle.composite/describe IndexedCell
     :ctor []
-    :extends [fx.cell/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["cell" "indexed-cell"]]}))
+    :props props))

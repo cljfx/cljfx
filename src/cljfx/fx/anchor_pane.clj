@@ -8,33 +8,35 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.pane/props
+    (lifecycle.composite/props AnchorPane
+      :children [:list
+                 (-> lifecycle/dynamic
+                     (lifecycle/wrap-extra-props
+                       {:anchor-pane/top (prop/make
+                                           (mutator/constraint "pane-top-anchor")
+                                           lifecycle/scalar
+                                           :coerce double)
+
+                        :anchor-pane/left (prop/make
+                                            (mutator/constraint "pane-left-anchor")
+                                            lifecycle/scalar
+                                            :coerce double)
+
+                        :anchor-pane/bottom (prop/make
+                                              (mutator/constraint "pane-bottom-anchor")
+                                              lifecycle/scalar
+                                              :coerce double)
+
+                        :anchor-pane/right (prop/make
+                                             (mutator/constraint "pane-right-anchor")
+                                             lifecycle/scalar
+                                             :coerce double)})
+                     lifecycle/wrap-many)])))
+
 (def lifecycle
   (lifecycle.composite/describe AnchorPane
     :ctor []
-    :extends [fx.pane/lifecycle]
-    :props {:children [:list (-> lifecycle/dynamic
-                                 (lifecycle/wrap-extra-props
-                                   {:anchor-pane/top
-                                    (prop/make
-                                      (mutator/constraint "pane-top-anchor")
-                                      lifecycle/scalar
-                                      :coerce double)
-
-                                    :anchor-pane/left
-                                    (prop/make
-                                      (mutator/constraint "pane-left-anchor")
-                                      lifecycle/scalar
-                                      :coerce double)
-
-                                    :anchor-pane/bottom
-                                    (prop/make
-                                      (mutator/constraint "pane-bottom-anchor")
-                                      lifecycle/scalar
-                                      :coerce double)
-
-                                    :anchor-pane/right
-                                    (prop/make
-                                      (mutator/constraint "pane-right-anchor")
-                                      lifecycle/scalar
-                                      :coerce double)})
-                                 lifecycle/wrap-many)]}))
+    :props props))

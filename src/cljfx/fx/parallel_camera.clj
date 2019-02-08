@@ -5,7 +5,10 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  fx.camera/props)
+
 (def lifecycle
   (lifecycle.composite/describe ParallelCamera
     :ctor []
-    :extends [fx.camera/lifecycle]))
+    :props props))

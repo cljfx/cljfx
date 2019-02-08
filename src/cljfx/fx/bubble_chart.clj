@@ -5,7 +5,10 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  fx.xy-chart/props)
+
 (def lifecycle
   (lifecycle.composite/describe BubbleChart
     :ctor [:x-axis :y-axis]
-    :extends [fx.xy-chart/lifecycle]))
+    :props props))

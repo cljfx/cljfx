@@ -22,20 +22,25 @@
     :else
     (coerce/fail Callback x)))
 
+(def props
+  (merge
+    fx.control/props
+    (lifecycle.composite/props Pagination
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "pagination"]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :pagination]
+      ;; definitions
+      :current-page-index [:setter lifecycle/scalar :coerce int :default 0]
+      :on-current-page-index-changed [:property-change-listener
+                                      (lifecycle/wrap-coerce lifecycle/event-handler
+                                                             coerce/change-listener)]
+      :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
+      :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
+      :page-factory [:setter (lifecycle/wrap-factory lifecycle/dynamic)
+                     :coerce page-factory])))
+
 (def lifecycle
   (lifecycle.composite/describe Pagination
     :ctor []
-    :extends [fx.control/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "pagination"]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :pagination]
-            ;; definitions
-            :current-page-index [:setter lifecycle/scalar :coerce int :default 0]
-            :on-current-page-index-changed [:property-change-listener
-                                            (lifecycle/wrap-coerce lifecycle/event-handler
-                                                                   coerce/change-listener)]
-            :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
-            :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
-            :page-factory [:setter (lifecycle/wrap-factory lifecycle/dynamic)
-                           :coerce page-factory]}))
+    :props props))

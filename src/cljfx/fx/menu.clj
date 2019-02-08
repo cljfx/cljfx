@@ -7,16 +7,21 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.menu-item/props
+    (lifecycle.composite/props Menu
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["menu" "menu-item"]]
+      ;; definitions
+      :items [:list lifecycle/dynamics]
+      :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler])))
+
 (def lifecycle
   (lifecycle.composite/describe Menu
     :ctor []
-    :extends [fx.menu-item/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["menu" "menu-item"]]
-            ;; definitions
-            :items [:list lifecycle/dynamics]
-            :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]}))
+    :props props))

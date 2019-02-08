@@ -6,8 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.region/props
+    (lifecycle.composite/props Pane
+      :children [:list lifecycle/dynamics])))
+
 (def lifecycle
   (lifecycle.composite/describe Pane
     :ctor []
-    :extends [fx.region/lifecycle]
-    :props {:children [:list lifecycle/dynamics]}))
+    :props props))

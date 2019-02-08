@@ -24,23 +24,28 @@
             :yes ButtonType/YES
             (coerce/fail ButtonType x))))
 
+(def props
+  (merge
+    fx.pane/props
+    (lifecycle.composite/props DialogPane
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default "dialog-pane"]
+      ;; definitions
+      :button-types [:list
+                     (lifecycle/wrap-many lifecycle/scalar
+                                          (constantly nil)
+                                          identity)
+                     :coerce #(map button-type %)]
+      :content [:setter lifecycle/dynamic]
+      :content-text [:setter lifecycle/scalar]
+      :expandable-content [:setter lifecycle/dynamic]
+      :expanded [:setter lifecycle/scalar :default false]
+      :graphic [:setter lifecycle/dynamic]
+      :header [:setter lifecycle/dynamic]
+      :header-text [:setter lifecycle/scalar])))
+
 (def lifecycle
   (lifecycle.composite/describe DialogPane
     :ctor []
-    :extends [fx.pane/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default "dialog-pane"]
-            ;; definitions
-            :button-types [:list
-                           (lifecycle/wrap-many lifecycle/scalar
-                                                (constantly nil)
-                                                identity)
-                           :coerce #(map button-type %)]
-            :content [:setter lifecycle/dynamic]
-            :content-text [:setter lifecycle/scalar]
-            :expandable-content [:setter lifecycle/dynamic]
-            :expanded [:setter lifecycle/scalar :default false]
-            :graphic [:setter lifecycle/dynamic]
-            :header [:setter lifecycle/dynamic]
-            :header-text [:setter lifecycle/scalar]}))
+    :props props))

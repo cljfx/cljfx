@@ -5,7 +5,10 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  fx.path-element/props)
+
 (def lifecycle
   (lifecycle.composite/describe ClosePath
     :ctor []
-    :extends [fx.path-element/lifecycle]))
+    :props props))

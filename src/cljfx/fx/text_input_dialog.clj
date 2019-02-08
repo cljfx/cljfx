@@ -5,7 +5,10 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  fx.dialog/props)
+
 (def lifecycle
   (lifecycle.composite/describe TextInputDialog
     :ctor []
-    :extends [fx.dialog/lifecycle]))
+    :props props))

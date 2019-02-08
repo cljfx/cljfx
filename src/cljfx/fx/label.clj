@@ -8,12 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.labeled/props
+    (lifecycle.composite/props Label
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "label"]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :text])))
+
 (def lifecycle
   ;; TODO label has label-for prop - a component ref
   (lifecycle.composite/describe Label
     :ctor []
-    :extends [fx.labeled/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "label"]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :text]}))
+    :props props))

@@ -6,11 +6,16 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.spinner-value-factory/props
+    (lifecycle.composite/props SpinnerValueFactory$IntegerSpinnerValueFactory
+      :amount-to-step-by [:setter lifecycle/scalar :coerce int :default 1]
+      :value [:setter lifecycle/scalar :coerce int]
+      :max [:setter lifecycle/scalar :coerce int :default 100]
+      :min [:setter lifecycle/scalar :coerce int :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe SpinnerValueFactory$IntegerSpinnerValueFactory
     :ctor [:min :max]
-    :extends [fx.spinner-value-factory/lifecycle]
-    :props {:amount-to-step-by [:setter lifecycle/scalar :coerce int :default 1]
-            :value [:setter lifecycle/scalar :coerce int]
-            :max [:setter lifecycle/scalar :coerce int :default 100]
-            :min [:setter lifecycle/scalar :coerce int :default 0]}))
+    :props props))

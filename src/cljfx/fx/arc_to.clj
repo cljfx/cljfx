@@ -6,14 +6,19 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.path-element/props
+    (lifecycle.composite/props ArcTo
+      :radius-x [:setter lifecycle/scalar :coerce double :default 0]
+      :radius-y [:setter lifecycle/scalar :coerce double :default 0]
+      :x-axis-rotation [:setter lifecycle/scalar :coerce double :default 0]
+      :large-arc-flag [:setter lifecycle/scalar :default false]
+      :sweep-flag [:setter lifecycle/scalar :default false]
+      :x [:setter lifecycle/scalar :coerce double :default 0]
+      :y [:setter lifecycle/scalar :coerce double :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe ArcTo
     :ctor []
-    :extends [fx.path-element/lifecycle]
-    :props {:radius-x [:setter lifecycle/scalar :coerce double :default 0]
-            :radius-y [:setter lifecycle/scalar :coerce double :default 0]
-            :x-axis-rotation [:setter lifecycle/scalar :coerce double :default 0]
-            :large-arc-flag [:setter lifecycle/scalar :default false]
-            :sweep-flag [:setter lifecycle/scalar :default false]
-            :x [:setter lifecycle/scalar :coerce double :default 0]
-            :y [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

@@ -5,6 +5,6 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe PathElement
-    :props {:absolute [:setter lifecycle/scalar :default true]}))
+(def props
+  (lifecycle.composite/props PathElement
+    :absolute [:setter lifecycle/scalar :default true]))

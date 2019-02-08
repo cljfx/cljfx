@@ -6,8 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.popup-window/props
+    (lifecycle.composite/props Popup
+      :content [:list lifecycle/dynamics])))
+
 (def lifecycle
   (lifecycle.composite/describe Popup
     :ctor []
-    :extends [fx.popup-window/lifecycle]
-    :props {:content [:list lifecycle/dynamics]}))
+    :props props))

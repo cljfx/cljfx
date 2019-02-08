@@ -5,7 +5,10 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  fx.light-base/props)
+
 (def lifecycle
   (lifecycle.composite/describe AmbientLight
     :ctor []
-    :extends [fx.light-base/lifecycle]))
+    :props props))

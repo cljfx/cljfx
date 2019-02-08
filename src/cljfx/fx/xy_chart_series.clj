@@ -5,9 +5,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props XYChart$Series
+    :data [:list lifecycle/dynamics]
+    :name [:setter lifecycle/scalar]
+    :node [:setter lifecycle/dynamic]))
+
 (def lifecycle
   (lifecycle.composite/describe XYChart$Series
     :ctor []
-    :props {:data [:list lifecycle/dynamics]
-            :name [:setter lifecycle/scalar]
-            :node [:setter lifecycle/dynamic]}))
+    :props props))

@@ -6,6 +6,6 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe Light
-    :props {:color [:setter lifecycle/scalar :coerce coerce/color :default :white]}))
+(def props
+  (lifecycle.composite/props Light
+    :color [:setter lifecycle/scalar :coerce coerce/color :default :white]))

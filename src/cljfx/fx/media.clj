@@ -7,8 +7,12 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props Media
+    :source [mutator/forbidden lifecycle/scalar]
+    :on-error [:setter lifecycle/event-handler :coerce coerce/runnable]))
+
 (def lifecycle
   (lifecycle.composite/describe Media
     :ctor [:source]
-    :props {:source [mutator/forbidden lifecycle/scalar]
-            :on-error [:setter lifecycle/event-handler :coerce coerce/runnable]}))
+    :props props))

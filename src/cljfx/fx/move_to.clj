@@ -6,9 +6,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.path-element/props
+    (lifecycle.composite/props MoveTo
+      :x [:setter lifecycle/scalar :coerce double :default 0]
+      :y [:setter lifecycle/scalar :coerce double :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe MoveTo
     :ctor []
-    :extends [fx.path-element/lifecycle]
-    :props {:x [:setter lifecycle/scalar :coerce double :default 0]
-            :y [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

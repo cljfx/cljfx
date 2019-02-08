@@ -15,8 +15,13 @@
     (instance? Collection x) (FXCollections/observableArrayList ^Collection x)
     :else (coerce/fail ObservableList x)))
 
+(def props
+  (merge
+    fx.spinner-value-factory/props
+    (lifecycle.composite/props SpinnerValueFactory$ListSpinnerValueFactory
+      :items [:list lifecycle/scalar :coerce observable-list])))
+
 (def lifecycle
   (lifecycle.composite/describe SpinnerValueFactory$ListSpinnerValueFactory
     :ctor [:items]
-    :extends [fx.spinner-value-factory/lifecycle]
-    :props {:items [:list lifecycle/scalar :coerce observable-list]}))
+    :props props))

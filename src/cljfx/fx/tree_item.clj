@@ -5,10 +5,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props TreeItem
+    :children [:list lifecycle/dynamics]
+    :expanded [:setter lifecycle/scalar :default false]
+    :graphic [:setter lifecycle/dynamic]
+    :value [:setter lifecycle/scalar]))
+
 (def lifecycle
   (lifecycle.composite/describe TreeItem
     :ctor []
-    :props {:children [:list lifecycle/dynamics]
-            :expanded [:setter lifecycle/scalar :default false]
-            :graphic [:setter lifecycle/dynamic]
-            :value [:setter lifecycle/scalar]}))
+    :props props))

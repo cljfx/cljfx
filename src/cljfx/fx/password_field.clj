@@ -8,12 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.text-field/props
+    (lifecycle.composite/props PasswordField
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["text-input" "text-field" "password-field"]]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :password-field])))
+
 (def lifecycle
   (lifecycle.composite/describe PasswordField
     :ctor []
-    :extends [fx.text-field/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["text-input" "text-field" "password-field"]]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :password-field]}))
+    :props props))

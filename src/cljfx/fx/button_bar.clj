@@ -9,22 +9,27 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.control/props
+    (lifecycle.composite/props ButtonBar
+      ;; overrides
+      :style-class [:list lifecycle/scalar
+                    :coerce coerce/style-class
+                    :default "button-bar"]
+      ;; definitions
+      :button-min-width [:setter lifecycle/scalar :coerce double]
+      :button-order [:setter lifecycle/scalar]
+      :buttons [:list (-> lifecycle/dynamic
+                          (lifecycle/wrap-extra-props
+                            {:button-bar/button-data
+                             (prop/make
+                               (mutator/setter #(ButtonBar/setButtonData %1 %2))
+                               lifecycle/scalar
+                               :coerce (coerce/enum ButtonBar$ButtonData))})
+                          lifecycle/wrap-many)])))
+
 (def lifecycle
   (lifecycle.composite/describe ButtonBar
     :ctor []
-    :extends [fx.control/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar
-                          :coerce coerce/style-class
-                          :default "button-bar"]
-            ;; definitions
-            :button-min-width [:setter lifecycle/scalar :coerce double]
-            :button-order [:setter lifecycle/scalar]
-            :buttons [:list (-> lifecycle/dynamic
-                                (lifecycle/wrap-extra-props
-                                  {:button-bar/button-data
-                                   (prop/make
-                                     (mutator/setter #(ButtonBar/setButtonData %1 %2))
-                                     lifecycle/scalar
-                                     :coerce (coerce/enum ButtonBar$ButtonData))})
-                                lifecycle/wrap-many)]}))
+    :props props))

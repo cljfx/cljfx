@@ -6,11 +6,16 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.point-light-effect/props
+    (lifecycle.composite/props Light$Spot
+      :points-at-x [:setter lifecycle/scalar :coerce double :default 0]
+      :points-at-y [:setter lifecycle/scalar :coerce double :default 0]
+      :points-at-z [:setter lifecycle/scalar :coerce double :default 0]
+      :specular-exponent [:setter lifecycle/scalar :coerce double :default 1])))
+
 (def lifecycle
   (lifecycle.composite/describe Light$Spot
     :ctor []
-    :extends [fx.point-light-effect/lifecycle]
-    :props {:points-at-x [:setter lifecycle/scalar :coerce double :default 0]
-            :points-at-y [:setter lifecycle/scalar :coerce double :default 0]
-            :points-at-z [:setter lifecycle/scalar :coerce double :default 0]
-            :specular-exponent [:setter lifecycle/scalar :coerce double :default 1]}))
+    :props props))

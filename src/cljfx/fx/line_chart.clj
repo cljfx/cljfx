@@ -7,11 +7,16 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.xy-chart/props
+    (lifecycle.composite/props LineChart
+      :axis-sorting-policy [:setter lifecycle/scalar
+                            :coerce (coerce/enum LineChart$SortingPolicy)
+                            :default :x-axis]
+      :create-symbols [:setter lifecycle/scalar :default true])))
+
 (def lifecycle
   (lifecycle.composite/describe LineChart
     :ctor [:x-axis :y-axis]
-    :extends [fx.xy-chart/lifecycle]
-    :props {:axis-sorting-policy [:setter lifecycle/scalar
-                                  :coerce (coerce/enum LineChart$SortingPolicy)
-                                  :default :x-axis]
-            :create-symbols [:setter lifecycle/scalar :default true]}))
+    :props props))

@@ -7,7 +7,8 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe ButtonBase
-    :extends [fx.labeled/lifecycle]
-    :props {:on-action [:setter lifecycle/event-handler :coerce coerce/event-handler]}))
+(def props
+  (merge
+    fx.labeled/props
+    (lifecycle.composite/props ButtonBase
+      :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler])))

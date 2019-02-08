@@ -6,7 +6,6 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe Transform
-    :props {:on-transform-changed [:setter lifecycle/event-handler
-                                   :coerce coerce/event-handler]}))
+(def props
+  (lifecycle.composite/props Transform
+    :on-transform-changed [:setter lifecycle/event-handler :coerce coerce/event-handler]))

@@ -7,13 +7,18 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.menu-item/props
+    (lifecycle.composite/props CustomMenuItem
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["custom-menu-item" "menu-item"]]
+      ;; definitions
+      :content [:setter lifecycle/dynamic]
+      :hide-on-click [:setter lifecycle/scalar :default true])))
+
 (def lifecycle
   (lifecycle.composite/describe CustomMenuItem
     :ctor []
-    :extends [fx.menu-item/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["custom-menu-item" "menu-item"]]
-            ;; definitions
-            :content [:setter lifecycle/dynamic]
-            :hide-on-click [:setter lifecycle/scalar :default true]}))
+    :props props))

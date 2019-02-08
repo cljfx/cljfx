@@ -6,8 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape3d/props
+    (lifecycle.composite/props Sphere
+      :radius [:setter lifecycle/scalar :coerce double :default 1.0])))
+
 (def lifecycle
   (lifecycle.composite/describe Sphere
     :ctor []
-    :extends [fx.shape3d/lifecycle]
-    :props {:radius [:setter lifecycle/scalar :coerce double :default 1.0]}))
+    :props props))

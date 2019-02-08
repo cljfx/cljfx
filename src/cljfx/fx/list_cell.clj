@@ -8,12 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.indexed-cell/props
+    (lifecycle.composite/props ListCell
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["cell" "indexed-cell" "list-cell"]]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :list-item])))
+
 (def lifecycle
   (lifecycle.composite/describe ListCell
     :ctor []
-    :extends [fx.indexed-cell/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["cell" "indexed-cell" "list-cell"]]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :list-item]}))
+    :props props))

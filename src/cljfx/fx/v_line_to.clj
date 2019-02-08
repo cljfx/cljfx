@@ -6,8 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.path-element/props
+    (lifecycle.composite/props VLineTo
+      :y [:setter lifecycle/scalar :coerce double :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe VLineTo
     :ctor []
-    :extends [fx.path-element/lifecycle]
-    :props {:y [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

@@ -24,25 +24,27 @@
     (fn? x) (fx.text-field-list-cell/create x)
     :else (coerce/fail ListCell x)))
 
+(def props
+  (merge
+    fx.combo-box-base/props
+    (lifecycle.composite/props ComboBox
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default ["combo-box" "combo-box-base"]]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :combo-box]
+      ;; definitions
+      :button-cell [:setter (lifecycle/detached-prop-map fx.text-field-list-cell/props)
+                    :coerce list-cell]
+      :cell-factory [:setter (lifecycle/detached-prop-map fx.text-field-list-cell/props)
+                     :coerce cell-factory]
+      :converter [:setter lifecycle/scalar :coerce coerce/string-converter
+                  :default :default]
+      :items [:list lifecycle/scalar]
+      :placeholder [:setter lifecycle/dynamic]
+      :visible-row-count [:setter lifecycle/scalar :coerce int :default 10])))
 
 (def lifecycle
   (lifecycle.composite/describe ComboBox
     :ctor []
-    :extends [fx.combo-box-base/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class
-                          :default ["combo-box" "combo-box-base"]]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :combo-box]
-            ;; definitions
-            :button-cell [:setter (lifecycle/detached-prop-map
-                                    (:props fx.text-field-list-cell/lifecycle))
-                          :coerce list-cell]
-            :cell-factory [:setter (lifecycle/detached-prop-map
-                                     (:props fx.text-field-list-cell/lifecycle))
-                           :coerce cell-factory]
-            :converter [:setter lifecycle/scalar :coerce coerce/string-converter
-                        :default :default]
-            :items [:list lifecycle/scalar]
-            :placeholder [:setter lifecycle/dynamic]
-            :visible-row-count [:setter lifecycle/scalar :coerce int :default 10]}))
+    :props props))

@@ -5,7 +5,7 @@
 
 (set! *warn-on-reflection* true)
 
-(def lifecycle
-  (lifecycle.composite/describe Camera
-    :props {:near-clip [:setter lifecycle/scalar :coerce double :default 0.1]
-            :far-clip [:setter lifecycle/scalar :coerce double :default 100]}))
+(def props
+  (lifecycle.composite/props Camera
+    :near-clip [:setter lifecycle/scalar :coerce double :default 0.1]
+    :far-clip [:setter lifecycle/scalar :coerce double :default 100]))

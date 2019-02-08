@@ -5,11 +5,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props ColorAdjust
+    :input [:setter lifecycle/dynamic]
+    :hue [:setter lifecycle/scalar :coerce double :default 0]
+    :saturation [:setter lifecycle/scalar :coerce double :default 0]
+    :brightness [:setter lifecycle/scalar :coerce double :default 0]
+    :contrast [:setter lifecycle/scalar :coerce double :default 0]))
+
 (def lifecycle
   (lifecycle.composite/describe ColorAdjust
     :ctor []
-    :props {:input [:setter lifecycle/dynamic]
-            :hue [:setter lifecycle/scalar :coerce double :default 0
-                  :saturation [:setter lifecycle/scalar :coerce double :default 0]
-                  :brightness [:setter lifecycle/scalar :coerce double :default 0]
-                  :contrast [:setter lifecycle/scalar :coerce double :default 0]]}))
+    :props props))

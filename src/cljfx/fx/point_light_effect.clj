@@ -6,10 +6,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.light/props
+    (lifecycle.composite/props Light$Point
+      :x [:setter lifecycle/scalar :coerce double :default 0]
+      :y [:setter lifecycle/scalar :coerce double :default 0]
+      :z [:setter lifecycle/scalar :coerce double :default 0])))
+
 (def lifecycle
   (lifecycle.composite/describe Light$Point
     :ctor []
-    :extends [fx.light/lifecycle]
-    :props {:x [:setter lifecycle/scalar :coerce double :default 0]
-            :y [:setter lifecycle/scalar :coerce double :default 0]
-            :z [:setter lifecycle/scalar :coerce double :default 0]}))
+    :props props))

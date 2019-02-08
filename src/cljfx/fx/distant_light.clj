@@ -6,9 +6,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.light/props
+    (lifecycle.composite/props Light$Distant
+      :azimuth [:setter lifecycle/scalar :coerce double :default 45]
+      :elevation [:setter lifecycle/scalar :coerce double :default 45])))
+
 (def lifecycle
   (lifecycle.composite/describe Light$Distant
     :ctor []
-    :extends [fx.light/lifecycle]
-    :props {:azimuth [:setter lifecycle/scalar :coerce double :default 45]
-            :elevation [:setter lifecycle/scalar :coerce double :default 45]}))
+    :props props))

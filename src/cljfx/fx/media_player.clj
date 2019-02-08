@@ -54,10 +54,9 @@
                 :on-stalled [:setter lifecycle/event-handler :coerce coerce/runnable]
                 :on-stopped [:setter lifecycle/event-handler :coerce coerce/runnable]
                 :rate [:setter lifecycle/scalar :coerce double :default 1]
-                :start-time [:setter lifecycle/scalar
-                             :coerce coerce/duration :default :zero]
-                :stop-time [:setter lifecycle/dynamic
-                            :coerce coerce/duration
+                :start-time [:setter lifecycle/scalar :coerce coerce/duration
+                             :default :zero]
+                :stop-time [:setter lifecycle/dynamic :coerce coerce/duration
                             :default :indefinite]
                 :volume [:setter lifecycle/scalar :coerce double :default 1]})
       (lifecycle/wrap-on-delete #(.dispose ^MediaPlayer %))))

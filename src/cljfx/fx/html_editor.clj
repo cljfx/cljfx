@@ -6,10 +6,15 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.control/props
+    (lifecycle.composite/props HTMLEditor
+      :html-text [:setter lifecycle/scalar :default
+                  "<html><head></head><body contenteditable=\"true\"></body></html>"])))
+
+
 (def lifecycle
   (lifecycle.composite/describe HTMLEditor
     :ctor []
-    :extends [fx.control/lifecycle]
-    :props {:html-text
-            [:setter lifecycle/scalar :default
-             "<html><head></head><body contenteditable=\"true\"></body></html>"]}))
+    :props props))

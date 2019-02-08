@@ -8,14 +8,20 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.control/props
+    (lifecycle.composite/props MenuBar
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-bar"]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :menu-bar]
+      ;; definitions
+      :menus [:list lifecycle/dynamics]
+      :use-system-menu-bar [:setter lifecycle/scalar :default false])))
+
+
 (def lifecycle
   (lifecycle.composite/describe MenuBar
     :ctor []
-    :extends [fx.control/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-bar"]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :menu-bar]
-            ;; definitions
-            :menus [:list lifecycle/dynamics]
-            :use-system-menu-bar [:setter lifecycle/scalar :default false]}))
+    :props props))

@@ -124,7 +124,7 @@
     `(fn ~fn-name [~instance-sym]
        (~prop-expr ~instance-sym))))
 
-(defmacro prop-map [type-expr & kvs]
+(defmacro props [type-expr & kvs]
   `(hash-map
      ~@(->> kvs
             (partition 2)
@@ -151,41 +151,25 @@
                   [k prop]))))))
 
 (defmacro describe [type-expr & kvs]
-  (let [kv-map (apply hash-map kvs)
-        wrap-lifecycle (if (contains? kv-map :ctor)
-                         (fn [x] `(lifecycle ~x))
-                         identity)
-        extend-bindings (->> kv-map
-                             :extends
-                             (map (juxt (fn [_] (gensym "extend"))
-                                        identity))
-                             (into {}))
-        wrap-props (if (empty? extend-bindings)
-                     identity
-                     (fn [x]
-                       `(merge ~@(->> extend-bindings
-                                      keys
-                                      (map (fn [k]
-                                             `(:props ~k))))
-                               ~x)))]
-    (wrap-lifecycle
-      `(let [~@(mapcat identity extend-bindings)]
-         (hash-map ~@(mapcat
-                       (fn [[k v]]
-                         (case k
-                           :ctor
-                           (let [args (map #(-> % name gensym) v)
-                                 ctor-sym (symbol (str type-expr "."))]
-                             `[:ctor (fn [~@args]
-                                       (~ctor-sym ~@args))
-                               :args ~v])
+  (let [kv-map (apply hash-map kvs)]
+    `(lifecycle
+       (hash-map ~@(mapcat
+                     (fn [[k v]]
+                       (case k
+                         :ctor
+                         (let [args (map #(-> % name gensym) v)
+                               ctor-sym (symbol (str type-expr "."))]
+                           `[:ctor (fn [~@args]
+                                     (~ctor-sym ~@args))
+                             :args ~v])
 
-                           :extends []
-                           :props []
+                         :props []
 
-                           [k v]))
-                       kv-map)
-                   :props ~(let [prop-map-expr `(prop-map
-                                                  ~type-expr
-                                                  ~@(mapcat identity (:props kv-map)))]
-                             (wrap-props prop-map-expr)))))))
+                         [k v]))
+                     kv-map)
+                 :props ~(let [props (:props kv-map)]
+                           (if (map? props)
+                             `(props
+                                ~type-expr
+                                ~@(mapcat identity props))
+                             props))))))

@@ -18,13 +18,17 @@
     (map? x) (map->float-map x)
     :else (coerce/fail FloatMap x)))
 
+(def props
+  (lifecycle.composite/props DisplacementMap
+    :input [:setter lifecycle/dynamic]
+    :map-data [:setter lifecycle/scalar :coerce float-map]
+    :offset-x [:setter lifecycle/scalar :coerce double :default 0]
+    :offset-y [:setter lifecycle/scalar :coerce double :default 0]
+    :scale-x [:setter lifecycle/scalar :coerce double :default 1]
+    :scale-y [:setter lifecycle/scalar :coerce double :default 1]
+    :wrap [:setter lifecycle/scalar :default false]))
+
 (def lifecycle
   (lifecycle.composite/describe DisplacementMap
     :ctor []
-    :props {:input [:setter lifecycle/dynamic]
-            :map-data [:setter lifecycle/scalar :coerce float-map
-                       :offset-x [:setter lifecycle/scalar :coerce double :default 0]
-                       :offset-y [:setter lifecycle/scalar :coerce double :default 0]
-                       :scale-x [:setter lifecycle/scalar :coerce double :default 1]
-                       :scale-y [:setter lifecycle/scalar :coerce double :default 1]
-                       :wrap [:setter lifecycle/scalar :default false]]}))
+    :props props))

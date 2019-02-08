@@ -8,11 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.toggle-button/props
+    (lifecycle.composite/props RadioButton
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class
+                    :default "radio-button"]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :radio-button])))
+
 (def lifecycle
   (lifecycle.composite/describe RadioButton
     :ctor []
-    :extends [fx.toggle-button/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "radio-button"]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :radio-button]}))
+    :props props))

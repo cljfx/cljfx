@@ -5,10 +5,14 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (lifecycle.composite/props XYChart$Data
+    :extra-value [:setter lifecycle/scalar]
+    :node [:setter lifecycle/dynamic]
+    :x-value [:setter lifecycle/scalar]
+    :y-value [:setter lifecycle/scalar]))
+
 (def lifecycle
   (lifecycle.composite/describe XYChart$Data
     :ctor []
-    :props {:extra-value [:setter lifecycle/scalar]
-            :node [:setter lifecycle/dynamic]
-            :x-value [:setter lifecycle/scalar]
-            :y-value [:setter lifecycle/scalar]}))
+    :props props))

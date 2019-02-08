@@ -6,8 +6,13 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.shape3d/props
+    (lifecycle.composite/props MeshView
+      :mesh [:setter lifecycle/dynamic])))
+
 (def lifecycle
   (lifecycle.composite/describe MeshView
     :ctor []
-    :extends [fx.shape3d/lifecycle]
-    :props {:mesh [:setter lifecycle/dynamic]}))
+    :props props))

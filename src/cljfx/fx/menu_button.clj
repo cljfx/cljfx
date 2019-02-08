@@ -9,19 +9,24 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.button-base/props
+    (lifecycle.composite/props MenuButton
+      ;; overrides
+      :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-button"]
+      :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
+                        :default :menu-button]
+      :mnemonic-parsing [:setter lifecycle/scalar :default true]
+      ;; definitions
+      :items [:list lifecycle/dynamics]
+      :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
+      :popup-side [:setter lifecycle/scalar :coerce (coerce/enum Side) :default :bottom])))
+
 (def lifecycle
   (lifecycle.composite/describe MenuButton
     :ctor []
-    :extends [fx.button-base/lifecycle]
-    :props {;; overrides
-            :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-button"]
-            :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                              :default :menu-button]
-            :mnemonic-parsing [:setter lifecycle/scalar :default true]
-            ;; definitions
-            :items [:list lifecycle/dynamics]
-            :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
-            :popup-side [:setter lifecycle/scalar :coerce (coerce/enum Side) :default :bottom]}))
+    :props props))

@@ -8,13 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(def props
+  (merge
+    fx.dialog/props
+    (lifecycle.composite/props Alert
+      :alert-type [:setter lifecycle/scalar :coerce (coerce/enum Alert$AlertType)]
+      :button-types [:list
+                     (lifecycle/wrap-many lifecycle/scalar (constantly nil) identity)
+                     :coerce #(map fx.dialog-pane/button-type %)])))
+
+
 (def lifecycle
   (lifecycle.composite/describe Alert
     :ctor [:alert-type]
-    :extends [fx.dialog/lifecycle]
-    :props {:alert-type [:setter lifecycle/scalar :coerce (coerce/enum Alert$AlertType)]
-            :button-types [:list
-                           (lifecycle/wrap-many lifecycle/scalar
-                                                (constantly nil)
-                                                identity)
-                           :coerce #(map fx.dialog-pane/button-type %)]}))
+    :props props))
