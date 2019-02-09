@@ -19,6 +19,7 @@
 
 
 (def lifecycle
-  (lifecycle.composite/describe Alert
-    :ctor [:alert-type]
-    :props props))
+  (-> (lifecycle.composite/describe Alert
+        :ctor [:alert-type]
+        :props props)
+      (lifecycle/wrap-on-delete #(.hide ^Alert %))))

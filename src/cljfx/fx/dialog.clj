@@ -50,7 +50,8 @@
     :y [:setter lifecycle/scalar :coerce double :default ##NaN]))
 
 (def lifecycle
-  (lifecycle.composite/describe Dialog
-    :ctor []
-    :prop-order {:showing 1}
-    :props props))
+  (-> (lifecycle.composite/describe Dialog
+        :ctor []
+        :prop-order {:showing 1}
+        :props props)
+      (lifecycle/wrap-on-delete #(.hide ^Dialog %))))

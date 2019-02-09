@@ -645,7 +645,6 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
-- hide dialogs on delete
 - measure performance
 - cofx stuff from re-frame?
 

@@ -14,6 +14,7 @@
       :selected-item [:setter lifecycle/scalar])))
 
 (def lifecycle
-  (lifecycle.composite/describe ChoiceDialog
-    :ctor []
-    :props props))
+  (-> (lifecycle.composite/describe ChoiceDialog
+        :ctor []
+        :props props)
+      (lifecycle/wrap-on-delete #(.hide ^ChoiceDialog %))))

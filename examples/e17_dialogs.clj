@@ -7,9 +7,9 @@
 (def *state
   (atom :select-action))
 
-(defn window [{:keys [nuke-launch-stage]}]
+(defn window [_]
   {:fx/type :stage
-   :showing (= nuke-launch-stage :select-action)
+   :showing true
    :scene {:fx/type :scene
            :root {:fx/type :v-box
                   :padding 20
@@ -21,9 +21,9 @@
                               :on-action (fn [_]
                                            (reset! *state :confirm))}]}}})
 
-(defn dialog [{:keys [nuke-launch-stage]}]
+(defn dialog [_]
   {:fx/type :dialog
-   :showing (= nuke-launch-stage :confirm)
+   :showing true
    :on-hidden (fn [^DialogEvent e]
                 (condp = (.getButtonData ^ButtonType (.getResult ^Dialog (.getSource e)))
                   ButtonBar$ButtonData/NO (reset! *state :select-action)
@@ -35,10 +35,10 @@
                                       :text "This action can't be undone."}
                  :button-types [:no :yes]}})
 
-(defn alert [{:keys [nuke-launch-stage]}]
+(defn alert [_]
   {:fx/type :alert
    :alert-type :warning
-   :showing (= nuke-launch-stage :confirmed)
+   :showing true
    :on-close-request (fn [^DialogEvent e]
                        (when (nil? (.getResult ^Dialog (.getSource e)))
                          (.consume e)))
@@ -48,22 +48,23 @@
    :content-text "Please press Yes"
    :button-types [:yes]})
 
-(defn choice-dialog [{:keys [nuke-launch-stage]}]
+(defn choice-dialog [_]
   {:fx/type :choice-dialog
-   :showing (= nuke-launch-stage :choose-vault)
+   :showing true
    :on-close-request (fn [^DialogEvent e]
                        (when (nil? (.getResult ^Dialog (.getSource e)))
                          (.consume e)))
    :on-hidden (fn [_]
                 (reset! *state :final-notes))
+   :header-text "Please choose vault"
    :items [{:id :vaults/v8}
            {:id :vaults/v13}
            {:id :vaults/v15}]})
 
-(defn text-input-dialog [{:keys [nuke-launch-stage]}]
+(defn text-input-dialog [_]
   {:fx/type :text-input-dialog
-   :showing (= nuke-launch-stage :final-notes)
-   :content-text "Final notes?"
+   :showing true
+   :header-text "Final notes?"
    :on-hidden (fn [^DialogEvent e]
                 (let [result (.getResult ^Dialog (.getSource e))]
                   (println (format "Bye! Your final words were \"%s\"" result))
@@ -72,17 +73,15 @@
 (def app
   (fx/create-app
     :middleware (comp
-                  (fx/wrap-map-desc (fn [nuke-launch-stage]
-                                      [{:fx/type window
-                                        :nuke-launch-stage nuke-launch-stage}
-                                       {:fx/type dialog
-                                        :nuke-launch-stage nuke-launch-stage}
-                                       {:fx/type alert
-                                        :nuke-launch-stage nuke-launch-stage}
-                                       {:fx/type choice-dialog
-                                        :nuke-launch-stage nuke-launch-stage}
-                                       {:fx/type text-input-dialog
-                                        :nuke-launch-stage nuke-launch-stage}]))
+                  (fx/wrap-map-desc
+                    (fn [nuke-launch-stage]
+                      (case nuke-launch-stage
+                        :select-action [{:fx/type window}]
+                        :confirm [{:fx/type dialog}]
+                        :confirmed [{:fx/type alert}]
+                        :choose-vault [{:fx/type choice-dialog}]
+                        :final-notes [{:fx/type text-input-dialog}]
+                        nil)))
                   fx/wrap-many)))
 
 (fx/mount-app *state app)
