@@ -119,6 +119,7 @@
    :spacing 10
    :children (for [task-id (fx/sub context sub-task-state->task-ids task-state)]
                {:fx/type task-view
+                :fx/key task-id
                 :id task-id})})
 
 (defn column [{:keys [task-state]}]

@@ -1,5 +1,5 @@
 (ns cljfx.fx.flow-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.pane :as fx.pane]
@@ -13,7 +13,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props FlowPane
+    (composite/props FlowPane
       :children [:list (-> lifecycle/dynamic
                            (lifecycle/wrap-extra-props
                              {:flow-pane/margin (prop/make
@@ -33,6 +33,6 @@
       :vgap [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe FlowPane
+  (composite/describe FlowPane
     :ctor []
     :props props))

@@ -1,5 +1,5 @@
 (ns cljfx.fx.polygon
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.shape :as fx.shape])
   (:import [javafx.scene.shape Polygon]))
@@ -9,10 +9,10 @@
 (def props
   (merge
     fx.shape/props
-    (lifecycle.composite/props Polygon
+    (composite/props Polygon
       :points [:list lifecycle/scalar :coerce #(map double %)])))
 
 (def lifecycle
-  (lifecycle.composite/describe Polygon
+  (composite/describe Polygon
     :ctor []
     :props props))

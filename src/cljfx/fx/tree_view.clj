@@ -1,5 +1,5 @@
 (ns cljfx.fx.tree-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
@@ -22,7 +22,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props TreeView
+    (composite/props TreeView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tree-view"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -50,6 +50,6 @@
       :show-root [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe TreeView
+  (composite/describe TreeView
     :ctor []
     :props props))

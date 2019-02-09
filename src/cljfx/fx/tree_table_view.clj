@@ -1,5 +1,5 @@
 (ns cljfx.fx.tree-table-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
@@ -26,7 +26,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props TreeTableView
+    (composite/props TreeTableView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "tree-table-view"]
@@ -65,6 +65,6 @@
       :table-menu-button-visible [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe TreeTableView
+  (composite/describe TreeTableView
     :ctor []
     :props props))

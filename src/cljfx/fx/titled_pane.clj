@@ -1,5 +1,5 @@
 (ns cljfx.fx.titled-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.labeled :as fx.labeled]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.labeled/props
-    (lifecycle.composite/props TitledPane
+    (composite/props TitledPane
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "titled-pane"]
@@ -24,6 +24,6 @@
       :expanded [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe TitledPane
+  (composite/describe TitledPane
     :ctor []
     :props props))

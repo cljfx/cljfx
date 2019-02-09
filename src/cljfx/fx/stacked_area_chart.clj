@@ -1,5 +1,5 @@
 (ns cljfx.fx.stacked-area-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart StackedAreaChart]))
@@ -9,10 +9,10 @@
 (def props
   (merge
     fx.xy-chart/props
-    (lifecycle.composite/props StackedAreaChart
+    (composite/props StackedAreaChart
       :create-symbols [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe StackedAreaChart
+  (composite/describe StackedAreaChart
     :ctor [:x-axis :y-axis]
     :props props))

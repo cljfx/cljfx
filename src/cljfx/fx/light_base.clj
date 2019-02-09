@@ -1,5 +1,5 @@
 (ns cljfx.fx.light-base
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.node :as fx.node]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -10,6 +10,6 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props LightBase
+    (composite/props LightBase
       :color [:setter lifecycle/scalar :coerce coerce/color :default :white]
       :light-on [:setter lifecycle/scalar :default true])))

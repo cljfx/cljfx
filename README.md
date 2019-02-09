@@ -506,7 +506,7 @@ default in cljfx are:
   listeners it's a new value, for JavaFX event handlers it's an event,
   for runnables it's `nil`, etc.
 
-Another notable lifecycle is `cljfx.lifecycle.composite/lifecycle`: it
+Another notable lifecycle is `cljfx.composite/lifecycle`: it
 manages mutable JavaFX objects: creates instance in `create`, advances
 any changes to props (each individual prop may be seen as lifecycle +
 mutator), and has some useful macros to simplify generating composite
@@ -645,8 +645,9 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
-- measure performance
-- cofx stuff from re-frame?
+- cofx stuff from re-frame:
+  - fx + cofx
+  - offload to separate thread
 
 ## Food for thought
 - make exceptions more informative
@@ -665,3 +666,15 @@ There are various examples available in [examples](examples) folder.
   - changing media should re-create media player
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
+- special lifecycles: one that tracks object as "offscreen" - it exists
+  in lifecycle graph, but is not a part of a component graph. use case:
+  have dialogs close to their usage place.
+- if animation is to be implemented, it probably should be done as in
+  https://popmotion.io/
+- declarative timers? problem is to figure out start/loop semantics. 
+  Examples:
+  - caret in custom text input may have timer that restarts on typing
+  - flipbook animation player needs to restart timer on FPS settings 
+    change 
+- lifecycle that is just a function creating component instance may be 
+  useful

@@ -1,5 +1,5 @@
 (ns cljfx.fx.shape
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.node :as fx.node])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props Shape
+    (composite/props Shape
       :fill [:setter lifecycle/scalar :coerce coerce/paint :default :black]
       :stroke [:setter lifecycle/scalar :coerce coerce/paint]
       :smooth [:setter lifecycle/scalar :default true]

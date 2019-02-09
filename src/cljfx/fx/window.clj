@@ -1,5 +1,5 @@
 (ns cljfx.fx.window
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.stage Window]))
@@ -7,7 +7,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props Window
+  (composite/props Window
     :event-dispatcher [:setter lifecycle/scalar]
     :force-integer-render-scale [:setter lifecycle/scalar :default false]
     :height [:setter lifecycle/scalar :coerce double :default Double/NaN]

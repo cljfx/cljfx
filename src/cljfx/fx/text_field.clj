@@ -1,5 +1,5 @@
 (ns cljfx.fx.text-field
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.text-input-control :as fx.text-input-control])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.text-input-control/props
-    (lifecycle.composite/props TextField
+    (composite/props TextField
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["text-input" "text-field"]]
@@ -24,6 +24,6 @@
       :pref-column-count [:setter lifecycle/scalar :coerce int :default 12])))
 
 (def lifecycle
-  (lifecycle.composite/describe TextField
+  (composite/describe TextField
     :ctor []
     :props props))

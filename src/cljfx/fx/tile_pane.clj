@@ -1,5 +1,5 @@
 (ns cljfx.fx.tile-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.pane :as fx.pane]
@@ -13,7 +13,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props TilePane
+    (composite/props TilePane
       :children [:list (-> lifecycle/dynamic
                            (lifecycle/wrap-extra-props
                              {:tile-pane/margin
@@ -42,6 +42,6 @@
       :vgap [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe TilePane
+  (composite/describe TilePane
     :ctor []
     :props props))

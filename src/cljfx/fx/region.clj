@@ -1,5 +1,5 @@
 (ns cljfx.fx.region
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.node :as fx.node])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props Region
+    (composite/props Region
       ;; overrides
       :pick-on-bounds [:setter lifecycle/scalar :default true]
       ;; definitions
@@ -43,6 +43,6 @@
       :snap-to-pixel [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe Region
+  (composite/describe Region
     :ctor []
     :props props))

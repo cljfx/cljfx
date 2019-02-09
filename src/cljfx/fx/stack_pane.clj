@@ -1,5 +1,5 @@
 (ns cljfx.fx.stack-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.pane :as fx.pane]
@@ -13,7 +13,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props StackPane
+    (composite/props StackPane
       :children [:list (-> lifecycle/dynamic
                            (lifecycle/wrap-extra-props
                              {:stack-pane/alignment
@@ -32,6 +32,6 @@
                   :default :center])))
 
 (def lifecycle
-  (lifecycle.composite/describe StackPane
+  (composite/describe StackPane
     :ctor []
     :props props))

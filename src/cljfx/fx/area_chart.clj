@@ -1,5 +1,5 @@
 (ns cljfx.fx.area-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart AreaChart]))
@@ -9,10 +9,10 @@
 (def props
   (merge
     fx.xy-chart/props
-    (lifecycle.composite/props AreaChart
+    (composite/props AreaChart
       :create-symbols [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe AreaChart
+  (composite/describe AreaChart
     :ctor [:x-axis :y-axis]
     :props props))

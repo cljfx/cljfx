@@ -1,5 +1,5 @@
 (ns cljfx.fx.date-cell
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.cell :as fx.cell]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.cell/props
-    (lifecycle.composite/props DateCell
+    (composite/props DateCell
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["cell" "date-cell"]]
@@ -19,6 +19,6 @@
                         :default :text])))
 
 (def lifecycle
-  (lifecycle.composite/describe DateCell
+  (composite/describe DateCell
     :ctor []
     :props props))

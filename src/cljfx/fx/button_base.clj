@@ -1,5 +1,5 @@
 (ns cljfx.fx.button-base
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.labeled :as fx.labeled]
             [cljfx.coerce :as coerce])
@@ -10,5 +10,5 @@
 (def props
   (merge
     fx.labeled/props
-    (lifecycle.composite/props ButtonBase
+    (composite/props ButtonBase
       :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler])))

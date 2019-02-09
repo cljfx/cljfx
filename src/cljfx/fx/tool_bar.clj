@@ -1,5 +1,5 @@
 (ns cljfx.fx.tool-bar
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props ToolBar
+    (composite/props ToolBar
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tool-bar"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -24,6 +24,6 @@
                     :default :horizontal])))
 
 (def lifecycle
-  (lifecycle.composite/describe ToolBar
+  (composite/describe ToolBar
     :ctor []
     :props props))

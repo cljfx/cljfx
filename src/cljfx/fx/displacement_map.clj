@@ -1,5 +1,5 @@
 (ns cljfx.fx.displacement-map
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.effect DisplacementMap FloatMap]))
@@ -19,7 +19,7 @@
     :else (coerce/fail FloatMap x)))
 
 (def props
-  (lifecycle.composite/props DisplacementMap
+  (composite/props DisplacementMap
     :input [:setter lifecycle/dynamic]
     :map-data [:setter lifecycle/scalar :coerce float-map]
     :offset-x [:setter lifecycle/scalar :coerce double :default 0]
@@ -29,6 +29,6 @@
     :wrap [:setter lifecycle/scalar :default false]))
 
 (def lifecycle
-  (lifecycle.composite/describe DisplacementMap
+  (composite/describe DisplacementMap
     :ctor []
     :props props))

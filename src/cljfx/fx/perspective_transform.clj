@@ -1,12 +1,12 @@
 (ns cljfx.fx.perspective-transform
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect PerspectiveTransform]))
 
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props PerspectiveTransform
+  (composite/props PerspectiveTransform
     :input [:setter lifecycle/dynamic]
     :llx [:setter lifecycle/scalar :coerce double :default 0.0]
     :lly [:setter lifecycle/scalar :coerce double :default 0.0]
@@ -18,6 +18,6 @@
     :ury [:setter lifecycle/scalar :coerce double :default 0.0]))
 
 (def lifecycle
-  (lifecycle.composite/describe PerspectiveTransform
+  (composite/describe PerspectiveTransform
     :ctor []
     :props props))

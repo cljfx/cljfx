@@ -1,5 +1,5 @@
 (ns cljfx.fx.split-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props SplitPane
+    (composite/props SplitPane
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "split-pane"]
@@ -24,6 +24,6 @@
                     :default :horizontal])))
 
 (def lifecycle
-  (lifecycle.composite/describe SplitPane
+  (composite/describe SplitPane
     :ctor []
     :props props))

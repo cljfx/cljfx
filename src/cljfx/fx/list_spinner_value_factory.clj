@@ -1,5 +1,5 @@
 (ns cljfx.fx.list-spinner-value-factory
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.spinner-value-factory :as fx.spinner-value-factory]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -18,10 +18,10 @@
 (def props
   (merge
     fx.spinner-value-factory/props
-    (lifecycle.composite/props SpinnerValueFactory$ListSpinnerValueFactory
+    (composite/props SpinnerValueFactory$ListSpinnerValueFactory
       :items [:list lifecycle/scalar :coerce observable-list])))
 
 (def lifecycle
-  (lifecycle.composite/describe SpinnerValueFactory$ListSpinnerValueFactory
+  (composite/describe SpinnerValueFactory$ListSpinnerValueFactory
     :ctor [:items]
     :props props))

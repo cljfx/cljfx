@@ -1,5 +1,5 @@
 (ns cljfx.fx.custom-menu-item
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.menu-item :as fx.menu-item]
             [cljfx.coerce :as coerce])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.menu-item/props
-    (lifecycle.composite/props CustomMenuItem
+    (composite/props CustomMenuItem
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["custom-menu-item" "menu-item"]]
@@ -19,6 +19,6 @@
       :hide-on-click [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe CustomMenuItem
+  (composite/describe CustomMenuItem
     :ctor []
     :props props))

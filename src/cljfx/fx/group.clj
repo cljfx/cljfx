@@ -1,5 +1,5 @@
 (ns cljfx.fx.group
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.node :as fx.node])
   (:import [javafx.scene Group]))
@@ -9,11 +9,11 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props Group
+    (composite/props Group
       :children [:list lifecycle/dynamics]
       :auto-size-children [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe Group
+  (composite/describe Group
     :ctor []
     :props props))

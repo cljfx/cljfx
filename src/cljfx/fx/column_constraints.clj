@@ -1,5 +1,5 @@
 (ns cljfx.fx.column-constraints
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.layout ColumnConstraints Priority]
@@ -8,7 +8,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props ColumnConstraints
+  (composite/props ColumnConstraints
     :fill-width [:setter lifecycle/scalar :default true]
     :halignment [:setter lifecycle/scalar :coerce (coerce/enum HPos)]
     :hgrow [:setter lifecycle/scalar :coerce (coerce/enum Priority)]
@@ -22,6 +22,6 @@
                  :default :use-computed-size]))
 
 (def lifecycle
-  (lifecycle.composite/describe ColumnConstraints
+  (composite/describe ColumnConstraints
     :ctor []
     :props props))

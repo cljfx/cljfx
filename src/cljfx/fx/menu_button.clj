@@ -1,5 +1,5 @@
 (ns cljfx.fx.menu-button
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.button-base :as fx.button-base])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.button-base/props
-    (lifecycle.composite/props MenuButton
+    (composite/props MenuButton
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-button"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -27,6 +27,6 @@
       :popup-side [:setter lifecycle/scalar :coerce (coerce/enum Side) :default :bottom])))
 
 (def lifecycle
-  (lifecycle.composite/describe MenuButton
+  (composite/describe MenuButton
     :ctor []
     :props props))

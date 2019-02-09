@@ -1,5 +1,5 @@
 (ns cljfx.fx.xy-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.chart :as fx.chart]
             [cljfx.mutator :as mutator]
             [cljfx.lifecycle :as lifecycle])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.chart/props
-    (lifecycle.composite/props XYChart
+    (composite/props XYChart
       :x-axis [mutator/forbidden lifecycle/dynamic]
       :y-axis [mutator/forbidden lifecycle/dynamic]
       :alternative-column-fill-visible [:setter lifecycle/scalar :default false]

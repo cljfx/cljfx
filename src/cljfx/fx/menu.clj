@@ -1,5 +1,5 @@
 (ns cljfx.fx.menu
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.menu-item :as fx.menu-item])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.menu-item/props
-    (lifecycle.composite/props Menu
+    (composite/props Menu
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["menu" "menu-item"]]
@@ -22,6 +22,6 @@
       :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler])))
 
 (def lifecycle
-  (lifecycle.composite/describe Menu
+  (composite/describe Menu
     :ctor []
     :props props))

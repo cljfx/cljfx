@@ -1,5 +1,5 @@
 (ns cljfx.fx.control
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.region :as fx.region])
   (:import [javafx.scene.control Control]))
@@ -9,7 +9,7 @@
 (def props
   (merge
     fx.region/props
-    (lifecycle.composite/props Control
+    (composite/props Control
       :context-menu [:setter lifecycle/dynamic]
       :tooltip [:setter lifecycle/dynamic])))
 

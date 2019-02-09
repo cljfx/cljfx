@@ -1,5 +1,5 @@
 (ns cljfx.fx.list-cell
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.indexed-cell :as fx.indexed-cell]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.indexed-cell/props
-    (lifecycle.composite/props ListCell
+    (composite/props ListCell
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["cell" "indexed-cell" "list-cell"]]
@@ -19,6 +19,6 @@
                         :default :list-item])))
 
 (def lifecycle
-  (lifecycle.composite/describe ListCell
+  (composite/describe ListCell
     :ctor []
     :props props))

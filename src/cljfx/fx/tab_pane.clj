@@ -1,5 +1,5 @@
 (ns cljfx.fx.tab-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props TabPane
+    (composite/props TabPane
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tab-pane"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -32,6 +32,6 @@
       :tabs [:list lifecycle/dynamics])))
 
 (def lifecycle
-  (lifecycle.composite/describe TabPane
+  (composite/describe TabPane
     :ctor []
     :props props))

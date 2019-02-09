@@ -1,5 +1,5 @@
 (ns cljfx.fx.tree-cell
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.indexed-cell :as fx.indexed-cell]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.indexed-cell/props
-    (lifecycle.composite/props TreeCell
+    (composite/props TreeCell
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["cell" "indexed-cell" "tree-cell"]]
@@ -21,7 +21,7 @@
       :disclosure-node [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (lifecycle.composite/describe TreeCell
+  (composite/describe TreeCell
     :ctor []
     :props props))
 

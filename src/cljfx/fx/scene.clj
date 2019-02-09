@@ -1,5 +1,5 @@
 (ns cljfx.fx.scene
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene Scene]
@@ -8,7 +8,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props Scene
+  (composite/props Scene
     :camera [:setter lifecycle/dynamic :default {:fx/type :parallel-camera}]
     :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
     :event-dispatcher [:setter lifecycle/scalar]
@@ -60,6 +60,6 @@
     :user-data [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (lifecycle.composite/describe Scene
+  (composite/describe Scene
     :ctor [:root]
     :props props))

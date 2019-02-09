@@ -1,5 +1,5 @@
 (ns cljfx.fx.combo-box-list-cell
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.list-cell :as fx.list-cell]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.list-cell/props
-    (lifecycle.composite/props ComboBoxListCell
+    (composite/props ComboBoxListCell
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["cell" "indexed-cell" "list-cell" "combo-box-list-cell"]]
@@ -19,6 +19,6 @@
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter])))
 
 (def lifecycle
-  (lifecycle.composite/describe ComboBoxListCell
+  (composite/describe ComboBoxListCell
     :ctor []
     :props props))

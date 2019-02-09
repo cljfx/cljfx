@@ -1,5 +1,5 @@
 (ns cljfx.fx.value-axis
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.axis :as fx.axis])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.axis/props
-    (lifecycle.composite/props ValueAxis
+    (composite/props ValueAxis
       :minor-tick-visible [:setter lifecycle/scalar :default true]
       :lower-bound [:setter lifecycle/scalar :coerce double :default 0]
       :upper-bound [:setter lifecycle/scalar :coerce double :default 100]

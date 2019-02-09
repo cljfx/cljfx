@@ -1,5 +1,5 @@
 (ns cljfx.fx.web-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.node :as fx.node]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
@@ -13,7 +13,7 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props WebView
+    (composite/props WebView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "web-view"]
       :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)
@@ -34,6 +34,6 @@
       :url [(mutator/setter #(.load (.getEngine ^WebView %1) %2)) lifecycle/scalar])))
 
 (def lifecycle
-  (lifecycle.composite/describe WebView
+  (composite/describe WebView
     :ctor []
     :props props))

@@ -1,5 +1,5 @@
 (ns cljfx.fx.text-area
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.text-input-control :as fx.text-input-control]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.text-input-control/props
-    (lifecycle.composite/props TextArea
+    (composite/props TextArea
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["text-input" "text-area"]]
@@ -25,6 +25,6 @@
       :wrap-text [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe TextArea
+  (composite/describe TextArea
     :ctor []
     :props props))

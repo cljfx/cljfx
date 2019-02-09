@@ -1,5 +1,5 @@
 (ns cljfx.fx.line-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.xy-chart :as fx.xy-chart])
@@ -10,13 +10,13 @@
 (def props
   (merge
     fx.xy-chart/props
-    (lifecycle.composite/props LineChart
+    (composite/props LineChart
       :axis-sorting-policy [:setter lifecycle/scalar
                             :coerce (coerce/enum LineChart$SortingPolicy)
                             :default :x-axis]
       :create-symbols [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe LineChart
+  (composite/describe LineChart
     :ctor [:x-axis :y-axis]
     :props props))

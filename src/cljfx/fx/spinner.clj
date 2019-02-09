@@ -1,5 +1,5 @@
 (ns cljfx.fx.spinner
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props Spinner
+    (composite/props Spinner
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "spinner"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -24,6 +24,6 @@
       :value-factory [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (lifecycle.composite/describe Spinner
+  (composite/describe Spinner
     :ctor []
     :props props))

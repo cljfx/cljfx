@@ -1,5 +1,5 @@
 (ns cljfx.fx.button-bar
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.control :as fx.control]
             [cljfx.prop :as prop]
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props ButtonBar
+    (composite/props ButtonBar
       ;; overrides
       :style-class [:list lifecycle/scalar
                     :coerce coerce/style-class
@@ -30,6 +30,6 @@
                           lifecycle/wrap-many)])))
 
 (def lifecycle
-  (lifecycle.composite/describe ButtonBar
+  (composite/describe ButtonBar
     :ctor []
     :props props))

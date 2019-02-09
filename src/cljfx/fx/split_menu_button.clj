@@ -1,5 +1,5 @@
 (ns cljfx.fx.split-menu-button
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.menu-button :as fx.menu-button]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.menu-button/props
-    (lifecycle.composite/props SplitMenuButton
+    (composite/props SplitMenuButton
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "split-menu-button"]
@@ -20,6 +20,6 @@
       :mnemonic-parsing [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe SplitMenuButton
+  (composite/describe SplitMenuButton
     :ctor []
     :props props))

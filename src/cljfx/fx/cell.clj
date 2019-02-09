@@ -1,5 +1,5 @@
 (ns cljfx.fx.cell
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.labeled :as fx.labeled]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -10,13 +10,13 @@
 (def props
   (merge
     fx.labeled/props
-    (lifecycle.composite/props Cell
+    (composite/props Cell
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "cell"]
       ;; definitions
       :editable [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe Cell
+  (composite/describe Cell
     :ctor []
     :props props))

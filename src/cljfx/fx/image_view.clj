@@ -1,5 +1,5 @@
 (ns cljfx.fx.image-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.node :as fx.node]
             [cljfx.coerce :as coerce])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props ImageView
+    (composite/props ImageView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "image-view"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -30,6 +30,6 @@
           :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d]])))
 
 (def lifecycle
-  (lifecycle.composite/describe ImageView
+  (composite/describe ImageView
     :ctor []
     :props props))

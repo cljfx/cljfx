@@ -1,5 +1,5 @@
 (ns cljfx.fx.color-input
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.effect ColorInput]))
@@ -7,7 +7,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props ColorInput
+  (composite/props ColorInput
     :width [:setter lifecycle/scalar :coerce double :default 0]
     :height [:setter lifecycle/scalar :coerce double :default 0]
     :x [:setter lifecycle/scalar :coerce double :default 0]
@@ -15,6 +15,6 @@
     :paint [:setter lifecycle/scalar :coerce coerce/paint]))
 
 (def lifecycle
-  (lifecycle.composite/describe ColorInput
+  (composite/describe ColorInput
     :ctor []
     :props props))

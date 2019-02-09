@@ -1,5 +1,5 @@
 (ns cljfx.fx.dialog-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.pane :as fx.pane]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -27,7 +27,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props DialogPane
+    (composite/props DialogPane
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "dialog-pane"]
@@ -46,6 +46,6 @@
       :header-text [:setter lifecycle/scalar])))
 
 (def lifecycle
-  (lifecycle.composite/describe DialogPane
+  (composite/describe DialogPane
     :ctor []
     :props props))

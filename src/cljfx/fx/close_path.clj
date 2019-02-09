@@ -1,5 +1,5 @@
 (ns cljfx.fx.close-path
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.path-element :as fx.path-element])
   (:import [javafx.scene.shape ClosePath]))
 
@@ -9,6 +9,6 @@
   fx.path-element/props)
 
 (def lifecycle
-  (lifecycle.composite/describe ClosePath
+  (composite/describe ClosePath
     :ctor []
     :props props))

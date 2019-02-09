@@ -1,4 +1,4 @@
-(ns cljfx.lifecycle.composite
+(ns cljfx.composite
   (:require [cljfx.component :as component]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]

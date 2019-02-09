@@ -1,5 +1,5 @@
 (ns cljfx.fx.chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.region :as fx.region])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.region/props
-    (lifecycle.composite/props Chart
+    (composite/props Chart
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "chart"]
       ;; definitions

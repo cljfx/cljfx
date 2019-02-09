@@ -1,5 +1,5 @@
 (ns cljfx.fx.choice-dialog
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.dialog :as fx.dialog]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.control ChoiceDialog]))
@@ -9,12 +9,12 @@
 (def props
   (merge
     fx.dialog/props
-    (lifecycle.composite/props ChoiceDialog
+    (composite/props ChoiceDialog
       :items [:list lifecycle/scalar]
       :selected-item [:setter lifecycle/scalar])))
 
 (def lifecycle
-  (-> (lifecycle.composite/describe ChoiceDialog
+  (-> (composite/describe ChoiceDialog
         :ctor []
         :props props)
       (lifecycle/wrap-on-delete #(.hide ^ChoiceDialog %))))

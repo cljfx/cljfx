@@ -1,5 +1,5 @@
 (ns cljfx.fx.inner-shadow
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.effect InnerShadow BlurType]))
@@ -7,7 +7,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props InnerShadow
+  (composite/props InnerShadow
     :input [:setter lifecycle/dynamic]
     :radius [:setter lifecycle/scalar :coerce double :default 10]
     :width [:setter lifecycle/scalar :coerce double :default 21]
@@ -20,6 +20,6 @@
     :offset-y [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (lifecycle.composite/describe InnerShadow
+  (composite/describe InnerShadow
     :ctor []
     :props props))

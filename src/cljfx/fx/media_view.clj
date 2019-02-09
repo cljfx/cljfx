@@ -1,5 +1,5 @@
 (ns cljfx.fx.media-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.node :as fx.node]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props MediaView
+    (composite/props MediaView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "media-view"]
       :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)
@@ -29,6 +29,6 @@
       :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d])))
 
 (def lifecycle
-  (lifecycle.composite/describe MediaView
+  (composite/describe MediaView
     :ctor []
     :props props))

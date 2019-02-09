@@ -1,5 +1,5 @@
 (ns cljfx.fx.check-box
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.button-base :as fx.button-base])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.button-base/props
-    (lifecycle.composite/props CheckBox
+    (composite/props CheckBox
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "check-box"]
@@ -30,6 +30,6 @@
                                                    coerce/change-listener)])))
 
 (def lifecycle
-  (lifecycle.composite/describe CheckBox
+  (composite/describe CheckBox
     :ctor []
     :props props))

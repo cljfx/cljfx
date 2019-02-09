@@ -1,5 +1,5 @@
 (ns cljfx.fx.stage
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.window/props
-    (lifecycle.composite/props Stage
+    (composite/props Stage
       :always-on-top [:setter lifecycle/scalar :default false]
       :full-screen [:setter lifecycle/scalar :default false]
       :full-screen-exit-hint [:setter lifecycle/scalar]
@@ -41,7 +41,7 @@
 
 (def lifecycle
   (-> Stage
-      (lifecycle.composite/describe
+      (composite/describe
         :ctor []
         :prop-order {:showing 1}
         :props props)

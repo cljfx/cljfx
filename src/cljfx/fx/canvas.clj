@@ -1,5 +1,5 @@
 (ns cljfx.fx.canvas
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
             [cljfx.fx.node :as fx.node]
@@ -10,7 +10,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props Canvas
+  (composite/props Canvas
     ;; overrides
     :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)
                        :default :left-to-right]
@@ -29,7 +29,7 @@
                (.getHeight canvas)))]))
 
 (def lifecycle
-  (lifecycle.composite/describe Canvas
+  (composite/describe Canvas
     :ctor []
     :prop-order {:draw 1}
     :props (merge fx.node/props props)))

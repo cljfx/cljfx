@@ -1,5 +1,5 @@
 (ns cljfx.fx.arc-to
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.path-element :as fx.path-element])
   (:import [javafx.scene.shape ArcTo]))
@@ -9,7 +9,7 @@
 (def props
   (merge
     fx.path-element/props
-    (lifecycle.composite/props ArcTo
+    (composite/props ArcTo
       :radius-x [:setter lifecycle/scalar :coerce double :default 0]
       :radius-y [:setter lifecycle/scalar :coerce double :default 0]
       :x-axis-rotation [:setter lifecycle/scalar :coerce double :default 0]
@@ -19,6 +19,6 @@
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (lifecycle.composite/describe ArcTo
+  (composite/describe ArcTo
     :ctor []
     :props props))

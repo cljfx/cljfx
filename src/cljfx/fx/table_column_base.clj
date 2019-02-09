@@ -1,5 +1,5 @@
 (ns cljfx.fx.table-column-base
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.control TableColumnBase]))
@@ -7,7 +7,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props TableColumnBase
+  (composite/props TableColumnBase
     :columns [:list lifecycle/dynamics]
     :comparator [:setter lifecycle/scalar :default TableColumnBase/DEFAULT_COMPARATOR]
     :context-menu [:setter lifecycle/dynamic]

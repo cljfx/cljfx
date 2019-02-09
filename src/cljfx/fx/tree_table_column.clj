@@ -1,5 +1,5 @@
 (ns cljfx.fx.tree-table-column
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.table-column-base :as fx.table-column-base]
@@ -35,7 +35,7 @@
 (def props
   (merge
     fx.table-column-base/props
-    (lifecycle.composite/props TreeTableColumn
+    (composite/props TreeTableColumn
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "table-column"]
       ;; definitions
@@ -54,6 +54,6 @@
                   :default :ascending])))
 
 (def lifecycle
-  (lifecycle.composite/describe TreeTableColumn
+  (composite/describe TreeTableColumn
     :ctor []
     :props props))

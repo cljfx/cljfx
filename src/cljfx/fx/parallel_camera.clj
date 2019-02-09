@@ -1,5 +1,5 @@
 (ns cljfx.fx.parallel-camera
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.camera :as fx.camera])
   (:import [javafx.scene ParallelCamera]))
 
@@ -9,6 +9,6 @@
   fx.camera/props)
 
 (def lifecycle
-  (lifecycle.composite/describe ParallelCamera
+  (composite/describe ParallelCamera
     :ctor []
     :props props))

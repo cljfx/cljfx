@@ -1,5 +1,5 @@
 (ns cljfx.fx.text-input-control
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
@@ -16,7 +16,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props TextInputControl
+    (composite/props TextInputControl
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "text-input"]
       ;; definitions

@@ -1,5 +1,5 @@
 (ns cljfx.fx.labeled
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.control :as fx.control]
             [cljfx.coerce :as coerce])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props Labeled
+    (composite/props Labeled
       :alignment [:setter lifecycle/scalar :coerce (coerce/enum Pos)
                   :default :center-left]
       :content-display [:setter lifecycle/scalar :coerce (coerce/enum ContentDisplay)

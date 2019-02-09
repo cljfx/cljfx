@@ -1,5 +1,5 @@
 (ns cljfx.fx.dialog
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator])
@@ -23,7 +23,7 @@
     (coerce/fail Callback x)))
 
 (def props
-  (lifecycle.composite/props Dialog
+  (composite/props Dialog
     :content-text [:setter lifecycle/scalar]
     :dialog-pane [:setter lifecycle/dynamic]
     :graphic [:setter lifecycle/dynamic]
@@ -50,7 +50,7 @@
     :y [:setter lifecycle/scalar :coerce double :default ##NaN]))
 
 (def lifecycle
-  (-> (lifecycle.composite/describe Dialog
+  (-> (composite/describe Dialog
         :ctor []
         :prop-order {:showing 1}
         :props props)

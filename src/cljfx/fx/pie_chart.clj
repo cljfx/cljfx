@@ -1,5 +1,5 @@
 (ns cljfx.fx.pie-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.chart :as fx.chart])
   (:import [javafx.scene.chart PieChart]))
@@ -9,7 +9,7 @@
 (def props
   (merge
     fx.chart/props
-    (lifecycle.composite/props PieChart
+    (composite/props PieChart
       :clockwise [:setter lifecycle/scalar :default true]
       :data [:list lifecycle/dynamics]
       :label-line-length [:setter lifecycle/scalar :coerce double :default 20.0]
@@ -17,6 +17,6 @@
       :start-angle [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe PieChart
+  (composite/describe PieChart
     :ctor []
     :props props))

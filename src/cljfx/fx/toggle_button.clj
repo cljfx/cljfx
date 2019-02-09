@@ -1,5 +1,5 @@
 (ns cljfx.fx.toggle-button
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.button-base :as fx.button-base]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.button-base/props
-    (lifecycle.composite/props ToggleButton
+    (composite/props ToggleButton
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "toggle-button"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -22,6 +22,6 @@
       :toggle-group [:setter lifecycle/scalar])))
 
 (def lifecycle
-  (lifecycle.composite/describe ToggleButton
+  (composite/describe ToggleButton
     :ctor []
     :props props))

@@ -1,5 +1,5 @@
 (ns cljfx.fx.button
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.button-base :as fx.button-base]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.button-base/props
-    (lifecycle.composite/props Button
+    (composite/props Button
       ;; overrides
       :style-class [:list lifecycle/scalar
                     :coerce coerce/style-class
@@ -25,6 +25,6 @@
       :default-button [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe Button
+  (composite/describe Button
     :ctor []
     :props props))

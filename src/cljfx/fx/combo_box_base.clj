@@ -1,5 +1,5 @@
 (ns cljfx.fx.combo-box-base
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props ComboBoxBase
+    (composite/props ComboBoxBase
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "combo-box-base"]

@@ -1,5 +1,5 @@
 (ns cljfx.fx.menu-item
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator])
@@ -8,9 +8,9 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props MenuItem
+  (composite/props MenuItem
     :accelerator [:setter lifecycle/scalar :coerce coerce/key-combination]
-    :disabled [(mutator/setter (lifecycle.composite/setter MenuItem :disable))
+    :disabled [(mutator/setter (composite/setter MenuItem :disable))
                lifecycle/scalar
                :default false]
     :graphic [:setter lifecycle/dynamic]
@@ -25,6 +25,6 @@
     :visible [:setter lifecycle/scalar :default true]))
 
 (def lifecycle
-  (lifecycle.composite/describe MenuItem
+  (composite/describe MenuItem
     :ctor []
     :props props))

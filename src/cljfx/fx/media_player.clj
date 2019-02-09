@@ -1,5 +1,5 @@
 (ns cljfx.fx.media-player
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.mutator :as mutator]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -25,7 +25,7 @@
 
 (def lifecycle
   (-> MediaPlayer
-      (lifecycle.composite/describe
+      (composite/describe
         :ctor [:media]
         :props {:media [mutator/forbidden lifecycle/dynamic]
                 :state [(mutator/setter #(case %2

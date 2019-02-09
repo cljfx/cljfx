@@ -1,5 +1,5 @@
 (ns cljfx.fx.table-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
@@ -29,7 +29,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props TableView
+    (composite/props TableView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "table-view"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -62,6 +62,6 @@
       :table-menu-button-visible [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe TableView
+  (composite/describe TableView
     :ctor []
     :props props))

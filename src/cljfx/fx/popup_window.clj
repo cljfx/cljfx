@@ -1,5 +1,5 @@
 (ns cljfx.fx.popup-window
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.window :as fx.window]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.window/props
-    (lifecycle.composite/props PopupWindow
+    (composite/props PopupWindow
       :anchor-location [:setter lifecycle/scalar
                         :coerce (coerce/enum PopupWindow$AnchorLocation)
                         :default :window-top-left]

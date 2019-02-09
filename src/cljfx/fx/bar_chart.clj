@@ -1,5 +1,5 @@
 (ns cljfx.fx.bar-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.xy-chart :as fx.xy-chart]
             [cljfx.coerce :as coerce])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.xy-chart/props
-    (lifecycle.composite/props BarChart
+    (composite/props BarChart
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "bar-chart"]
       ;; definitions
@@ -18,6 +18,6 @@
       :category-gap [:setter lifecycle/scalar :coerce double :default 10])))
 
 (def lifecycle
-  (lifecycle.composite/describe BarChart
+  (composite/describe BarChart
     :ctor [:x-axis :y-axis]
     :props props))

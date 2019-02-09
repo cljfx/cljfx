@@ -1,5 +1,5 @@
 (ns cljfx.fx.drop-shadow
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.effect DropShadow BlurType]))
@@ -7,7 +7,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props DropShadow
+  (composite/props DropShadow
     :input [:setter lifecycle/dynamic]
     :radius [:setter lifecycle/scalar :coerce double :default 10]
     :width [:setter lifecycle/scalar :coerce double :default 21]
@@ -20,6 +20,6 @@
     :offset-y [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (lifecycle.composite/describe DropShadow
+  (composite/describe DropShadow
     :ctor []
     :props props))

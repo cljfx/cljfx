@@ -1,5 +1,5 @@
 (ns cljfx.fx.h-box
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.pane :as fx.pane]
@@ -13,7 +13,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props HBox
+    (composite/props HBox
       :children [:list (-> lifecycle/dynamic
                            (lifecycle/wrap-extra-props
                              {:h-box/margin (prop/make
@@ -31,6 +31,6 @@
       :spacing [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe HBox
+  (composite/describe HBox
     :ctor []
     :props props))

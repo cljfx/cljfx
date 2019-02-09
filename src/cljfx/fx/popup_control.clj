@@ -1,5 +1,5 @@
 (ns cljfx.fx.popup-control
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.popup-window :as fx.popup-window])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.popup-window/props
-    (lifecycle.composite/props PopupControl
+    (composite/props PopupControl
       ;; overrides
       :anchor-location [:setter lifecycle/scalar
                         :coerce (coerce/enum PopupWindow$AnchorLocation)
@@ -40,6 +40,6 @@
       :style-class [:list lifecycle/scalar :coerce coerce/style-class])))
 
 (def lifecycle
-  (lifecycle.composite/describe PopupControl
+  (composite/describe PopupControl
     :ctor []
     :props props))

@@ -1,5 +1,5 @@
 (ns cljfx.fx.menu-bar
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.control :as fx.control]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props MenuBar
+    (composite/props MenuBar
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "menu-bar"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -22,6 +22,6 @@
 
 
 (def lifecycle
-  (lifecycle.composite/describe MenuBar
+  (composite/describe MenuBar
     :ctor []
     :props props))

@@ -1,5 +1,5 @@
 (ns cljfx.fx.text-input-dialog
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.dialog :as fx.dialog]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.control TextInputDialog]))
@@ -10,7 +10,7 @@
   fx.dialog/props)
 
 (def lifecycle
-  (-> (lifecycle.composite/describe TextInputDialog
+  (-> (composite/describe TextInputDialog
         :ctor []
         :props props)
       (lifecycle/wrap-on-delete #(.hide ^TextInputDialog %))))

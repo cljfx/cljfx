@@ -1,5 +1,5 @@
 (ns cljfx.fx.border-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.pane :as fx.pane]
@@ -25,7 +25,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props BorderPane
+    (composite/props BorderPane
       :bottom [:setter border-pane-constrained-dynamic]
       :center [:setter border-pane-constrained-dynamic]
       :left [:setter border-pane-constrained-dynamic]
@@ -33,6 +33,6 @@
       :top [:setter border-pane-constrained-dynamic])))
 
 (def lifecycle
-  (lifecycle.composite/describe BorderPane
+  (composite/describe BorderPane
     :ctor []
     :props props))

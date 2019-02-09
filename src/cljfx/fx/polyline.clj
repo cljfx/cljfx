@@ -1,5 +1,5 @@
 (ns cljfx.fx.polyline
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.shape :as fx.shape])
@@ -10,12 +10,12 @@
 (def props
   (merge
     fx.shape/props
-    (lifecycle.composite/props Polyline
+    (composite/props Polyline
       :fill [:setter lifecycle/scalar :coerce coerce/paint]
       :stroke [:setter lifecycle/scalar :coerce coerce/paint :default :black]
       :points [:list lifecycle/scalar :coerce #(map double %)])))
 
 (def lifecycle
-  (lifecycle.composite/describe Polyline
+  (composite/describe Polyline
     :ctor []
     :props props))

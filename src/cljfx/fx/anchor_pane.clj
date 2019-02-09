@@ -1,5 +1,5 @@
 (ns cljfx.fx.anchor-pane
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.pane :as fx.pane]
             [cljfx.prop :as prop]
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props AnchorPane
+    (composite/props AnchorPane
       :children [:list
                  (-> lifecycle/dynamic
                      (lifecycle/wrap-extra-props
@@ -37,6 +37,6 @@
                      lifecycle/wrap-many)])))
 
 (def lifecycle
-  (lifecycle.composite/describe AnchorPane
+  (composite/describe AnchorPane
     :ctor []
     :props props))

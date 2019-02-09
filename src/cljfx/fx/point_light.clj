@@ -1,5 +1,5 @@
 (ns cljfx.fx.point-light
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.light-base :as fx.light-base])
   (:import [javafx.scene PointLight]))
 
@@ -9,6 +9,6 @@
   fx.light-base/props)
 
 (def lifecycle
-  (lifecycle.composite/describe PointLight
+  (composite/describe PointLight
     :ctor []
     :props props))

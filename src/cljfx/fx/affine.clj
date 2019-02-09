@@ -1,5 +1,5 @@
 (ns cljfx.fx.affine
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.transform :as fx.transform])
   (:import [javafx.scene.transform Affine]))
@@ -9,7 +9,7 @@
 (def props
   (merge
     fx.transform/props
-    (lifecycle.composite/props Affine
+    (composite/props Affine
       :mxx [:setter lifecycle/scalar :coerce double :default 1.0]
       :mxy [:setter lifecycle/scalar :coerce double :default 0.0]
       :mxz [:setter lifecycle/scalar :coerce double :default 0.0]
@@ -24,6 +24,6 @@
       :tz [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe Affine
+  (composite/describe Affine
     :ctor []
     :props props))

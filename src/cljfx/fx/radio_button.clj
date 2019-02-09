@@ -1,5 +1,5 @@
 (ns cljfx.fx.radio-button
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.toggle-button :as fx.toggle-button]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.toggle-button/props
-    (lifecycle.composite/props RadioButton
+    (composite/props RadioButton
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "radio-button"]
@@ -19,6 +19,6 @@
                         :default :radio-button])))
 
 (def lifecycle
-  (lifecycle.composite/describe RadioButton
+  (composite/describe RadioButton
     :ctor []
     :props props))

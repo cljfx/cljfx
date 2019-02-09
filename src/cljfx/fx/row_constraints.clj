@@ -1,5 +1,5 @@
 (ns cljfx.fx.row-constraints
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.layout RowConstraints Priority]
@@ -8,7 +8,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props RowConstraints
+  (composite/props RowConstraints
     :fill-height [:setter lifecycle/scalar :default true]
     :max-height [:setter lifecycle/scalar :coerce double :default -1.0]
     :min-height [:setter lifecycle/scalar :coerce double :default -1.0]
@@ -18,6 +18,6 @@
     :vgrow [:setter lifecycle/scalar :coerce (coerce/enum Priority)]))
 
 (def lifecycle
-  (lifecycle.composite/describe RowConstraints
+  (composite/describe RowConstraints
     :ctor []
     :props props))

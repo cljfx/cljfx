@@ -1,5 +1,5 @@
 (ns cljfx.fx.tooltip
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.popup-control :as fx.popup-control])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.popup-control/props
-    (lifecycle.composite/props Tooltip
+    (composite/props Tooltip
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tooltip"]
       ;; definitions
@@ -32,6 +32,6 @@
       :wrap-text [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe Tooltip
+  (composite/describe Tooltip
     :ctor []
     :props props))

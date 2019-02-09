@@ -1,5 +1,5 @@
 (ns cljfx.fx.scroll-bar
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props ScrollBar
+    (composite/props ScrollBar
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "scroll-bar"]
@@ -29,6 +29,6 @@
       :visible-amount [:setter lifecycle/scalar :coerce double :default 15.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe ScrollBar
+  (composite/describe ScrollBar
     :ctor []
     :props props))

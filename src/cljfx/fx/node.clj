@@ -1,5 +1,5 @@
 (ns cljfx.fx.node
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator])
@@ -10,7 +10,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props Node
+  (composite/props Node
     :accessible-help [:setter lifecycle/scalar]
     :accessible-role-description [:setter lifecycle/scalar]
     :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)]
@@ -20,7 +20,7 @@
     :cache [:setter lifecycle/scalar :default false]
     :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
     :depth-test [:setter lifecycle/scalar :coerce (coerce/enum DepthTest)]
-    :disabled [(mutator/setter (lifecycle.composite/setter Node :disable))
+    :disabled [(mutator/setter (composite/setter Node :disable))
                lifecycle/scalar]
     :effect [:setter lifecycle/dynamic]
     :event-dispatcher [:setter lifecycle/scalar]

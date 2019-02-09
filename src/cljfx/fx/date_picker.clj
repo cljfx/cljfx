@@ -1,5 +1,5 @@
 (ns cljfx.fx.date-picker
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.combo-box-base :as fx.combo-box-base])
@@ -24,7 +24,7 @@
 (def props
   (merge
     fx.combo-box-base/props
-    (lifecycle.composite/props DatePicker
+    (composite/props DatePicker
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["date-picker" "combo-box-base"]]
@@ -39,6 +39,6 @@
       :show-week-numbers [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe DatePicker
+  (composite/describe DatePicker
     :ctor []
     :props props))

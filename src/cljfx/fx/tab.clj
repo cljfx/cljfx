@@ -1,5 +1,5 @@
 (ns cljfx.fx.tab
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])
   (:import [javafx.scene.control Tab]))
@@ -7,7 +7,7 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (lifecycle.composite/props Tab
+  (composite/props Tab
     :closable [:setter lifecycle/scalar :default true]
     :content [:setter lifecycle/dynamic]
     :context-menu [:setter lifecycle/dynamic]
@@ -24,6 +24,6 @@
     :user-data [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (lifecycle.composite/describe Tab
+  (composite/describe Tab
     :ctor []
     :props props))

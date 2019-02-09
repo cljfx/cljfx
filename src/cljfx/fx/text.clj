@@ -1,5 +1,5 @@
 (ns cljfx.fx.text
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.shape :as fx.shape])
@@ -12,7 +12,7 @@
 (def props
   (merge
     fx.shape/props
-    (lifecycle.composite/props Text
+    (composite/props Text
       ;; overrides
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
                         :default :text]
@@ -42,6 +42,6 @@
       :caret-bias [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (lifecycle.composite/describe Text
+  (composite/describe Text
     :ctor []
     :props props))

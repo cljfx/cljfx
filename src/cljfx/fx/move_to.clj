@@ -1,5 +1,5 @@
 (ns cljfx.fx.move-to
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.path-element :as fx.path-element])
   (:import [javafx.scene.shape MoveTo]))
@@ -9,11 +9,11 @@
 (def props
   (merge
     fx.path-element/props
-    (lifecycle.composite/props MoveTo
+    (composite/props MoveTo
       :x [:setter lifecycle/scalar :coerce double :default 0]
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (lifecycle.composite/describe MoveTo
+  (composite/describe MoveTo
     :ctor []
     :props props))

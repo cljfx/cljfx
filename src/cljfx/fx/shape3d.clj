@@ -1,6 +1,6 @@
 (ns cljfx.fx.shape3d
   (:require [cljfx.coerce :as coerce]
-            [cljfx.lifecycle.composite :as lifecycle.composite]
+            [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.node :as fx.node])
   (:import [javafx.scene.shape DrawMode CullFace Shape3D]))
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.node/props
-    (lifecycle.composite/props Shape3D
+    (composite/props Shape3D
       :cull-face [:setter lifecycle/scalar :coerce (coerce/enum CullFace) :default :back]
       :draw-mode [:setter lifecycle/scalar :coerce (coerce/enum DrawMode) :default :fill]
       :material [:setter lifecycle/dynamic])))

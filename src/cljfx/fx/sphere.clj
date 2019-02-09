@@ -1,5 +1,5 @@
 (ns cljfx.fx.sphere
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.shape3d :as fx.shape3d])
   (:import [javafx.scene.shape Sphere]))
@@ -9,10 +9,10 @@
 (def props
   (merge
     fx.shape3d/props
-    (lifecycle.composite/props Sphere
+    (composite/props Sphere
       :radius [:setter lifecycle/scalar :coerce double :default 1.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe Sphere
+  (composite/describe Sphere
     :ctor []
     :props props))

@@ -1,5 +1,5 @@
 (ns cljfx.fx.rotate
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.transform :as fx.transform])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.transform/props
-    (lifecycle.composite/props Rotate
+    (composite/props Rotate
       :angle [:setter lifecycle/scalar :coerce double :default 0.0]
       :axis [:setter lifecycle/scalar :coerce coerce/point-3d :default :z-axis]
       :pivot-x [:setter lifecycle/scalar :coerce double :default 0.0]
@@ -18,6 +18,6 @@
       :pivot-z [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (lifecycle.composite/describe Rotate
+  (composite/describe Rotate
     :ctor []
     :props props))

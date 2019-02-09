@@ -1,5 +1,5 @@
 (ns cljfx.fx.list-view
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.mutator :as mutator]
@@ -23,7 +23,7 @@
 (def props
   (merge
     fx.control/props
-    (lifecycle.composite/props ListView
+    (composite/props ListView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "list-view"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
@@ -53,6 +53,6 @@
                        :default :single])))
 
 (def lifecycle
-  (lifecycle.composite/describe ListView
+  (composite/describe ListView
     :ctor []
     :props props))

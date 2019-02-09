@@ -1,5 +1,5 @@
 (ns cljfx.fx.password-field
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.text-field :as fx.text-field]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.text-field/props
-    (lifecycle.composite/props PasswordField
+    (composite/props PasswordField
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["text-input" "text-field" "password-field"]]
@@ -19,6 +19,6 @@
                         :default :password-field])))
 
 (def lifecycle
-  (lifecycle.composite/describe PasswordField
+  (composite/describe PasswordField
     :ctor []
     :props props))

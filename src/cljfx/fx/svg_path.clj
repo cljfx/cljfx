@@ -1,5 +1,5 @@
 (ns cljfx.fx.svg-path
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.shape :as fx.shape])
@@ -10,12 +10,12 @@
 (def props
   (merge
     fx.shape/props
-    (lifecycle.composite/props SVGPath
+    (composite/props SVGPath
       :content [:setter lifecycle/scalar]
       :fill-rule [:setter lifecycle/scalar :coerce (coerce/enum FillRule)
                   :default :non-zero])))
 
 (def lifecycle
-  (lifecycle.composite/describe SVGPath
+  (composite/describe SVGPath
     :ctor []
     :props props))

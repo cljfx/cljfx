@@ -1,5 +1,5 @@
 (ns cljfx.fx.scatter-chart
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart ScatterChart]))
 
@@ -9,6 +9,6 @@
   fx.xy-chart/props)
 
 (def lifecycle
-  (lifecycle.composite/describe ScatterChart
+  (composite/describe ScatterChart
     :ctor [:x-axis :y-axis]
     :props props))

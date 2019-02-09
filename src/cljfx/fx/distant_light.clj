@@ -1,5 +1,5 @@
 (ns cljfx.fx.distant-light
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.light :as fx.light])
   (:import [javafx.scene.effect Light$Distant]))
@@ -9,11 +9,11 @@
 (def props
   (merge
     fx.light/props
-    (lifecycle.composite/props Light$Distant
+    (composite/props Light$Distant
       :azimuth [:setter lifecycle/scalar :coerce double :default 45]
       :elevation [:setter lifecycle/scalar :coerce double :default 45])))
 
 (def lifecycle
-  (lifecycle.composite/describe Light$Distant
+  (composite/describe Light$Distant
     :ctor []
     :props props))

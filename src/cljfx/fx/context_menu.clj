@@ -1,5 +1,5 @@
 (ns cljfx.fx.context-menu
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.popup-control :as fx.popup-control]
             [cljfx.coerce :as coerce])
@@ -10,7 +10,7 @@
 (def props
   (merge
     fx.popup-control/props
-    (lifecycle.composite/props ContextMenu
+    (composite/props ContextMenu
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "context-menu"]
@@ -21,6 +21,6 @@
       :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler])))
 
 (def lifecycle
-  (lifecycle.composite/describe ContextMenu
+  (composite/describe ContextMenu
     :ctor []
     :props props))

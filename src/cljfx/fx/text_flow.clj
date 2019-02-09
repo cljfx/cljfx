@@ -1,5 +1,5 @@
 (ns cljfx.fx.text-flow
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.pane :as fx.pane])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.pane/props
-    (lifecycle.composite/props TextFlow
+    (composite/props TextFlow
       ;; overrides
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
                         :default :text]
@@ -21,6 +21,6 @@
                        :default :left])))
 
 (def lifecycle
-  (lifecycle.composite/describe TextFlow
+  (composite/describe TextFlow
     :ctor []
     :props props))

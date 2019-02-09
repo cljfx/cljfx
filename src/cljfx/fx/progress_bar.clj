@@ -1,5 +1,5 @@
 (ns cljfx.fx.progress-bar
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.fx.progress-indicator :as fx.progress-indicator]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle])
@@ -10,12 +10,12 @@
 (def props
   (merge
     fx.progress-indicator/props
-    (lifecycle.composite/props ProgressBar
+    (composite/props ProgressBar
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "progress-bar"])))
 
 (def lifecycle
-  (lifecycle.composite/describe ProgressBar
+  (composite/describe ProgressBar
     :ctor []
     :props props))

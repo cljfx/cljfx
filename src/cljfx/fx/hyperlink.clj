@@ -1,5 +1,5 @@
 (ns cljfx.fx.hyperlink
-  (:require [cljfx.lifecycle.composite :as lifecycle.composite]
+  (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.button-base :as fx.button-base]
             [cljfx.coerce :as coerce])
@@ -11,7 +11,7 @@
 (def props
   (merge
     fx.button-base/props
-    (lifecycle.composite/props Hyperlink
+    (composite/props Hyperlink
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default "hyperlink"]
@@ -21,6 +21,6 @@
       :visited [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle.composite/describe Hyperlink
+  (composite/describe Hyperlink
     :ctor []
     :props props))
