@@ -645,9 +645,7 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
-- cofx stuff from re-frame:
-  - fx + cofx
-  - offload to separate thread
+- fx/cofx documentation
 
 ## Food for thought
 - make exceptions more informative

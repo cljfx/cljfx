@@ -2,6 +2,7 @@
   (:require [cljfx.app :as app]
             [cljfx.component :as component]
             [cljfx.defaults :as defaults]
+            [cljfx.event-handler :as event-handler]
             [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]
@@ -168,15 +169,75 @@
   "When given function, returns lifecycle that uses said function with context
 
   This function is supposed to be used as part of `:fx.opt/type->lifecycle` in conjunction
-  with `wrap-context-desc` being part of middleware"
+  with [[wrap-context-desc]] being part of middleware"
   [fx-type]
   (when (fn? fx-type) lifecycle/context-fn->dynamic))
 
 (defn wrap-context-desc
   "Middleware function that passes context description as option to lifecycle
 
-  This middleware is supposed to be used in conjunction with `fn->lifecycle-with-context`
-  which will then pass context to every function. Context is a black box wrapping
-  description map, with `sub` being an interface to that black box"
+  This middleware is supposed to be used in conjunction with
+  [[fn->lifecycle-with-context]] which will then pass context to every function. Context
+  is a black box wrapping description map, with `sub` being an interface to that black
+  box"
   [lifecycle]
   (lifecycle/wrap-context-desc lifecycle))
+
+(defn wrap-co-effects
+  "Event handler wrapper intended to provide mutable external dependencies as immutable
+  values to make event handler pure. Transforms `f` of 2 args (dependency map + event)
+  to function of 1 argument (event)
+
+  `co-effect-id->producer` is a map from arbitrary keys to zero-argument side-effecting
+  functions, which are used to produce a dependency map"
+  [f co-effect-id->producer]
+  (event-handler/wrap-co-effects f co-effect-id->producer))
+
+(defn wrap-effects
+  "Event handler wrapper intended to execute side effects described by otherwise pure `f`
+
+  `f` is a function of 1 argument (event) that returns data describing possible side
+  effects: a series of 2-element vectors, where 1st value corresponds to key of
+  side-effecting consumer in `effect-id->consumer`, and 2nd is an argument to that
+  consumer
+
+  `effect-id->consumer` is a map from arbitrary keys to 2-argument side-effecting
+  functions. 1st argument is a value provided by `f`, and second is a 1-arg event
+  dispatcher that can be called with new events and will eventually call `f`
+
+  Returns function that takes event (and optionally custom dispatcher function) and
+  executes side effects described by returned values of `f`"
+  [f effect-id->consumer]
+  (event-handler/wrap-effects f effect-id->consumer))
+
+(defn make-deref-co-effect
+  "Creates co-effect function that derefs a `*ref` when it's realized"
+  [*ref]
+  (event-handler/make-deref-co-effect *ref))
+
+(defn make-reset-effect
+  "Creates effect function that reset an `*atom` when this effect is triggered"
+  [*atom]
+  (event-handler/make-reset-effect *atom))
+
+(def dispatch-effect
+  "Effect function that dispatches another event when this effect is triggered"
+  event-handler/dispatch-effect)
+
+(defn wrap-async
+  "Event handler wrapper that redirects all actual event handling to background thread
+
+  Returned handler uses agent underneath, so using this wrapper will require call to
+  [[clojure.core/shutdown-agents]] to gracefully stop JVM
+
+  `f` is a function that will be called with 2 args: event and event dispatcher fn that
+  can be used to enqueue more events for asynchronous handling
+
+  `options` is map that accepts following keys:
+  - `:sync-checker` is event predicate that determines if event should be handled
+    immediately, which useful for syncing typed text, default value is `:fx/sync`
+  - `:meta`, `:validator`, `:error-handler` and `:error-mode`, passed to construct
+    [[clojure.core/agent]], by `:error-handler` that will print stack traces of thrown
+    exceptions"
+  [f & {:as options}]
+  (event-handler/wrap-async f options))

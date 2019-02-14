@@ -17,7 +17,7 @@
                     :default "split-pane"]
       ;; definitions
       :divider-positions [:setter lifecycle/scalar
-                          :coerce #(into-array Double/TYPE %)
+                          :coerce #(into-array Double/TYPE (map double %))
                           :default []]
       :items [:list lifecycle/dynamics]
       :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)

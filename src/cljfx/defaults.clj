@@ -15,7 +15,10 @@
 (defn- or-default [x y]
   (or x y))
 
+(defn provide [m k v]
+  (update m k or-default v))
+
 (defn fill-opts [opts]
   (-> opts
-      (update :fx.opt/type->lifecycle or-default fx-type->lifecycle)
-      (update :fx.opt/map-event-handler or-default map-event-handler)))
+      (provide :fx.opt/type->lifecycle fx-type->lifecycle)
+      (provide :fx.opt/map-event-handler map-event-handler)))
