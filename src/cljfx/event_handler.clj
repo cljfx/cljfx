@@ -33,13 +33,8 @@
 (defn- print-error-handler [_ ^Throwable e]
   (.printStackTrace e))
 
-(defn wrap-async [f options]
-  (let [agent-options (-> options
-                          (dissoc :sync-checker)
-                          (defaults/provide :error-handler print-error-handler))
-        agent (apply agent nil (mapcat identity agent-options))
-        sync? (:sync-checker options :fx/sync)]
+(defn wrap-async [f agent-options]
+  (let [with-defaults (defaults/provide agent-options :error-handler print-error-handler)
+        *agent (apply agent nil (mapcat identity with-defaults))]
     (fn dispatch-async! [event]
-      (if (sync? event)
-        (f event dispatch-async!)
-        (send agent process-event f event dispatch-async!)))))
+      (send *agent process-event f event dispatch-async!))))

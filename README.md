@@ -464,6 +464,92 @@ returning cache) as a second argument. What kind of cache
 to use is a question with no easy answer, you probably should try
 different caches and see what is a better fit for your app.
 
+### Event handling on steroids
+
+While using maps to describe events is a good step towards mostly pure
+applications, there is still a room for improvement:
+- almost every event handler still mutates app state
+- many event handlers dereference app state, which makes them coupled 
+  with an atom
+- events should be handled on separate thread to keep application 
+  responsive
+
+Cljfx borrows solutions to all these problems from re-frame, providing
+map event handler wrappers that allow having effects, co-effects and 
+async handling. Lets walk through this example event handler and see how
+we can make it pure:
+
+```clj
+(def *state
+  (atom {:todos []}))
+
+(defn handle [event]
+  (let [state @*state
+        {:keys [event/type text]} event]
+    (case type
+      ::add-todo (reset! *state (update state :todos conj {:text text :done false})))))
+```
+
+1. Co-effects: `wrap-co-effects`
+   It would be nice to not have to deref state atom and instead receive 
+   it as an argument, and that is what co-effects are for. Co-effect is 
+   a term taken from re-frame, and it means current state as data, as 
+   presented to event handler. In cljfx you describe co-effects as a map
+   from arbitrary key to function that produces some data that is then 
+   passed to handler:
+   ```clj
+   (defn handle [event]
+     ;; receive state as part of an event
+     (let [{:keys [event/type text state]} event]
+       (case type
+         ::add-todo (reset! *state (update state :todos conj {:text text :done false})))))
+         
+   (def actual-handler 
+     (-> handle
+         (fx/wrap-co-effects {:state #(deref *state)})))
+   ```
+2. Effects: `wrap-effects`
+   Instead of performing side-effecting operations from handlers, we can
+   return data that describes how to perform these side-effecting 
+   operations. `fx/wrap-effects` uses that data to perform side effects. It
+   expects event handler to return a seqable of 2-element vectors. First
+   element is a key used to describe side effect, and second is an 
+   argument to side-effecting function. `fx/wrap-effects` accepts a map 
+   from these description keys to side-effecting functions:
+   ```clj
+   (defn handle [event]
+     (let [{:keys [event/type text state]} event]
+       (case type
+         ;; Now handlers not only receive just data, they also return just data
+         ::add-todo {:state (update state :todos conj {:text text :done false})})))
+   
+   (def actual-handler
+     (-> handle
+         (fx/wrap-co-effects {:state #(deref *state)})
+         (fx/wrap-effects {:state (fn [state _] (reset! *state state))})))
+   ```
+   In addition to value provided by wrapped handler, side-effecting 
+   function receives dispatch function they can call to process new 
+   events. While it's useless for resetting state, it can be useful in
+   other circumstances. One is you can create a `:dispatch` effect that
+   dispatches another effects, and another is you can describe 
+   asynchronous operations such as http requests as just data. Examples
+   of both can be found at [examples/e18_pure_event_handling.clj](examples/e18_pure_event_handling.clj).
+   This approach allows to specify side effects in a few places, and 
+   then have easily testable handlers:
+   ```clj
+   (handle {:event/type ::add-todo
+            :text "Buy milk"
+            :state {:todos []}})
+   => {:state {:todos [{:text "Buy milk", :done false}]}}
+   ;; data in, data out, no mocks necessary! 
+   ```
+3. Async handling: `wrap-async`
+   Finally, you can wrap your handler with `fx/wrap-async` to offload 
+   event handling to background thread. Note that it uses agents 
+   underneath, so you will need to call `clojure.core/shutdown-agents` 
+   when exiting application.
+
 ### How does it actually work
 
 There are 3 main building blocks of cljfx: components, lifecycles and
@@ -645,7 +731,9 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
-- fx/cofx documentation
+- make wrap-async better: option to perform sync dispatch that will 
+  block until queue is consumed
+- how to try examples
 
 ## Food for thought
 - make exceptions more informative

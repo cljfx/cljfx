@@ -233,11 +233,7 @@
   `f` is a function that will be called with 2 args: event and event dispatcher fn that
   can be used to enqueue more events for asynchronous handling
 
-  `options` is map that accepts following keys:
-  - `:sync-checker` is event predicate that determines if event should be handled
-    immediately, which useful for syncing typed text, default value is `:fx/sync`
-  - `:meta`, `:validator`, `:error-handler` and `:error-mode`, passed to construct
-    [[clojure.core/agent]], by `:error-handler` that will print stack traces of thrown
-    exceptions"
-  [f & {:as options}]
-  (event-handler/wrap-async f options))
+  `agent-options` is map that is passed to [[clojure.core/agent]], has default
+  `:error-handler` that will print stack traces of thrown exceptions"
+  [f & {:as agent-options}]
+  (event-handler/wrap-async f agent-options))
