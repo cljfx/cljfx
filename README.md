@@ -30,6 +30,18 @@ everything with clojure data. Unlike fn-fx, it is more dynamic, allowing
 users to use maps and functions instead of macros and deftypes, and has
 more explicit and extensible lifecycle for components.
 
+## Installation and requirements
+
+Cljfx uses `tools.deps`, so you can add this repo with latest sha as a 
+dependency:
+```edn
+ {cljfx {:git/uri "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}}
+```
+Cljfx is also published on clojars, so you can add `cljfx` as a maven
+dependency, current version is on this badge: [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg)](https://clojars.org/cljfx)
+
+Minimum required version of clojure is 1.10, minimum JDK version is 11.
+
 ## Overview
 
 ### Hello world
@@ -759,7 +771,6 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
-- installation & requirements
 - how to try examples
 
 ## Food for thought

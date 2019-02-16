@@ -2,7 +2,6 @@
   (:require [cljfx.api :as fx]
             [e18-pure-event-handling.subs :as subs]
             [e18-pure-event-handling.events :as events]
-            [clojure.string :as str]
             [clojure.java.io :as io])
   (:import [org.jsoup.nodes Element]
            [org.jsoup Jsoup]))
