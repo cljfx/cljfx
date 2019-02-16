@@ -26,9 +26,10 @@
      (doseq [[fx-effect value] (f event)]
        ((effect-id->consumer fx-effect) value dispatch!)))))
 
-(defn- process-event [_ f e dispatch-async!]
+(defn- process-event [_ f e dispatch-async! *maybe-promise]
   (f e dispatch-async!)
-  nil)
+  (when *maybe-promise
+    (deliver *maybe-promise nil)))
 
 (defn- print-error-handler [_ ^Throwable e]
   (.printStackTrace e))
@@ -37,4 +38,9 @@
   (let [with-defaults (defaults/provide agent-options :error-handler print-error-handler)
         *agent (apply agent nil (mapcat identity with-defaults))]
     (fn dispatch-async! [event]
-      (send *agent process-event f event dispatch-async!))))
+      (if (:fx/sync event)
+        (let [*promise (promise)]
+          (send *agent process-event f event dispatch-async! *promise)
+          @*promise)
+        (send *agent process-event f event dispatch-async! nil))
+      nil)))

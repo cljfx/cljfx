@@ -468,16 +468,17 @@ different caches and see what is a better fit for your app.
 
 While using maps to describe events is a good step towards mostly pure
 applications, there is still a room for improvement:
-- almost every event handler still mutates app state
 - many event handlers dereference app state, which makes them coupled 
-  with an atom
-- events should be handled on separate thread to keep application 
-  responsive
+  with an atom: mutable place
+- almost every event handler still mutates app state, which also makes 
+  them coupled
+- events are handled on JavaFX application thread, which may lead to 
+  responsiveness issues
 
 Cljfx borrows solutions to all these problems from re-frame, providing
-map event handler wrappers that allow having effects, co-effects and 
-async handling. Lets walk through this example event handler and see how
-we can make it pure:
+map event handler wrappers that allow having co-effects (pure inputs), 
+effects (pure outputs), and async handling. Lets walk through this 
+example event handler and see how we can make it pure:
 
 ```clj
 (def *state
@@ -488,9 +489,13 @@ we can make it pure:
         {:keys [event/type text]} event]
     (case type
       ::add-todo (reset! *state (update state :todos conj {:text text :done false})))))
+
+;; usage:
+(handle {:event/type ::add-todo :text "Buy milk"})
 ```
 
 1. Co-effects: `wrap-co-effects`
+
    It would be nice to not have to deref state atom and instead receive 
    it as an argument, and that is what co-effects are for. Co-effect is 
    a term taken from re-frame, and it means current state as data, as 
@@ -507,20 +512,26 @@ we can make it pure:
    (def actual-handler 
      (-> handle
          (fx/wrap-co-effects {:state #(deref *state)})))
+   
+   ;; usage:
+   (actual-handler {:event/type ::add-todo :text "Buy milk"})
    ```
 2. Effects: `wrap-effects`
+
    Instead of performing side-effecting operations from handlers, we can
    return data that describes how to perform these side-effecting 
-   operations. `fx/wrap-effects` uses that data to perform side effects. It
-   expects event handler to return a seqable of 2-element vectors. First
-   element is a key used to describe side effect, and second is an 
-   argument to side-effecting function. `fx/wrap-effects` accepts a map 
-   from these description keys to side-effecting functions:
+   operations. `fx/wrap-effects` uses that data to perform side effects.
+   You describe effects as a map from arbitrary keys to side-effecting
+   function. Wrapped handler in turn should return a seqable of 
+   2-element vectors. First element is a key used to find side-effecting
+   function, and second is an argument to it:
    ```clj
    (defn handle [event]
      (let [{:keys [event/type text state]} event]
        (case type
          ;; Now handlers not only receive just data, they also return just data
+         ;; Returning map is a convenience option that can be used as a return
+         ;; value, and sequences like [[:state ...] [:state ...]] are fine too 
          ::add-todo {:state (update state :todos conj {:text text :done false})})))
    
    (def actual-handler
@@ -529,8 +540,8 @@ we can make it pure:
          (fx/wrap-effects {:state (fn [state _] (reset! *state state))})))
    ```
    In addition to value provided by wrapped handler, side-effecting 
-   function receives dispatch function they can call to process new 
-   events. While it's useless for resetting state, it can be useful in
+   function receives a function they can call to dispatch new events. 
+   While it's useless for resetting state, it can be useful in
    other circumstances. One is you can create a `:dispatch` effect that
    dispatches another effects, and another is you can describe 
    asynchronous operations such as http requests as just data. Examples
@@ -545,10 +556,27 @@ we can make it pure:
    ;; data in, data out, no mocks necessary! 
    ```
 3. Async handling: `wrap-async`
+
    Finally, you can wrap your handler with `fx/wrap-async` to offload 
-   event handling to background thread. Note that it uses agents 
-   underneath, so you will need to call `clojure.core/shutdown-agents` 
-   when exiting application.
+   event handling to background thread:
+   ```clj
+   (def actual-handler
+     (-> handle
+         (fx/wrap-co-effects {:state #(deref *state)})
+         (fx/wrap-effects {:state (fn [state _] (reset! *state state))})
+         (fx/wrap-async)))
+   ```
+   Note that it uses agents underneath, so you will need to call 
+   `clojure.core/shutdown-agents` on exit. Another thing to keep in mind
+   is that there are couple of cases where you want event handling to 
+   be synchronous: 
+   - when syncing typed text in input fields with app state by using 
+     `:text` and `:on-text-changed` props to avoid text reverts when 
+     typing too fast;
+   - when dispatching events on startup that prepare some views to avoid
+     showing empty screens.
+   In these cases you can put `:fx/sync true` to event map: that will 
+   block event handler until this event is processed.
 
 ### How does it actually work
 
@@ -731,8 +759,7 @@ There are various examples available in [examples](examples) folder.
 
 ## TODO
 
-- make wrap-async better: option to perform sync dispatch that will 
-  block until queue is consumed
+- installation & requirements
 - how to try examples
 
 ## Food for thought

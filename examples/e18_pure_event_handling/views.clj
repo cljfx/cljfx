@@ -90,7 +90,7 @@
               {:fx/type :text-field
                :h-box/hgrow :always
                :text (fx/sub context :typed-url)
-               :on-text-changed {:event/type ::events/type-url}
+               :on-text-changed {:event/type ::events/type-url :fx/sync true}
                :on-key-pressed {:event/type ::events/key-press-url}}]})
 
 (defn root [_]

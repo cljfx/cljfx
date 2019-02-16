@@ -230,6 +230,10 @@
   Returned handler uses agent underneath, so using this wrapper will require call to
   [[clojure.core/shutdown-agents]] to gracefully stop JVM
 
+  Setting `:fx/sync` to true in event will make calling this handler block until event is
+  processed. This may be useful for text changed listeners in inputs that synchronise
+  typed text with displayed text.
+
   `f` is a function that will be called with 2 args: event and event dispatcher fn that
   can be used to enqueue more events for asynchronous handling
 
