@@ -555,7 +555,7 @@ example event handler and see how we can make it pure:
    function receives a function they can call to dispatch new events. 
    While it's useless for resetting state, it can be useful in
    other circumstances. One is you can create a `:dispatch` effect that
-   dispatches another effects, and another is you can describe 
+   dispatches another events, and another is you can describe 
    asynchronous operations such as http requests as just data. Examples
    of both can be found at [examples/e18_pure_event_handling.clj](examples/e18_pure_event_handling.clj).
    This approach allows to specify side effects in a few places, and 
@@ -587,8 +587,9 @@ example event handler and see how we can make it pure:
      typing too fast;
    - when dispatching events on startup that prepare some views to avoid
      showing empty screens.
+   
    In these cases you can put `:fx/sync true` to event map: that will 
-   block event handler until this event is processed.
+   block call to event handler until this event is processed.
 
 ### How does it actually work
 
@@ -768,10 +769,23 @@ example in [examples/e09_todo_app.clj](examples/e09_todo_app.clj))
 ## More examples
 
 There are various examples available in [examples](examples) folder.
+To try them out:
+1. Clone this repo and cd into it:
+   ```shell
+   git clone https://github.com/cljfx/cljfx.git
+   cd cljfx 
+   ```
+2. Launch repl with `:examples` alias and require examples:
+   ```shell
+   clj -A:examples
+   # Clojure 1.10
+   # user=> (require 'e15-task-tracker)
+   # nil ;; window appears
+   ```
 
 ## TODO
 
-- how to try examples
+- interactive workflow is brittle: throwing exception stops app 
 
 ## Food for thought
 - make exceptions more informative
