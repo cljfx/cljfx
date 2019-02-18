@@ -2,6 +2,8 @@
   (:require [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]))
 
+(set! *warn-on-reflection* true)
+
 (defn complete-rendering [app desc component]
   (cond-> app
     :always (assoc :component component)
@@ -15,8 +17,12 @@
   immediately re-render app to always view it's actual state"
   [*app]
   (let [{:keys [desc component render-fn request]} @*app
-        new-component (render-fn component desc)
+        [new-component ^Exception exception] (try
+                                               [(render-fn component desc) nil]
+                                               (catch Exception e
+                                                 [component e]))
         new-app (swap! *app complete-rendering desc new-component)]
+    (some-> exception .printStackTrace)
     (if (:request new-app)
       (recur *app)
       (deliver request new-component))))

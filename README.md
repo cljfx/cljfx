@@ -783,10 +783,6 @@ To try them out:
    # nil ;; window appears
    ```
 
-## TODO
-
-- interactive workflow is brittle: throwing exception stops app 
-
 ## Food for thought
 - make exceptions more informative
 - are controlled props possible? (controls, also stage's `:showing`)
