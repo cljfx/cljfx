@@ -724,14 +724,6 @@ Some notable coercion examples and approaches:
 
 #### Differences with JavaFX
 
-There are some differences in naming:
-- `disabled` property is read-only in JavaFX, and to make something
-disabled you have to use `disable` property, but in cljfx you use
-`:disabled` anyway.
-- inner classes like `Light$Distant` are called like `:distant-light`,
-  except for `Light$Point`, which is a `:point-light-effect`, because there
-  is also a node class `PointLight`, which in turn is a `:point-light`
-
 There are some "synthetic" properties that provide needed functionality
 usually used through some other API:
 - canvas has a `:draw` prop that is a function that receives Canvas as
@@ -782,6 +774,10 @@ To try them out:
    # user=> (require 'e15-task-tracker)
    # nil ;; window appears
    ```
+
+## TODO
+
+- shortcut for fully-re-frame-like app?
 
 ## Food for thought
 - make exceptions more informative

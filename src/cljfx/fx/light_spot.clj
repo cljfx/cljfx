@@ -1,14 +1,14 @@
-(ns cljfx.fx.spot-light
+(ns cljfx.fx.light-spot
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.fx.point-light-effect :as fx.point-light-effect])
+            [cljfx.fx.light-point :as fx.light-point])
   (:import [javafx.scene.effect Light$Spot]))
 
 (set! *warn-on-reflection* true)
 
 (def props
   (merge
-    fx.point-light-effect/props
+    fx.light-point/props
     (composite/props Light$Spot
       :points-at-x [:setter lifecycle/scalar :coerce double :default 0]
       :points-at-y [:setter lifecycle/scalar :coerce double :default 0]

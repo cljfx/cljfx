@@ -84,7 +84,7 @@
    :spacing 10
    :children [{:fx/type :button
                :text "Back"
-               :disabled (fx/sub context subs/history-empty?)
+               :disable (fx/sub context subs/history-empty?)
                :on-action {:event/type ::events/go-back}}
               {:fx/type :text-field
                :h-box/hgrow :always

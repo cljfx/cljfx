@@ -1,8 +1,7 @@
 (ns cljfx.fx.menu-item
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator])
+            [cljfx.coerce :as coerce])
   (:import [javafx.scene.control MenuItem]))
 
 (set! *warn-on-reflection* true)
@@ -10,9 +9,7 @@
 (def props
   (composite/props MenuItem
     :accelerator [:setter lifecycle/scalar :coerce coerce/key-combination]
-    :disabled [(mutator/setter (composite/setter MenuItem :disable))
-               lifecycle/scalar
-               :default false]
+    :disable [:setter lifecycle/scalar :default false]
     :graphic [:setter lifecycle/dynamic]
     :id [:setter lifecycle/scalar]
     :mnemonic-parsing [:setter lifecycle/scalar :default true]

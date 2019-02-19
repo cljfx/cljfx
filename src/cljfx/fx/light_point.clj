@@ -1,4 +1,4 @@
-(ns cljfx.fx.point-light-effect
+(ns cljfx.fx.light-point
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.light :as fx.light])

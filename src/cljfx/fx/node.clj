@@ -1,8 +1,7 @@
 (ns cljfx.fx.node
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator])
+            [cljfx.coerce :as coerce])
   (:import [javafx.scene Node AccessibleRole CacheHint DepthTest]
            [javafx.scene.effect BlendMode]
            [javafx.geometry NodeOrientation]))
@@ -20,8 +19,7 @@
     :cache [:setter lifecycle/scalar :default false]
     :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
     :depth-test [:setter lifecycle/scalar :coerce (coerce/enum DepthTest)]
-    :disabled [(mutator/setter (composite/setter Node :disable))
-               lifecycle/scalar]
+    :disable [:setter lifecycle/scalar :default false]
     :effect [:setter lifecycle/dynamic]
     :event-dispatcher [:setter lifecycle/scalar]
     :focus-traversable [:setter lifecycle/scalar :default false]

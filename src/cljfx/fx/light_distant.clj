@@ -1,4 +1,4 @@
-(ns cljfx.fx.distant-light
+(ns cljfx.fx.light-distant
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.light :as fx.light])
