@@ -23,3 +23,10 @@
   `(if (Platform/isFxApplicationThread)
      (deliver (promise) (do ~@body))
      (run-later ~@body)))
+
+(defn initialize []
+  (try
+    (Platform/startup #(Platform/setImplicitExit false))
+    ::initialized
+    (catch IllegalStateException _
+      ::already-initialized)))

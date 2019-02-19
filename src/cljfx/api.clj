@@ -1,4 +1,7 @@
 (ns cljfx.api
+  "Main API namespace for cljfx
+
+  Requiring this namespace starts JavaFX runtime"
   (:require [cljfx.component :as component]
             [cljfx.context :as context]
             [cljfx.defaults :as defaults]
@@ -6,17 +9,14 @@
             [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]
-            [cljfx.renderer :as renderer])
-  (:import [javafx.application Platform]))
+            [cljfx.renderer :as renderer]))
 
-(defonce initialized
-  (try
-    (Platform/startup (fn []))
-    :initialized
-    (catch IllegalStateException _
-      :already-initialized)))
+(defonce
+  ^{:doc "Starts JavaFX runtime and sets implicit exit to false if JavaFX wasn't started
 
-(Platform/setImplicitExit false)
+  Either `:cljfx.platform/initialized` or `:cljfx.platform/already-initialized`"}
+  initialized
+  (platform/initialize))
 
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class
