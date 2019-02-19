@@ -54,18 +54,48 @@
   `(platform/on-fx-thread ~@body))
 
 (defn create-component
+  "Create component from description and optional opts for manual management
+
+  `:opts` is map that every lifecycle receives as an argument and uses for various
+  purposes. You can provide your data to custom lifecycles, or extend default cljfx
+  behavior via these keys:
+  - `:fx.opt/type->lifecycle` — a function that gets called on every `:fx/type` value
+    in descriptions to determine what lifecycle will be used for that description
+  - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
+    of change-listener, event-handler or any other callback-like prop. It receives that
+    map with `:fx/event` key containing appropriate event data"
   ([desc]
    (create-component desc {}))
   ([desc opts]
    (lifecycle/create lifecycle/root desc (defaults/fill-opts opts))))
 
 (defn advance-component
+  "Advance component created with [[create-component]] with new description and opts
+
+  `:opts` is map that every lifecycle receives as an argument and uses for various
+  purposes. You can provide your data to custom lifecycles, or extend default cljfx
+  behavior via these keys:
+  - `:fx.opt/type->lifecycle` — a function that gets called on every `:fx/type` value
+    in descriptions to determine what lifecycle will be used for that description
+  - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
+    of change-listener, event-handler or any other callback-like prop. It receives that
+    map with `:fx/event` key containing appropriate event data"
   ([component desc]
    (advance-component component desc {}))
   ([component desc opts]
    (lifecycle/advance lifecycle/root component desc (defaults/fill-opts opts))))
 
 (defn delete-component
+  "Delete component reated with [[create-component]]
+
+  `:opts` is map that every lifecycle receives as an argument and uses for various
+  purposes. You can provide your data to custom lifecycles, or extend default cljfx
+  behavior via these keys:
+  - `:fx.opt/type->lifecycle` — a function that gets called on every `:fx/type` value
+    in descriptions to determine what lifecycle will be used for that description
+  - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
+    of change-listener, event-handler or any other callback-like prop. It receives that
+    map with `:fx/event` key containing appropriate event data"
   ([component]
    (delete-component component {}))
   ([component opts]
@@ -87,11 +117,11 @@
   argument API
 
   Optional settings for this map:
-  - `:middleware` — function that transforms used lifecycle. All such functions in
-    `cljfx.api` namespace have `wrap-` prefix and can be composed with `comp`
+  - `:middleware` — function that transforms used lifecycle, such as [[wrap-map-desc]],
+    [[wrap-many]] or [[wrap-context-desc]]. Can be composed with `comp`
   - `:opts` — map that every lifecycle receives as an argument and uses for various
-    purposes. You can provide your data for custom lifecycles, or extend some default
-    cljfx behaviour via these keys:
+    purposes. You can provide your data to custom lifecycles, or extend default cljfx
+    behavior via these keys:
     - `:fx.opt/type->lifecycle` — a function that gets called on every `:fx/type` value
       in descriptions to determine what lifecycle will be used for that description
     - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
