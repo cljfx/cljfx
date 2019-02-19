@@ -29,14 +29,14 @@
                   :children [{:fx/type :label
                               :text (str "g = " gravity ", f = " friction)}]}}})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc (fn [state]
                                     {:fx/type root-view
                                      :state state}))
     :opts {:fx.opt/map-event-handler event-handler}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)
 
 ;; At this point, really tiny window appears that displays current gravity and
 ;; friction. We want to have an ability to change these values, so let's create
@@ -66,10 +66,10 @@
 
 ;; Now we updated our root function, but window didn't change. It happens
 ;; because cljfx has no way to know if definition of some component functions is
-;; changed. But we can ask app to refresh itself by calling it without any
+;; changed. But we can ask renderer to refresh itself by calling it without any
 ;; arguments:
 
-(app)
+(renderer)
 
 ;; Now small label got replaced with 2 sliders. Problem is, there are no labels
 ;; on them, so users can't really see what these sliders mean, so let's fix it:
@@ -102,7 +102,7 @@
                               :label "Friction"
                               :value friction}]}}})
 
-(app)
+(renderer)
 
 ;; Great, time to add a chart that uses gravity and friction, but first let's
 ;; try to display something dummy to make sure it works
@@ -143,7 +143,7 @@
                                           :label "Friction"
                                           :value friction}]}]}}})
 
-(app)
+(renderer)
 
 ;; Now chart is added to a window. Everything looks fine, time to do some
 ;; simulation:
@@ -171,7 +171,7 @@
                                       :x-value index
                                       :y-value y})))}]})
 
-(app)
+(renderer)
 
 ;; Okay, there are some results showing, but there is no bouncing, probably
 ;; gravity and friction have some weird values. It's time to make it all alive!
@@ -221,7 +221,7 @@
                                           :value friction
                                           :event ::set-friction}]}]}}})
 
-(app)
+(renderer)
 
 ;; Nice, now playing with sliders makes chart data change! And all this is
 ;; done in runtime! Looks like the problem was that gravity is too high, so as a
@@ -254,4 +254,4 @@
                                           :value friction
                                           :event ::set-friction}]}]}}})
 
-(app)
+(renderer)

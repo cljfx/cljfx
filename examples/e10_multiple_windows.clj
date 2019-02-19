@@ -2,8 +2,8 @@
   (:require [cljfx.api :as fx])
   (:import [javafx.stage Screen]))
 
-(def app
-  (fx/create-app :middleware fx/wrap-many))
+(def renderer
+  (fx/create-renderer :middleware fx/wrap-many))
 
 (defn window [{:keys [x y width height]}]
   {:fx/type :stage
@@ -36,7 +36,7 @@
       .getWidth
       (- width)))
 
-(app
+(renderer
   [{:fx/type window
     :x 0
     :y 0

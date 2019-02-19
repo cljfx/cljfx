@@ -167,8 +167,8 @@
                               :grid-pane/margin 5
                               :task-state :done}]}}})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (comp
                   fx/wrap-context-desc
                   (fx/wrap-map-desc (fn [_] {:fx/type root})))
@@ -176,4 +176,4 @@
            :fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
                                         (fx/fn->lifecycle-with-context %))}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

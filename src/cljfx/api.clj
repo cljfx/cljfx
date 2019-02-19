@@ -1,12 +1,12 @@
 (ns cljfx.api
-  (:require [cljfx.app :as app]
-            [cljfx.component :as component]
+  (:require [cljfx.component :as component]
+            [cljfx.context :as context]
             [cljfx.defaults :as defaults]
             [cljfx.event-handler :as event-handler]
             [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]
-            [cljfx.context :as context])
+            [cljfx.renderer :as renderer])
   (:import [javafx.application Platform]))
 
 (defonce initialized
@@ -46,12 +46,20 @@
   (lifecycle/wrap-many lifecycle))
 
 (defmacro on-fx-thread
-  "Execute body (in implicit do) on fx thread
+  "Execute body in implicit do on fx thread
 
-  Returns derefable with result of last expression of body. If current thread is already
-  fx thread, executes body immediately"
+  If current thread is already an fx thread, executes body immediately. Returns derefable
+  with result of last expression of body."
   [& body]
   `(platform/on-fx-thread ~@body))
+
+(defmacro run-later
+  "Asynchronously execute body in implicit do on fx thread
+
+  Will execute asynchronously even if already on fx thread. Returns derefable with result
+  of last expression of body"
+  [& body]
+  `(platform/run-later ~@body))
 
 (defn create-component
   "Create component from description and optional opts for manual management
@@ -106,11 +114,12 @@
   [component]
   (component/instance component))
 
-(defn create-app
+(defn create-renderer
   "Returns a stateful function that manages lifecycle of a component
 
-  This app function can be called from any thread with new description for a component,
-  and advances component on JavaFX application thread with most actual description
+  This renderer function can be called from any thread with new description for a
+  component. and advances component on JavaFX application thread with most actual
+  description
 
   It has special semantics for `nil` descriptions meaning absence of any description, this
   is used to have full access to lifecycle functions (create/advance/delete) with single
@@ -128,20 +137,20 @@
       of change-listener, event-handler or any other callback-like prop. It receives that
       map with `:fx/event` key containing appropriate event data
 
-  Calling app function with 0 arguments will re-render current state, which is useful
+  Calling renderer function with 0 arguments will re-render current state, which is useful
   during development"
   [& {:keys [middleware opts]
       :or {middleware identity
            opts {}}}]
-  (app/create middleware (defaults/fill-opts opts)))
+  (renderer/create middleware (defaults/fill-opts opts)))
 
-(defn mount-app
-  "Use `*ref` to provide descriptions for supplied `app` function
+(defn mount-renderer
+  "Use `*ref` to provide descriptions for supplied `renderer` function
 
-  This is a convenient function that adds watch to a ref + immediately calls app function
-  with `deref`-ed value"
-  [*ref app]
-  (app/mount *ref app))
+  This is a convenient function that adds watch to a ref + immediately calls renderer
+  function with `deref`-ed value"
+  [*ref renderer]
+  (renderer/mount *ref renderer))
 
 (defn create-context
   "Create a memoizing context for a map

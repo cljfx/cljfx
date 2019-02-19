@@ -70,8 +70,8 @@
                   (println (format "Bye! Your final words were \"%s\"" result))
                   (reset! *state :the-end)))})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (comp
                   (fx/wrap-map-desc
                     (fn [nuke-launch-stage]
@@ -84,4 +84,4 @@
                         nil)))
                   fx/wrap-many)))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

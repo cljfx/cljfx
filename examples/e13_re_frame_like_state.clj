@@ -196,8 +196,8 @@
                   :items [{:fx/type potion-list}
                           {:fx/type ingredient-list}]}}})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (comp
                   fx/wrap-context-desc
                   (fx/wrap-map-desc (fn [_] {:fx/type root-view})))
@@ -205,4 +205,4 @@
                                         (fx/fn->lifecycle-with-context %))
            :fx.opt/map-event-handler event-handler}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

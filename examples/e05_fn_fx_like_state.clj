@@ -39,9 +39,9 @@
 (defn map-event-handler [event]
   (swap! *state assoc (:key event) (:fx/event event)))
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc root)
     :opts {:fx.opt/map-event-handler map-event-handler}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

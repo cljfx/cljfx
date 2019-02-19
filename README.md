@@ -79,16 +79,16 @@ The overall mental model of these descriptions is this:
 - if prop x can be changed by user, there is a corresponding
   `:on-x-changed` prop for observing these changes
 
-### App
+### Renderer
 
 To be truly useful, there should be some state and changes over time,
-for this matter there is an `app` abstraction, which is a function that
-you may call whenever you want with new description, and
-cljfx will advance all the mutable state underneath to match this
-description. Example:
+for this matter there is a renderer abstraction, which is a function 
+that you may call whenever you want with new description, and cljfx will 
+advance all the mutable state underneath to match this description. 
+Example:
 ```clj
-(def app
-  (fx/create-app))
+(def renderer
+  (fx/create-renderer))
 
 (defn root [{:keys [showing]}]
   {:fx/type :stage
@@ -99,11 +99,11 @@ description. Example:
                   :children [{:fx/type :button
                               :text "close"
                               :on-action (fn [_]
-                                           (app {:fx/type root
-                                                 :showing false}))}]}}})
+                                           (renderer {:fx/type root
+                                                      :showing false}))}]}}})
 
-(app {:fx/type root
-      :showing true})
+(renderer {:fx/type root
+           :showing true})
 ```
 Evaluating this code will show this:
 
@@ -111,10 +111,10 @@ Evaluating this code will show this:
 
 Clicking `close` button will hide this window.
 
-App batches descriptions and re-renders views on fx thread only with last
-received description, so it is safe to call many times at once. Calls to app
-function return derefable that will contain component value with most recent
-description.
+Renderer batches descriptions and re-renders views on fx thread only 
+with last received description, so it is safe to call many times at 
+once. Calls to renderer function return derefable that will contain 
+component value with most recent description.
 
 ### Atoms
 
@@ -146,17 +146,17 @@ contents instead. Here is how it's done:
                              {:fx/type title-input
                               :title title}]}}})
 
-;; Create app with middleware that maps incoming data - description -
+;; Create renderer with middleware that maps incoming data - description -
 ;; to component description that can be used to render JavaFX state.
 ;; Here description is just passed as an argument to function component.
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc assoc :fx/type root)))
 
 ;; Convenient way to add watch to an atom + immediately render app
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)
 ```
 Evaluating code above pops up this window:
 
@@ -191,9 +191,9 @@ every change to this view (for example, when changing it's text),
 behavior.
 
 To mitigate these problems, cljfx allows to define event handlers as
-arbitrary maps, and provide a function to an app that performs actual
-handling of these map-events (with additional `:fx/event` key containing
-dispatched event):
+arbitrary maps, and provide a function to a renderer that performs 
+actual handling of these map-events (with additional `:fx/event` key 
+containing dispatched event):
 
 ```clj
 
@@ -216,11 +216,11 @@ dispatched event):
   (case (:event/type event)
     ::set-done (swap! *state assoc-in [:by-id (:id event) :done] (:fx/event event))))
 
-;; Provide map-event-handler to app as an option
+;; Provide map-event-handler to renderer as an option
 
-(fx/mount-app
+(fx/mount-renderer
   *state
-  (fx/create-app
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc assoc :fx/type root)
     :opts {:fx.opt/map-event-handler map-event-handler}))
 
@@ -230,9 +230,10 @@ You can see full example at [examples/e09_todo_app.clj](examples/e09_todo_app.cl
 
 ### Interactive development
 
-Another useful aspect of app function that should be used during development is
-refresh functionality: you can call app function with zero args and it will
-recreate all the components with current description.
+Another useful aspect of renderer function that should be used during 
+development is refresh functionality: you can call renderer function 
+with zero args and it will recreate all the components with current 
+description.
 
 See walk-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
 as an example of how to iterate on cljfx app in REPL.
@@ -444,8 +445,8 @@ Minimal app example using contexts:
                   :children [{:fx/type :label
                               :text (fx/sub context :title)}]}}})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (comp
                   ;; Pass context to every lifecycle as part of option map
                   fx/wrap-context-desc
@@ -455,7 +456,7 @@ Minimal app example using contexts:
                                         ;; context from option map to these functions
                                         (fx/fn->lifecycle-with-context %))}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)
 ```
 
 Using contexts effectively makes every fx-type function a subscription

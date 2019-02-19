@@ -30,8 +30,8 @@
                                 :label-text "Last Name"
                                 :key :last-name}]}}}))
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (comp
                   fx/wrap-context-desc
                   (fx/wrap-map-desc (fn [_]
@@ -39,4 +39,4 @@
     :opts {:fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
                                         (fx/fn->lifecycle-with-context %))}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

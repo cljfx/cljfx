@@ -20,8 +20,8 @@
              (= KeyCode/ESCAPE (.getCode ^KeyEvent (:fx/event e))))
     (reset! *state nil)))
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :opts {:fx.opt/map-event-handler map-event-handler}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

@@ -37,11 +37,11 @@
                                  :point point})
                               points)}}})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc (fn [points]
                                     {:fx/type root
                                      :points points}))
     :opts {:fx.opt/map-event-handler event-handler}))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

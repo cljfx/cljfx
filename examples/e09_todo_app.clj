@@ -59,8 +59,8 @@
                                             :done false}))))
     nil))
 
-(fx/mount-app
+(fx/mount-renderer
   *state
-  (fx/create-app
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc assoc :fx/type root)
     :opts {:fx.opt/map-event-handler map-event-handler}))

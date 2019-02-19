@@ -75,9 +75,9 @@
     ::set-volume (swap! *state assoc :volume (:fx/event e))
     (prn e)))
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :opts {:fx.opt/map-event-handler map-event-handler}
     :middleware (fx/wrap-map-desc root)))
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

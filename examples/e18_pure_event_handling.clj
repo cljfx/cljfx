@@ -36,7 +36,7 @@
     (catch Exception e
       (dispatch! (assoc (:on-exception v) :exception e)))))
 
-(def app-event-handler
+(def event-handler
   (-> events/event-handler
       (fx/wrap-co-effects
         {:fx/context (fx/make-deref-co-effect *state)})
@@ -46,18 +46,18 @@
          :http http-effect})
       (fx/wrap-async)))
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (comp
                   fx/wrap-context-desc
                   (fx/wrap-map-desc (fn [_] {:fx/type views/root})))
-    :opts {:fx.opt/map-event-handler app-event-handler
+    :opts {:fx.opt/map-event-handler event-handler
            :fx.opt/type->lifecycle #(or (fx/keyword->lifecycle %)
                                         (fx/fn->lifecycle-with-context %))}))
 
-(app-event-handler
+(event-handler
   {:event/type ::events/open-url
    :fx/sync true
    :url "https://github.com/cljfx/cljfx/"})
 
-(fx/mount-app *state app)
+(fx/mount-renderer *state renderer)

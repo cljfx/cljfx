@@ -43,8 +43,8 @@
                                                   (catch Exception e
                                                     (pprint/pprint e))))}}]}}})
 
-(def app
-  (fx/create-app
+(def renderer
+  (fx/create-renderer
     :middleware (fx/wrap-map-desc (fn [text]
                                     {:fx/type root-view
                                      :text text}))
@@ -52,4 +52,4 @@
                                          (fx/wrap-effects {:text (fx/make-reset-effect *text)})
                                          (fx/wrap-async))}))
 
-(fx/mount-app *text app)
+(fx/mount-renderer *text renderer)
