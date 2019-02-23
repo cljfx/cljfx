@@ -31,7 +31,7 @@
                   :coerce coerce/pref-or-computed-size-double
                   :default :use-computed-size]
       :opaque-insets [:setter lifecycle/scalar :coerce coerce/insets]
-      :padding [:setter lifecycle/scalar :coerce coerce/insets]
+      :padding [:setter lifecycle/scalar :coerce coerce/insets :default :empty]
       :pref-height [:setter lifecycle/scalar
                     :coerce coerce/computed-size-double
                     :default :use-computed-size]

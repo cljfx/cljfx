@@ -1,7 +1,7 @@
 (ns cljfx.api
   "Main API namespace for cljfx
 
-  Requiring this namespace starts JavaFX runtime"
+  Requiring this namespace starts JavaFX runtime if it wasn't previously started"
   (:require [cljfx.component :as component]
             [cljfx.context :as context]
             [cljfx.defaults :as defaults]
@@ -279,4 +279,28 @@
   `agent-options` is map that is passed to [[clojure.core/agent]], has default
   `:error-handler` that will print stack traces of thrown exceptions"
   [f & {:as agent-options}]
-  (event-handler/wrap-async f agent-options))
+  (event-handler/wrap-async
+    f
+    (defaults/fill-async-handler-options agent-options)))
+
+(defn create-app
+  [*context & {:keys [event-handler desc-fn co-effects effects async-agent-options]
+               :or {co-effects {}
+                    effects {}
+                    async-agent-options {}}}]
+  (let [handler (-> event-handler
+                    (event-handler/wrap-co-effects
+                      (defaults/fill-co-effects co-effects *context))
+                    (event-handler/wrap-effects
+                      (defaults/fill-effects effects *context))
+                    (event-handler/wrap-async
+                      (defaults/fill-async-handler-options async-agent-options)))
+        renderer (create-renderer
+                   :middleware (comp
+                                 wrap-context-desc
+                                 (wrap-map-desc desc-fn))
+                   :opts {:fx.opt/map-event-handler handler
+                          :fx.opt/type->lifecycle #(or (keyword->lifecycle %)
+                                                       (fn->lifecycle-with-context %))})]
+    (mount-renderer *context renderer)
+    {:renderer renderer}))

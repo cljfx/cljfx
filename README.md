@@ -196,7 +196,6 @@ actual handling of these map-events (with additional `:fx/event` key
 containing dispatched event):
 
 ```clj
-
 ;; Define view as just data
 
 (defn todo-view [{:keys [text id done]}]
@@ -778,7 +777,8 @@ To try them out:
 
 ## TODO
 
-- shortcut for fully-re-frame-like app?
+- shortcut for fully-re-frame-like app
+- `cljfx.api` ns doc
 
 ## Food for thought
 - make exceptions more informative

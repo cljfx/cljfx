@@ -1,5 +1,4 @@
-(ns cljfx.event-handler
-  (:require [cljfx.defaults :as defaults]))
+(ns cljfx.event-handler)
 
 (defn make-deref-co-effect [*ref]
   #(deref *ref))
@@ -31,12 +30,8 @@
   (when *maybe-promise
     (deliver *maybe-promise nil)))
 
-(defn- print-error-handler [_ ^Throwable e]
-  (.printStackTrace e))
-
 (defn wrap-async [f agent-options]
-  (let [with-defaults (defaults/provide agent-options :error-handler print-error-handler)
-        *agent (apply agent nil (mapcat identity with-defaults))]
+  (let [*agent (apply agent nil (mapcat identity agent-options))]
     (fn dispatch-async! [event]
       (if (:fx/sync event)
         (let [*promise (promise)]
