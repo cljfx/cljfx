@@ -332,7 +332,10 @@
   "Convenient starting point for apps with pure views, subscriptions and events
 
   Creates renderer that is mounted on `*context` containing context created by
-  [[create-context]].
+  [[create-context]]
+
+  Returns map with `:renderer` and `:handler` keys containing actual renderer and event
+  handler
 
   Accepted options:
   - `:event-handler` (required) - map event handler that should be a pure function.
@@ -340,19 +343,27 @@
     default available effects are `:context` to set a context to a new value and
     `:dispatch` to dispatch new event. Events are handled asynchronously.
   - `:desc-fn` (required) - function receiving context and returning view description
-  - `:co-effects` (optional, default {}) - additional co-effects map as described in
+  - `:co-effects` (optional, default `{}`) - additional co-effects map as described in
     [[wrap-co-effects]]
-  - `:effects` (optional, default {}) - additional effects map as described in
+  - `:effects` (optional, default `{}`) - additional effects map as described in
     [[wrap-effects]]
-  - `:async-agent-options` (optional, default {}) - agent options as described in
+  - `:async-agent-options` (optional, default `{}`) - agent options as described in
     [[wrap-async]]
+  - `:renderer-middleware` (optional, default `identity`) - additional renderer
+    middleware, such as [[wrap-many]]
 
   Note that since events are handled using agents, you'll need to call
   [[clojure.core/shutdown-agents]] to gracefully stop JVM"
-  [*context & {:keys [event-handler desc-fn co-effects effects async-agent-options]
+  [*context & {:keys [event-handler
+                      desc-fn
+                      co-effects
+                      effects
+                      async-agent-options
+                      renderer-middleware]
                :or {co-effects {}
                     effects {}
-                    async-agent-options {}}}]
+                    async-agent-options {}
+                    renderer-middleware identity}}]
   (let [handler (-> event-handler
                     (event-handler/wrap-co-effects
                       (defaults/fill-co-effects co-effects *context))
@@ -363,7 +374,8 @@
         renderer (create-renderer
                    :middleware (comp
                                  wrap-context-desc
-                                 (wrap-map-desc desc-fn))
+                                 (wrap-map-desc desc-fn)
+                                 renderer-middleware)
                    :opts {:fx.opt/map-event-handler handler
                           :fx.opt/type->lifecycle #(or (keyword->lifecycle %)
                                                        (fn->lifecycle-with-context %))})]

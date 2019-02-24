@@ -646,6 +646,29 @@ Most common mutator is `setter`, but there are some other, for example,
 `property-change-listener`, which uses `addListener` and
 `removeListener`.
 
+### Combining it all together
+
+Now that every piece is laid out, it's time to combine them into 
+application. What suits your needs is up to you, but if you plan to 
+build something non-trivial, you'll probably want to combine all of the
+pieces, and easiest way to start is using `create-app` function. It 
+accepts app atom, event handler and function producing view description
+and wires them all together:
+```clj
+(def app
+  (fx/create-app *context
+    :event-handler handle-event
+    :desc-fn (fn [_]
+               {:fx/type root-view})))
+```
+Using that as a starting point, you can build your application using 
+pure functions for everything: views, subscriptions, events. 
+`create-app` also allows some optional settings, such as `:effects`,
+`:co-effects` and `:async-agent-options` for configuring event handling 
+and `:renderer-middleware` for configuring renderer. An example of such
+application can be found at 
+[examples/e20_markdown_editor.clj](examples/e20_markdown_editor.clj).
+
 ### Gotchas
 
 #### `:fx/key` should be put on descriptions in a list, not inside these descriptions
@@ -774,11 +797,6 @@ To try them out:
    # user=> (require 'e15-task-tracker)
    # nil ;; window appears
    ```
-
-## TODO
-
-- `create-app` section in README
-- defaults -> api
 
 ## Food for thought
 - make exceptions more informative
