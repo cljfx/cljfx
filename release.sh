@@ -8,5 +8,5 @@ printf "Clojars Password: "
 read password
 printf "\n"
 stty echo
-CLOJARS_USERNAME=${username} CLOJARS_PASSWORD=${password} clj -A:deploy && echo "done"
+CLOJARS_USERNAME=${username} CLOJARS_PASSWORD=${password} clj -A:deploy
 rm cljfx.jar
