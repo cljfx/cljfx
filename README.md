@@ -777,7 +777,8 @@ To try them out:
 
 ## TODO
 
-- shortcut for fully-re-frame-like app
+- `create-app` section in README
+- defaults -> api
 - `cljfx.api` ns doc
 
 ## Food for thought

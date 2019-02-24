@@ -284,6 +284,26 @@
     (defaults/fill-async-handler-options agent-options)))
 
 (defn create-app
+  "Convenient starting point for apps with pure views, subscriptions and events
+
+  Creates renderer that is mounted on `*context` containing context created by
+  [[create-context]].
+
+  Accepted options:
+  - `:event-handler` (required) - map event handler that should be a pure function.
+    received current context at `:fx/context` key, should return effects description,
+    default available effects are `:context` to set a context to a new value and
+    `:dispatch` to dispatch new event. Events are handled asynchronously.
+  - `:desc-fn` (required) - function receiving context and returning view description
+  - `:co-effects` (optional, default {}) - additional co-effects map as described in
+    [[wrap-co-effects]]
+  - `:effects` (optional, default {}) - additional effects map as described in
+    [[wrap-effects]]
+  - `:async-agent-options` (optional, default {}) - agent options as described in
+    [[wrap-async]]
+
+  Note that since events are handling using agents, you'll need to call
+  [[clojure.core/shutdown-agents]] to gracefully stop JVM"
   [*context & {:keys [event-handler desc-fn co-effects effects async-agent-options]
                :or {co-effects {}
                     effects {}
@@ -303,4 +323,5 @@
                           :fx.opt/type->lifecycle #(or (keyword->lifecycle %)
                                                        (fn->lifecycle-with-context %))})]
     (mount-renderer *context renderer)
-    {:renderer renderer}))
+    {:renderer renderer
+     :handler handler}))
