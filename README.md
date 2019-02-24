@@ -779,7 +779,6 @@ To try them out:
 
 - `create-app` section in README
 - defaults -> api
-- `cljfx.api` ns doc
 
 ## Food for thought
 - make exceptions more informative
