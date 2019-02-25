@@ -2,7 +2,7 @@
 [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg)](https://clojars.org/cljfx)
 
 Cljfx is a declarative, functional and extensible wrapper of JavaFX
-mutability soup.
+inspired by better parts of react and re-frame.
 
 ## Rationale
 
