@@ -1,4 +1,5 @@
 (ns cljfx.fx.light-base
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.node :as fx.node]
             [cljfx.lifecycle :as lifecycle]

@@ -1,4 +1,5 @@
 (ns cljfx.fx.text-area
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.text-input-control :as fx.text-input-control]
             [cljfx.lifecycle :as lifecycle]

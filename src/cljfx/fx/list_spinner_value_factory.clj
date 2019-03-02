@@ -1,4 +1,5 @@
 (ns cljfx.fx.list-spinner-value-factory
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.spinner-value-factory :as fx.spinner-value-factory]
             [cljfx.lifecycle :as lifecycle]

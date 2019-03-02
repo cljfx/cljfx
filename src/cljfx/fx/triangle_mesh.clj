@@ -1,4 +1,5 @@
 (ns cljfx.fx.triangle-mesh
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])

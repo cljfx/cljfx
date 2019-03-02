@@ -1,4 +1,5 @@
 (ns cljfx.fx.radio-menu-item
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.menu-item :as fx.menu-item]

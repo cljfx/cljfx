@@ -1,4 +1,5 @@
 (ns cljfx.coerce
+  "Part of a public API"
   (:require [clojure.string :as str])
   (:import [java.util List]
            [javafx.event EventHandler]

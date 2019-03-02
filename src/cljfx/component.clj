@@ -1,4 +1,5 @@
-(ns cljfx.component)
+(ns cljfx.component
+  "Part of a public API")
 
 (defprotocol Component
   "Component is an immutable description of some (possibly mutable) object"

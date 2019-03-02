@@ -1,4 +1,5 @@
 (ns cljfx.fx.context-menu
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.popup-control :as fx.popup-control]

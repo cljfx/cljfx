@@ -1,4 +1,5 @@
 (ns cljfx.fx.reflection
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect Reflection]))

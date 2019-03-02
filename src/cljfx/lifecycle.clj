@@ -1,4 +1,11 @@
 (ns cljfx.lifecycle
+  "Part of a public API
+
+  All Lifecycle implementations should be treated as Lifecycle protocol implementations
+  only, their internals are subject to change
+
+  All Component implementations created by lifecycles should be treated as Component
+  protocol implementations only, their internals are subject to change"
   (:require [cljfx.component :as component]
             [cljfx.prop :as prop]
             [cljfx.context :as context]
@@ -16,8 +23,7 @@
   (let [type (:fx/type desc)
         type->lifecycle (:fx.opt/type->lifecycle opts)]
     (or (type->lifecycle type)
-        (throw (ex-info "Don't know how to get component lifecycle from :fx/type"
-                        {:desc desc})))))
+        type)))
 
 (defn- create-dynamic-component [lifecycle child-desc opts]
   (with-meta
@@ -424,3 +430,41 @@
                 (advance dynamic component (sub-context-fn desc opts) opts))
      `delete (fn [_ component opts]
                (delete dynamic component opts))}))
+
+(defn wrap-on-instance-lifecycle [lifecycle]
+  (with-meta
+    [::on-instance-lifecycle lifecycle]
+    {`create (fn [_ {:keys [on-created on-deleted desc]} opts]
+               (let [child (create lifecycle desc opts)]
+                 (when on-created
+                   (on-created (component/instance child)))
+                 (with-meta
+                   {:on-deleted on-deleted
+                    :child child}
+                   {`component/instance #(-> % :child component/instance)})))
+     `advance (fn [_ component {:keys [on-advanced on-deleted desc]} opts]
+                (let [old-child (:child component)
+                      old-instance (component/instance old-child)
+                      new-child (advance lifecycle old-child desc opts)
+                      new-instance (component/instance new-child)]
+                  (when (and on-advanced (not= old-instance new-instance))
+                    (on-advanced old-instance new-instance))
+                  (assoc component :child new-child :on-deleted on-deleted)))
+     `delete (fn [_ {:keys [child on-deleted]} opts]
+               (delete lifecycle child opts)
+               (when on-deleted
+                 (on-deleted (component/instance child))))}))
+
+(def instance-factory
+  (with-meta
+    [::instance-factory]
+    {`create (fn [_ {:keys [create]} _]
+               (with-meta
+                 {:create create
+                  :instance (create)}
+                 {`component/instance :instance}))
+     `advance (fn [_ component {:keys [create]} _]
+                (if (identical? create (:create component))
+                  component
+                  (assoc component :create create :instance (create))))
+     `delete (fn [_ _ _])}))

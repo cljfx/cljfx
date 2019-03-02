@@ -1,4 +1,5 @@
 (ns cljfx.fx.menu-bar
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.control :as fx.control]

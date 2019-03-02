@@ -1,4 +1,5 @@
 (ns cljfx.fx.camera
+  "Part of a public API"
   (:require [cljfx.lifecycle :as lifecycle]
             [cljfx.composite :as composite])
   (:import [javafx.scene Camera]))

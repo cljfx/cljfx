@@ -1,5 +1,6 @@
 # Cljfx
-[![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg)](https://clojars.org/cljfx)
+[![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
+[![Slack Channel](https://img.shields.io/badge/slack-cljfx@clojurians-blue.svg?logo=slack)](https://clojurians.slack.com/messages/cljfx/)
 
 Cljfx is a declarative, functional and extensible wrapper of JavaFX
 inspired by better parts of react and re-frame.
@@ -38,7 +39,7 @@ dependency:
  {cljfx {:git/uri "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}}
 ```
 Cljfx is also published on clojars, so you can add `cljfx` as a maven
-dependency, current version is on this badge: [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg)](https://clojars.org/cljfx)
+dependency, current version is on this badge: [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
 
 Minimum required version of clojure is 1.10, minimum JDK version is 11.
 
@@ -47,9 +48,14 @@ Minimum required version of clojure is 1.10, minimum JDK version is 11.
 ### Hello world
 
 Components in cljfx are described by maps with `:fx/type` key. By
-default, fx-type can be either a keyword corresponding to some JavaFX
-class, or a function, which receives this map as argument and returns
-another description. Minimal example:
+default, fx-type can be:
+- a keyword corresponding to some JavaFX class
+- a function, which receives this map as argument and returns
+  another description
+- an implementation of Lifecycle protocol (more on that in [extending 
+  cljfx](#extending-cljfx) section)
+
+Minimal example:
 ```clj
 (ns example
   (:require [cljfx.api :as fx]))
@@ -67,7 +73,7 @@ another description. Minimal example:
                     :children [{:fx/type :label
                                 :text "Hello world"}]}}}))
 ```
-Evaluating this code will create and show this window:
+Evaluating this code will create and show a window:
 
 ![](doc/hello-world.png)
 
@@ -616,12 +622,12 @@ Component is an immutable value representing some object in some state
 (that object may be mutable — usually it's a javafx object), that also
 has a reference to said object instance.
 
-Lifecycle is well, a lifecycle of a component. It gets created from a
-description once, advanced to new description zero or more times, and
-then deleted. Cljfx is a composition of multiple different lifecycles,
-each useful in their own place. `opts` is a map that contains some data
-used by different lifecycles. 2 opt keys that are used by
-default in cljfx are:
+Lifecycle is well, a lifecycle of a component. Component gets created 
+from a description once, advanced to new description zero or more times, 
+and then deleted. Cljfx is a composition of multiple different 
+lifecycles, each useful in their own place. `opts` is a map that 
+contains some data used by different lifecycles. 2 opt keys that are 
+used by default in cljfx are:
 - `:fx.opt/type->lifecycle` — used in `dynamic` lifecycle to select what
   lifecycle will be actually used for description based by value in
   `:fx/type` key.
@@ -645,6 +651,65 @@ receives `coerce` function which is called on value before applying it.
 Most common mutator is `setter`, but there are some other, for example,
 `property-change-listener`, which uses `addListener` and
 `removeListener`.
+
+### Extending cljfx
+
+Cljfx might have some missing parts that you'll want to fill. Not 
+everything can be configured with lifecycle opts and renderer 
+middleware, and in that case you are encouraged to create and use 
+extension lifecycles. Fx-types in descriptions can be implementations of 
+Lifecycle protocol, and with this escape hatch you get a lot more 
+freedom. Since these lifecycles can introduce different meanings for 
+what descriptions mean in their context, they should stand out from 
+other keyword or function lifecycles, and convention is to have `ext-` 
+prefix in their names. 
+ 
+#### Included extension lifecycles
+
+1. `fx/ext-instance-factory`
+
+   Using this extension lifecycle you can simply create a component 
+   using 0-argument factory function:
+   ```clj
+   (fx/instance
+     (fx/create-component
+       {:fx/type fx/ext-instance-factory
+        :create #(Duration/valueOf "10ms")}))
+   => #object[javafx.util.Duration 0x2f5eb358 "10.0 ms"]
+   ```
+   
+2. `fx/ext-on-instance-lifecycle`
+
+   You can use this lifecycle to additionally setup/tear down instance
+   of otherwise declaratively created value:
+   ```clj
+   (fx/instance
+     (fx/create-component
+       {:fx/type fx/ext-on-instance-lifecycle
+        :on-created #(prn "created" %)
+        :desc {:fx/type fx/ext-instance-factory
+               :create #(Duration/valueOf "10ms")}}))
+   ;; prints "created" #object[javafx.util.Duration 0x284cdce9 "10.0 ms"]
+   => #object[javafx.util.Duration 0x284cdce9 "10.0 ms"]
+   ```
+
+Examples of included extension lifecycles are available at 
+[examples/e21_extension_lifecycles.clj](examples/e21_extension_lifecycles.clj).
+
+#### Writing extension lifecycles
+
+If that's not enough, you can write your own, but this requires more 
+thorough knowledge of cljfx: take a look at 
+[cljfx.lifecycle](src/cljfx/lifecycle.clj) namespace to see how other 
+lifecycles are implemented.
+
+#### Wrapping other java-based JavaFX components
+
+There is `cljfx.composite/props` macro to create a prop-map for 
+arbitrary Java class. Also there is a `cljfx.composite/describe` macro
+that allows to construct a lifecycle from a class and a prop map, and 
+plenty of examples in `cljfx.fx.*` namespaces that can help you make
+custom java components for JavaFX cljfx-friendly.
 
 ### Combining it all together
 
@@ -798,14 +863,31 @@ To try them out:
    # nil ;; window appears
    ```
 
+## API stability, public and internal code
+
+Newer versions of cljfx should never introduce breaking changes, so if 
+an update broke something, please file a bug report. Growth of cljfx 
+should happen only by accretion (providing more), relaxation (requiring 
+less) and fixation (bashing bugs).
+
+This applies to public API of cljfx. `cljfx.api` namespace and all 
+behaviors that can be observed by using it are a public API. Other 
+namespaces have a docstring stating what is and is not a public API.
+
+Current shapes of values implementing `Lifecycle`, `Component` and 
+`Mutator` protocols are internal and subject to change: treat them as 
+a protocol implementations only. Context is not a protocol, but it's 
+shape is internal too. 
+
+Keywords with `fx` namespace in component descriptions are reserved: new
+ones may be introduced.
+
 ## Food for thought
 - make exceptions more informative
 - are controlled props possible? (controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations
-- how to handle animations and other possibly missed things?
 - update to same desc should be identical (component-vec)
-- optional flatten in wrap-many for maps?
 - expand on props and composite lifecycle. What's known about them:
   - ctor:
     - scene requires root, root can be replaced afterwards
@@ -825,5 +907,3 @@ To try them out:
   - caret in custom text input may have timer that restarts on typing
   - flipbook animation player needs to restart timer on FPS settings 
     change 
-- lifecycle that is just a function creating component instance may be 
-  useful

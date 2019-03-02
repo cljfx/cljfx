@@ -1,4 +1,5 @@
 (ns cljfx.fx.pie-chart
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.chart :as fx.chart])

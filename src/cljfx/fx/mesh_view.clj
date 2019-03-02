@@ -1,4 +1,5 @@
 (ns cljfx.fx.mesh-view
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.shape3d :as fx.shape3d])

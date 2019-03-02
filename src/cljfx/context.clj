@@ -1,4 +1,7 @@
 (ns cljfx.context
+  "Part of a public API
+
+  Context value should be treated a black box, it's shape is subject to change"
   (:require [clojure.set :as set])
   (:import [clojure.lang IPersistentMap Seqable]
            [java.io FileNotFoundException]))
@@ -145,7 +148,7 @@ Possible reasons:
     (recur s2 s1)
     (some #(contains? s2 %) s1)))
 
-(defn invalidate-cache [cache old-m new-m]
+(defn- invalidate-cache [cache old-m new-m]
   (let [changed-keys (into #{} (remove #(= (old-m %) (new-m %))) (keys old-m))
         changed-sub-ids (into #{} (map vector) changed-keys)]
     (reduce (fn [acc [k v]]

@@ -1,4 +1,5 @@
 (ns cljfx.fx.scatter-chart
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.xy-chart :as fx.xy-chart])
   (:import [javafx.scene.chart ScatterChart]))

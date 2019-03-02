@@ -1,4 +1,5 @@
 (ns cljfx.fx.tree-cell
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.indexed-cell :as fx.indexed-cell]

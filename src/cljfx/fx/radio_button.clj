@@ -1,4 +1,5 @@
 (ns cljfx.fx.radio-button
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.toggle-button :as fx.toggle-button]
             [cljfx.coerce :as coerce]

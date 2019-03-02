@@ -1,4 +1,5 @@
 (ns cljfx.fx.label
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.labeled :as fx.labeled]
             [cljfx.coerce :as coerce]

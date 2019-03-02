@@ -1,4 +1,5 @@
 (ns cljfx.fx.category-axis
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.axis :as fx.axis])

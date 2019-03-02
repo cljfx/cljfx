@@ -1,4 +1,5 @@
 (ns cljfx.fx.html-editor
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.control :as fx.control]
             [cljfx.lifecycle :as lifecycle])

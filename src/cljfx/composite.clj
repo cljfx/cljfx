@@ -1,4 +1,8 @@
 (ns cljfx.composite
+  "Part of a public API
+
+  [[lifecycle]] should be treated as a Lifecycle protocol implementation only, it's
+  internals are subject to change"
   (:require [cljfx.component :as component]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]

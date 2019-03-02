@@ -1,4 +1,5 @@
 (ns cljfx.fx.dialog-pane
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.pane :as fx.pane]
             [cljfx.lifecycle :as lifecycle]

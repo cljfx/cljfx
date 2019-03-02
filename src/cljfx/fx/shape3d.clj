@@ -1,4 +1,5 @@
 (ns cljfx.fx.shape3d
+  "Part of a public API"
   (:require [cljfx.coerce :as coerce]
             [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]

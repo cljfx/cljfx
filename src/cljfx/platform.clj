@@ -1,4 +1,5 @@
 (ns cljfx.platform
+  "Part of a public API"
   (:import [javafx.application Platform]))
 
 (defmacro run-later [& body]

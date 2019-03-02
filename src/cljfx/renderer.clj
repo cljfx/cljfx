@@ -1,10 +1,11 @@
 (ns cljfx.renderer
+  "Part of a public API"
   (:require [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]))
 
 (set! *warn-on-reflection* true)
 
-(defn complete-rendering [renderer desc component]
+(defn- complete-rendering [renderer desc component]
   (cond-> renderer
     :always (assoc :component component)
     (= desc (:desc renderer)) (dissoc :request)))

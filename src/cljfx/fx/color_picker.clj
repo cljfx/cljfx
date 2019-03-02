@@ -1,4 +1,5 @@
 (ns cljfx.fx.color-picker
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.combo-box-base :as fx.combo-box-base]

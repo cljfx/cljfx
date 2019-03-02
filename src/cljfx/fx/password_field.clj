@@ -1,4 +1,5 @@
 (ns cljfx.fx.password-field
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.text-field :as fx.text-field]
             [cljfx.coerce :as coerce]

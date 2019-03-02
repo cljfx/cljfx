@@ -1,4 +1,5 @@
 (ns cljfx.fx.media-player
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.mutator :as mutator]
             [cljfx.lifecycle :as lifecycle]

@@ -1,4 +1,5 @@
 (ns cljfx.fx.table-column
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.table-column-base :as fx.table-column-base]

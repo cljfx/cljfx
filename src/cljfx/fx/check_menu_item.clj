@@ -1,4 +1,5 @@
 (ns cljfx.fx.check-menu-item
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.menu-item :as fx.menu-item]
             [cljfx.lifecycle :as lifecycle]

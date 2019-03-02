@@ -1,4 +1,5 @@
 (ns cljfx.fx.motion-blur
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect MotionBlur]))

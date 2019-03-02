@@ -1,4 +1,5 @@
 (ns cljfx.fx.xy-chart
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.chart :as fx.chart]
             [cljfx.mutator :as mutator]

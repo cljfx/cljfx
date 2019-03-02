@@ -1,4 +1,5 @@
 (ns cljfx.fx.popup-window
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.window :as fx.window]
             [cljfx.lifecycle :as lifecycle]

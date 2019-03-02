@@ -1,4 +1,5 @@
 (ns cljfx.fx.progress-bar
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.progress-indicator :as fx.progress-indicator]
             [cljfx.coerce :as coerce]

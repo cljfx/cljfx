@@ -1,4 +1,5 @@
 (ns cljfx.fx.control
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.region :as fx.region])

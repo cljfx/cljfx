@@ -13,6 +13,9 @@
     - [[advance-component]] - changes previously created component to new description
     - [[delete-component]] - deletes previously created/advanced component
     - [[instance]] - get JavaFX object from component
+  - extension lifecycles:
+    - [[ext-instance-factory]] - manually create component instance
+    - [[ext-on-instance-lifecycle]] - observe created/advanced/deleted instances
   - automatic component lifecycle:
     - [[keyword->lifecycle]] - component/renderer `:fx.opt/type->lifecycle` opt function
       that returns lifecycle of keyword fx-types
@@ -131,6 +134,27 @@
   "Returns (usually mutable) Java object associated with this component"
   [component]
   (component/instance component))
+
+(def ext-instance-factory
+  "Extension lifecycle that allows to manually create an instance of a component
+
+  Supported keys:
+  - `:create` (required) - 0-arg function that creates new instance of a component"
+  lifecycle/instance-factory)
+
+(def ext-on-instance-lifecycle
+  "Extension lifecycle that can observe created/advanced/deleted component instances
+
+  Supported keys:
+  - `:desc` (required) - description of a component, instances of which will be observed
+  - `:on-created` (optional) - function that will receive instance of a component
+    described by `:desc` when it's created
+  - `:on-advanced` (optional) - function that will receive previous and new instance of a
+    component described by `:desc` when component's instance changes (as in gets replaced
+    with another instance, not changes it's content)
+  - `:on-deleted` (optional) - function that will receive instance of a component
+    described by `:desc` when it's deleted"
+  (lifecycle/wrap-on-instance-lifecycle lifecycle/dynamic))
 
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class

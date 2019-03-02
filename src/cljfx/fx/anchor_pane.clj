@@ -1,4 +1,5 @@
 (ns cljfx.fx.anchor-pane
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.pane :as fx.pane]

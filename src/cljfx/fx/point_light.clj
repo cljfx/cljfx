@@ -1,4 +1,5 @@
 (ns cljfx.fx.point-light
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.light-base :as fx.light-base])
   (:import [javafx.scene PointLight]))

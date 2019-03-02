@@ -1,4 +1,5 @@
 (ns cljfx.fx.parallel-camera
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.camera :as fx.camera])
   (:import [javafx.scene ParallelCamera]))

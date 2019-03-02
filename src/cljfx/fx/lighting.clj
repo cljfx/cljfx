@@ -1,4 +1,5 @@
 (ns cljfx.fx.lighting
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.effect Lighting]))

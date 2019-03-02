@@ -1,4 +1,5 @@
 (ns cljfx.fx.check-box
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]

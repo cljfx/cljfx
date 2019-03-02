@@ -1,4 +1,5 @@
 (ns cljfx.fx.text-field-list-cell
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.list-cell :as fx.list-cell]
             [cljfx.lifecycle :as lifecycle]

@@ -1,4 +1,5 @@
 (ns cljfx.fx.image-view
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.node :as fx.node]

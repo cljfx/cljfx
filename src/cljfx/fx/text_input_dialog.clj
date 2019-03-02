@@ -1,4 +1,5 @@
 (ns cljfx.fx.text-input-dialog
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.dialog :as fx.dialog]
             [cljfx.lifecycle :as lifecycle])

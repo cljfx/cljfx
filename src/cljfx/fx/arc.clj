@@ -1,4 +1,5 @@
 (ns cljfx.fx.arc
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.shape :as fx.shape]

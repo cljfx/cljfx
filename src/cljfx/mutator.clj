@@ -1,4 +1,8 @@
 (ns cljfx.mutator
+  "Part of a public API
+
+  All Mutator implementations should be treated as Mutator protocol implementations
+  only, their internals are subject to change"
   (:import [java.util Collection]
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.collections ObservableList]

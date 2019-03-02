@@ -1,4 +1,5 @@
 (ns cljfx.fx.h-line-to
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.path-element :as fx.path-element])

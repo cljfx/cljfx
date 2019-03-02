@@ -1,4 +1,5 @@
 (ns cljfx.fx.scale
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.transform :as fx.transform])

@@ -1,4 +1,5 @@
 (ns cljfx.fx.button
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.button-base :as fx.button-base]
             [cljfx.lifecycle :as lifecycle]

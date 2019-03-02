@@ -1,4 +1,5 @@
 (ns cljfx.defaults
+  "Part of a public API"
   (:require [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.event-handler :as event-handler]))

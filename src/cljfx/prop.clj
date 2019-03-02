@@ -1,4 +1,7 @@
 (ns cljfx.prop
+  "Part of a public API
+
+  Shape of a prop is internal and subject to change"
   (:require [cljfx.component :as component]
             [cljfx.mutator :as mutator]))
 

@@ -1,4 +1,5 @@
 (ns cljfx.fx.split-menu-button
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.menu-button :as fx.menu-button]
             [cljfx.coerce :as coerce]

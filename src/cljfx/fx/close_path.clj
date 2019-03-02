@@ -1,4 +1,5 @@
 (ns cljfx.fx.close-path
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.path-element :as fx.path-element])
   (:import [javafx.scene.shape ClosePath]))

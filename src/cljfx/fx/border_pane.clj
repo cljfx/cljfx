@@ -1,4 +1,5 @@
 (ns cljfx.fx.border-pane
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
             [cljfx.lifecycle :as lifecycle]

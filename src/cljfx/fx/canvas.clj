@@ -1,4 +1,5 @@
 (ns cljfx.fx.canvas
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]

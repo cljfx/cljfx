@@ -1,4 +1,5 @@
-(ns cljfx.event-handler)
+(ns cljfx.event-handler
+  "Part of a public API")
 
 (defn make-deref-co-effect [*ref]
   #(deref *ref))

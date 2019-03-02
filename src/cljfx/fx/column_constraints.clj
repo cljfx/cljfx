@@ -1,4 +1,5 @@
 (ns cljfx.fx.column-constraints
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce])

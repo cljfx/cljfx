@@ -1,4 +1,5 @@
 (ns cljfx.fx.bar-chart
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.xy-chart :as fx.xy-chart]

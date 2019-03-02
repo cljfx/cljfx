@@ -1,4 +1,5 @@
 (ns cljfx.fx.xy-chart-data
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene.chart XYChart$Data]))

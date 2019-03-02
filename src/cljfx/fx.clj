@@ -1,4 +1,5 @@
-(ns cljfx.fx)
+(ns cljfx.fx
+  "Part of a public API")
 
 (defmacro lazy-load [sym-expr]
   `(delay @(requiring-resolve '~sym-expr)))
@@ -170,5 +171,5 @@
    :text-input-dialog (lazy-load cljfx.fx.text-input-dialog/lifecycle)})
 
 (defn keyword->lifecycle [kw]
-  (when-let [delay (keyword->lifecycle-delay kw)]
-    @delay))
+  (when-let [*delay (keyword->lifecycle-delay kw)]
+    @*delay))

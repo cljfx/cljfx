@@ -1,4 +1,5 @@
 (ns cljfx.fx.indexed-cell
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.fx.cell :as fx.cell]
             [cljfx.coerce :as coerce]

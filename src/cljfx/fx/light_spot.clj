@@ -1,4 +1,5 @@
 (ns cljfx.fx.light-spot
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.light-point :as fx.light-point])

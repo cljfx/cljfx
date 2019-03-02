@@ -1,4 +1,5 @@
 (ns cljfx.fx.perspective-camera
+  "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.camera :as fx.camera])
