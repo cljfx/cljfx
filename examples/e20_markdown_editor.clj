@@ -63,6 +63,7 @@
 
 (defmethod md->fx :heading [{children :children {:keys [level]} :attrs}]
   {:fx/type :text-flow
+   :cache true
    :style-class ["heading" (str "level-" level)]
    :children (for [node children]
                {:fx/type md-view
@@ -70,6 +71,7 @@
 
 (defmethod md->fx :paragraph [{children :children}]
   {:fx/type :text-flow
+   :cache true
    :style-class "paragraph"
    :children (for [node children]
                {:fx/type md-view
@@ -77,10 +79,12 @@
 
 (defmethod md->fx :text [{{:keys [literal]} :attrs}]
   {:fx/type :text
+   :cache true
    :text literal})
 
 (defmethod md->fx :code [{{:keys [literal]} :attrs}]
   {:fx/type :label
+   :cache true
    :style-class "code"
    :text literal})
 
@@ -91,6 +95,7 @@
                :style-class ["scroll-pane" "code-block"]
                :fit-to-width true
                :content {:fx/type :label
+                         :cache true
                          :max-width ##Inf
                          :min-width :use-pref-size
                          :text literal}}]})
@@ -102,6 +107,7 @@
                :style-class ["scroll-pane" "code-block"]
                :fit-to-width true
                :content {:fx/type :label
+                         :cache true
                          :max-width ##Inf
                          :min-width :use-pref-size
                          :text literal}}]})
@@ -128,9 +134,11 @@
   (if (and (= 1 (count children))
            (= :text (:tag (first children))))
     {:fx/type :text
+     :cache true
      :style-class "strong-emphasis"
      :text (-> children first :attrs :literal)}
     {:fx/type :h-box
+     :cache true
      :style-class "strong-emphasis"
      :children (for [node children]
                  {:fx/type md-view
@@ -140,9 +148,11 @@
   (if (and (= 1 (count children))
            (= :text (:tag (first children))))
     {:fx/type :text
+     :cache true
      :style-class "emphasis"
      :text (-> children first :attrs :literal)}
     {:fx/type :h-box
+     :cache true
      :style-class "emphasis"
      :children (for [node children]
                  {:fx/type md-view

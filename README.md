@@ -883,6 +883,9 @@ Keywords with `fx` namespace in component descriptions are reserved: new
 ones may be introduced.
 
 ## Food for thought
+
+Internal list of ideas to explore:
+
 - make exceptions more informative
 - are controlled props possible? (controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
