@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to cljfx will be documented in this file.
+All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be documented in this file.
 
 ## [1.1.0] - 2019-03-03
 ### Added
