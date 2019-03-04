@@ -6,7 +6,7 @@ All notable changes to cljfx will be documented in this file.
 ### Added
 - Treat fx-type as Lifecycle if `:fx.opt/type->lifecycle` returned 
   falsey value;
-- Add some basic extension lifecycles: 
+- Add some basic [extension lifecycles](https://github.com/cljfx/cljfx#extending-cljfx): 
   - `fx/ext-instance-factory` to create component instances using 
     factory function;
   - `fx/ext-on-instance-lifecycle` to observe created/advanced/deleted
