@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be documented in this file.
+All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
+documented in this file.
+
+## [1.2.0] - 2019-03-12
+### Added
+- `fx/ext-let-refs` and `fx/ext-get-ref` [extension lifecycles](https://github.com/cljfx/cljfx#included-extension-lifecycles) 
+  that allow decoupling component lifecycle from component tree 
 
 ## [1.1.0] - 2019-03-03
 ### Added
