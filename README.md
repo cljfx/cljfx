@@ -692,6 +692,29 @@ prefix in their names.
    ;; prints "created" #object[javafx.util.Duration 0x284cdce9 "10.0 ms"]
    => #object[javafx.util.Duration 0x284cdce9 "10.0 ms"]
    ```
+   
+3. `fx/ext-let-refs` and `fx/ext-get-ref`
+
+   You can create managed components outside of component tree using 
+   `fx/ext-let-refs`, and then use instances of them, possibly in 
+   multiple places, using `fx/ext-get-ref`:
+   ```clj
+   {:fx/type fx/ext-let-refs
+    :refs {::button-a {:fx/type :button
+                       :text "Press Alt+A to focus on me"}}
+    :desc {:fx/type :v-box
+           :children [{:fx/type :label
+                       :text "Mnemonic _A"
+                       :mnemonic-parsing true
+                       :label-for {:fx/type fx/ext-get-ref
+                                   :ref ::button-a}}
+                      {:fx/type fx/ext-get-ref
+                       :ref ::button-a}]}}
+   ```
+   One use case is for using references in props that expect nodes in a 
+   scene graph (such as label's, `:label-for`), and another is having 
+   dialogs defined close to usage places, you can find an example of 
+   such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj) 
 
 Examples of included extension lifecycles are available at 
 [examples/e21_extension_lifecycles.clj](examples/e21_extension_lifecycles.clj).
@@ -886,6 +909,9 @@ ones may be introduced.
 
 Internal list of ideas to explore:
 
+- missing observable maps: Scene's getMnemonics and getAccelerators
+- `:row-factory` in tree-view/tree-table-view should be similar to cell 
+  factories
 - make exceptions more informative
 - are controlled props possible? (controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing

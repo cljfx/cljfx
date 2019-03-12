@@ -59,10 +59,10 @@
       :show-root [:setter lifecycle/scalar :default true]
       :sort-mode [:setter lifecycle/scalar :coerce (coerce/enum TreeSortMode)
                   :default :all-descendants]
-      ; :sort-order [:list] ;; should be list of refs to columns
+      :sort-order [:list lifecycle/dynamics]
       :sort-policy [:setter lifecycle/scalar :coerce tree-table-sort-policy
                     :default :default]
-      ; :tree-column [:setter lifecycle/dynamics] ;; should be a ref to column
+      :tree-column [:setter lifecycle/dynamic]
       :table-menu-button-visible [:setter lifecycle/scalar :default false])))
 
 (def lifecycle

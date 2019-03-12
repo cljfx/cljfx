@@ -16,10 +16,11 @@
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "label"]
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
-                        :default :text])))
+                        :default :text]
+      ;; definitions
+      :label-for [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  ;; TODO label has label-for prop - a component ref
   (composite/describe Label
     :ctor []
     :props props))

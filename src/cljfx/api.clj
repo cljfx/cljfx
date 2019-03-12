@@ -16,6 +16,9 @@
   - extension lifecycles:
     - [[ext-instance-factory]] - manually create component instance
     - [[ext-on-instance-lifecycle]] - observe created/advanced/deleted instances
+    - [[ext-let-refs]] - manage component lifecycles decoupled from component tree
+    - [[ext-get-ref]] - use offscreen component instance introduced by [[ext-let-refs]],
+      possibly in multiple places
   - automatic component lifecycle:
     - [[keyword->lifecycle]] - component/renderer `:fx.opt/type->lifecycle` opt function
       that returns lifecycle of keyword fx-types
@@ -155,6 +158,28 @@
   - `:on-deleted` (optional) - function that will receive instance of a component
     described by `:desc` when it's deleted"
   (lifecycle/wrap-on-instance-lifecycle lifecycle/dynamic))
+
+(def ext-let-refs
+  "Extension lifecycle that decouples component lifecycles from component tree
+
+  It manages a set of components identified by arbitrary keys, and returns another
+  component: a part of component tree that can access these offscreen component instances
+  via [[ext-get-ref]]. Using [[ext-let-refs]] with same keys in that scope will shadow
+  previously established \"bindings\"
+
+  Supported keys:
+  - `:refs` (required) - map from arbitrary keys to component descriptions
+  - `:desc` (required) - component description that will be a part of a component tree,
+    has access to components created in `:refs` using [[ext-get-ref]]"
+  (lifecycle/wrap-let-refs lifecycle/dynamic))
+
+(def ext-get-ref
+  "Extension lifecycle that returns component instance created by [[ext-let-refs]]
+
+  Supported keys:
+  - `:ref` (required) - component identifier used as a key in [[ext-let-ref]]'s `:refs`
+    map"
+  (lifecycle/get-ref :ref))
 
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class

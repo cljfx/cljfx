@@ -468,3 +468,51 @@
                   component
                   (assoc component :create create :instance (create))))
      `delete (fn [_ _ _])}))
+
+(defn wrap-let-refs [lifecycle]
+  (reify Lifecycle
+    (create [_ {:keys [desc refs]} opts]
+      (let [ref-components (reduce (fn [acc [k v]]
+                                     (assoc acc k (create lifecycle v opts)))
+                                   refs
+                                   refs)]
+        (with-meta
+          {:refs ref-components
+           :child (create lifecycle desc (update opts ::refs merge ref-components))}
+          {`component/instance #(-> % :child component/instance)})))
+    (advance [_ component {:keys [desc refs]} opts]
+      (let [old-refs (:refs component)
+            refs (reduce
+                   (fn [acc k]
+                     (let [old-e (find old-refs k)
+                           new-e (find refs k)]
+                       (cond
+                         (and (some? old-e) (some? new-e))
+                         (let [component (val old-e)
+                               desc (val new-e)]
+                           (assoc acc k (advance lifecycle component desc opts)))
+
+                         (some? old-e)
+                         (do (delete lifecycle (val old-e) opts)
+                             (dissoc acc k))
+
+                         :else
+                         (assoc acc k (create lifecycle (val new-e) opts)))))
+                   old-refs
+                   (set/union (set (keys old-refs))
+                              (set (keys refs))))]
+        (-> component
+            (assoc :refs refs)
+            (update :child #(advance lifecycle % desc (update opts ::refs merge refs))))))
+    (delete [_ {:keys [child refs]} opts]
+      (doseq [ref-component (vals refs)]
+        (delete lifecycle ref-component opts))
+      (delete lifecycle child opts))))
+
+(defn get-ref [desc->ref]
+  (reify Lifecycle
+    (create [_ desc opts]
+      (get-in opts [::refs (desc->ref desc)]))
+    (advance [_ _ desc opts]
+      (get-in opts [::refs (desc->ref desc)]))
+    (delete [_ _ _])))

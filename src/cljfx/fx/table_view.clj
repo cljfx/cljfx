@@ -57,7 +57,7 @@
                        lifecycle/scalar
                        :coerce (coerce/enum SelectionMode)
                        :default :single]
-      ; :sort-order [:list] ;; should be list of refs to columns
+      :sort-order [:list lifecycle/dynamics]
       :sort-policy [:setter lifecycle/scalar :coerce table-sort-policy
                     :default :default]
       :table-menu-button-visible [:setter lifecycle/scalar :default false])))

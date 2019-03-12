@@ -12,6 +12,52 @@
     (.setInterpolator Interpolator/EASE_OUT)
     (.play)))
 
+;; Imperative escape hatch in declarative world: you can use ext-on-instance-lifecycle to
+;; execute code when instance is created, replaced or deleted
+
+(defn ext-on-instance-lifecycle-example [_]
+  {:fx/type fx/ext-on-instance-lifecycle
+   :on-created animate-entrance
+   :desc {:fx/type :region
+          :pref-width 20
+          :pref-height 20
+          :style {:-fx-background-color :red}}})
+
+;; Use ext-instance-factory to just create an instance
+
+(defn ext-instance-factory-example [_]
+  {:fx/type fx/ext-instance-factory
+   :create #(doto (Region.)
+              (.setPrefWidth 20)
+              (.setPrefHeight 20)
+              (.setStyle "-fx-background-color: green;"))})
+
+;; Use ext-let-refs and ext-get-ref to decouple lifecycles from scene graph. It allows to
+;; have same exact component instances in different places
+
+(defn ext-ref-examples [_]
+  {:fx/type fx/ext-let-refs
+   :refs {::button-a {:fx/type :button
+                      :text "Press Alt+A to focus on me"}
+          ::button-b {:fx/type :button
+                      :text "Press Alt+B to focus on me"}}
+   :desc {:fx/type :v-box
+          :spacing 5
+          :children [{:fx/type :label
+                      :text "Mnemonic _A"
+                      :mnemonic-parsing true
+                      :label-for {:fx/type fx/ext-get-ref
+                                  :ref ::button-a}}
+                     {:fx/type fx/ext-get-ref
+                      :ref ::button-a}
+                     {:fx/type :label
+                      :text "Mnemonic _B"
+                      :mnemonic-parsing true
+                      :label-for {:fx/type fx/ext-get-ref
+                                  :ref ::button-b}}
+                     {:fx/type fx/ext-get-ref
+                      :ref ::button-b}]}})
+
 (fx/on-fx-thread
   (fx/create-component
     {:fx/type :stage
@@ -20,15 +66,8 @@
      :scene {:fx/type :scene
              :root {:fx/type :v-box
                     :alignment :center
+                    :fill-width false
                     :padding 100
-                    :children [{:fx/type fx/ext-on-instance-lifecycle
-                                :on-created animate-entrance
-                                :desc {:fx/type :region
-                                       :pref-width 20
-                                       :pref-height 20
-                                       :style {:-fx-background-color :red}}}
-                               {:fx/type fx/ext-instance-factory
-                                :create #(doto (Region.)
-                                           (.setPrefWidth 20)
-                                           (.setPrefHeight 20)
-                                           (.setStyle "-fx-background-color: green;"))}]}}}))
+                    :children [{:fx/type ext-on-instance-lifecycle-example}
+                               {:fx/type ext-instance-factory-example}
+                               {:fx/type ext-ref-examples}]}}}))
