@@ -36,7 +36,7 @@ more explicit and extensible lifecycle for components.
 Cljfx uses `tools.deps`, so you can add this repo with latest sha as a 
 dependency:
 ```edn
- {cljfx {:git/uri "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}}
+ {cljfx {:git/url "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}}
 ```
 Cljfx is also published on clojars, so you can add `cljfx` as a maven
 dependency, current version is on this badge: [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
