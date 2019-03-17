@@ -8,8 +8,17 @@
 
 (set! *warn-on-reflection* true)
 
+(defn- accelerators [m]
+  (persistent!
+    (reduce-kv
+      (fn [acc k v]
+        (assoc! acc (coerce/key-combination k) (coerce/runnable v)))
+      (transient {})
+      m)))
+
 (def props
   (composite/props Scene
+    :accelerators [:map (lifecycle/map-of lifecycle/event-handler) :coerce accelerators]
     :camera [:setter lifecycle/dynamic :default {:fx/type :parallel-camera}]
     :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
     :event-dispatcher [:setter lifecycle/scalar]

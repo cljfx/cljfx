@@ -32,21 +32,20 @@
     {`component/instance #(-> % :child component/instance)}))
 
 (def dynamic
-  (with-meta
-    [::dynamic]
-    {`create (fn [_ desc opts]
-               (let [lifecycle (desc->lifecycle desc opts)]
-                 (create-dynamic-component lifecycle desc opts)))
-     `advance (fn [_ component desc opts]
-                (let [lifecycle (:lifecycle component)
-                      new-lifecycle (desc->lifecycle desc opts)]
-                  (if (identical? lifecycle new-lifecycle)
-                    (-> component
-                        (update :child #(advance lifecycle % desc opts)))
-                    (do (delete lifecycle (:child component) opts)
-                        (create-dynamic-component new-lifecycle desc opts)))))
-     `delete (fn [_ component opts]
-               (delete (:lifecycle component) (:child component) opts))}))
+  (reify Lifecycle
+    (create [_ desc opts]
+      (let [lifecycle (desc->lifecycle desc opts)]
+        (create-dynamic-component lifecycle desc opts)))
+    (advance [_ component desc opts]
+      (let [lifecycle (:lifecycle component)
+            new-lifecycle (desc->lifecycle desc opts)]
+        (if (identical? lifecycle new-lifecycle)
+          (-> component
+              (update :child #(advance lifecycle % desc opts)))
+          (do (delete lifecycle (:child component) opts)
+              (create-dynamic-component new-lifecycle desc opts)))))
+    (delete [_ component opts]
+      (delete (:lifecycle component) (:child component) opts))))
 
 (def ^:dynamic *in-progress?* false)
 
@@ -516,3 +515,43 @@
     (advance [_ _ desc opts]
       (get-in opts [::refs (desc->ref desc)]))
     (delete [_ _ _])))
+
+(defn map-of [lifecycle]
+  (reify Lifecycle
+    (create [_ desc opts]
+      (let [comps (reduce-kv #(assoc %1 %2 (create lifecycle %3 opts)) desc desc)]
+        (with-meta
+          {:components comps
+           :instance (reduce-kv #(assoc %1 %2 (component/instance %3)) comps comps)}
+          {`component/instance :instance})))
+    (advance [_ component desc opts]
+      (loop [components (:components component)
+             instance (:instance component)
+             ks (set/union (set (keys desc))
+                           (set (keys components)))]
+        (if (empty? ks)
+          (assoc component :components components :instance instance)
+          (let [[k & rest-ks] ks
+                old-e (find components k)
+                new-e (find desc k)]
+            (cond
+              (and (some? old-e) (some? new-e))
+              (let [c (advance lifecycle (val old-e) (val new-e) opts)]
+                (recur (assoc components k c)
+                       (assoc instance k (component/instance c))
+                       rest-ks))
+
+              (some? old-e)
+              (do (delete lifecycle (val old-e) opts)
+                  (recur (dissoc components k)
+                         (dissoc instance k)
+                         rest-ks))
+
+              :else
+              (let [c (create lifecycle (val new-e) opts)]
+                (recur (assoc components k c)
+                       (assoc instance k (component/instance c))
+                       rest-ks)))))))
+    (delete [_ component opts]
+      (doseq [v (vals (:components component))]
+        (delete lifecycle v opts)))))

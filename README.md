@@ -712,7 +712,7 @@ prefix in their names.
                        :ref ::button-a}]}}
    ```
    One use case is for using references in props that expect nodes in a 
-   scene graph (such as label's, `:label-for`), and another is having 
+   scene graph (such as label's `:label-for`), and another is having 
    dialogs defined close to usage places, you can find an example of 
    such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj) 
 
@@ -909,7 +909,7 @@ ones may be introduced.
 
 Internal list of ideas to explore:
 
-- missing observable maps: Scene's getMnemonics and getAccelerators
+- missing observable maps: Scene's getMnemonics
 - `:row-factory` in tree-view/tree-table-view should be similar to cell 
   factories
 - make exceptions more informative

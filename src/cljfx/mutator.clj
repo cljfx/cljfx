@@ -5,7 +5,7 @@
   only, their internals are subject to change"
   (:import [java.util Collection]
            [javafx.beans.value ObservableValue ChangeListener]
-           [javafx.collections ObservableList]
+           [javafx.collections ObservableList ObservableMap]
            [javafx.scene Node]))
 
 (set! *warn-on-reflection* true)
@@ -55,6 +55,20 @@
                      (set-all! instance (coerce new-value))))
        `retract! (fn [_ instance _ _]
                    (set-all! instance []))})))
+
+(defn observable-map [get-map-fn]
+  (let [set-all! #(let [^ObservableMap m (get-map-fn %1)]
+                    (.clear m)
+                    (.putAll m %2))]
+    (with-meta
+      [::observable-map get-map-fn]
+      {`assign! (fn [_ instance coerce value]
+                  (set-all! instance (coerce value)))
+       `replace! (fn [_ instance coerce old-value new-value]
+                   (when-not (= old-value new-value)
+                     (set-all! instance (coerce new-value))))
+       `retract! (fn [_ instance _ _]
+                   (set-all! instance {}))})))
 
 (def forbidden
   (with-meta

@@ -134,7 +134,7 @@
         (x event)))
 
     :else
-    (throw (fail EventHandler x))))
+    (fail EventHandler x)))
 
 (defn runnable [x]
   (cond
@@ -146,7 +146,7 @@
     x
 
     :else
-    (throw (fail Runnable x))))
+    (fail Runnable x)))
 
 (defn point-3d [x]
   (cond

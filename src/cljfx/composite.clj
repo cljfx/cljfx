@@ -13,16 +13,14 @@
   (dissoc desc :fx/type))
 
 (defn- create-props [props-desc props-config opts]
-  (reduce
-    (fn [acc k]
+  (reduce-kv
+    (fn [acc k v]
       (let [prop-config (get props-config k)]
         (when-not prop-config
           (throw (ex-info "No such prop" {:prop k})))
-        (assoc acc k (lifecycle/create (prop/lifecycle prop-config)
-                                       (get props-desc k)
-                                       opts))))
+        (assoc acc k (lifecycle/create (prop/lifecycle prop-config) v opts))))
     props-desc
-    (keys props-desc)))
+    props-desc))
 
 (defn- create-composite-component [this desc opts]
   (let [props-desc (desc->props-desc desc)
@@ -116,6 +114,15 @@
     `(fn ~fn-name [~instance-sym]
        (~getter-expr ~instance-sym))))
 
+(defmacro observable-map [type-expr kw]
+  (let [instance-sym (with-meta (gensym "instance") {:tag type-expr})
+        getter-expr (symbol (apply str ".get" (map str/capitalize (-> kw
+                                                                      name
+                                                                      (str/split #"-")))))
+        fn-name (symbol (str "get-" (name kw)))]
+    `(fn ~fn-name [~instance-sym]
+       (~getter-expr ~instance-sym))))
+
 (defmacro property-change-listener [type-expr kw]
   (let [instance-sym (with-meta (gensym "instance") {:tag type-expr})
         property-name (second (re-matches #"on-(.+)-changed" (name kw)))
@@ -146,6 +153,10 @@
                                  :list
                                  `(mutator/observable-list
                                     (observable-list ~type-expr ~k))
+
+                                 :map
+                                 `(mutator/observable-map
+                                    (observable-map ~type-expr ~k))
 
                                  :property-change-listener
                                  `(mutator/property-change-listener
