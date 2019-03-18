@@ -10,10 +10,7 @@
                                    com.atlassian.commonmark/commonmark {:mvn/version "0.12.1"}
                                    de.codecentric.centerdevice/javafxsvg {:mvn/version "1.3.0"}}}
            :cache {:extra-deps {org.clojure/core.cache {:mvn/version "0.7.1"}}}
-           :dev {:extra-paths ["dev"]
-                 :jvm-opts ["-Djdk.attach.allowAttachSelf"]
-                 :extra-deps {com.clojure-goes-fast/clj-async-profiler {:mvn/version "0.3.0"}
-                              criterium {:mvn/version "0.4.4"}}}
+           :dev {:extra-paths ["dev"]}
            :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
            :test {:extra-paths ["test"]
                   :extra-deps {metosin/testit {:mvn/version "0.2.0"}}}
