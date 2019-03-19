@@ -24,6 +24,10 @@
     :ctor []
     :props props))
 
+;; proxy-super uses reflection because updateItem is protected
+
+(set! *warn-on-reflection* false)
+
 (defn create [f]
   (let [*props (volatile! {})]
     (proxy [TableCell] []
