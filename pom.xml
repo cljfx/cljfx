@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cljfx</groupId>
   <artifactId>cljfx</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
   <name>cljfx</name>
   <dependencies>
     <dependency>
@@ -14,27 +14,27 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>12-ea+10</version>
+      <version>12</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-base</artifactId>
-      <version>12-ea+10</version>
+      <version>12</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <version>12-ea+10</version>
+      <version>12</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-media</artifactId>
-      <version>12-ea+10</version>
+      <version>12</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-web</artifactId>
-      <version>12-ea+10</version>
+      <version>12</version>
     </dependency>
   </dependencies>
   <build>

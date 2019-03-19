@@ -3,9 +3,14 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## [1.2.2] - 2019-03-19
+### Changed
+- Update JavaFX dependencies to latest stable release
+- Don't warn on reflection where reflection is unavoidable
+
 ## [1.2.1] - 2019-03-17
 ### Added
-- support `:accelerators` prop in scene ([example](examples/e23_accelerators.clj))
+- Support `:accelerators` prop in scene ([example](examples/e23_accelerators.clj))
 
 ## [1.2.0] - 2019-03-12
 ### Added
