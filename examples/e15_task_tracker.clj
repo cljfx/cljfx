@@ -124,7 +124,12 @@
 
 (defn column [{:keys [task-state]}]
   {:fx/type :v-box
-   :style {:-fx-background-color "#ddd"}
+   :style {:-fx-background-color "#ddd"
+           :-fx-background-radius 2}
+   :effect {:fx/type :drop-shadow
+            :radius 8
+            :offset-y 2
+            :color "#0004"}
    :padding 5
    :spacing 15
    :children [{:fx/type :h-box

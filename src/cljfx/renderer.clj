@@ -6,16 +6,17 @@
 (set! *warn-on-reflection* true)
 
 (defn- complete-rendering [renderer desc component]
-  (cond-> renderer
-    :always (assoc :component component)
-    (= desc (:desc renderer)) (dissoc :request)))
+  (let [with-component (assoc renderer :component component)]
+    (if (= desc (:desc renderer))
+      (dissoc with-component :request)
+      (assoc with-component :request (promise)))))
 
 (defn- perform-render
   "Re-renders component on fx thread
 
   Since advancing is a mutating operation on dom, it can't be in `swap!` which
   may retry it. During advancing new render request may arrive, in that case we
-  immediately re-render component to always view it's actual state"
+  enqueue another re-render component to not lock JavaFX application thread"
   [*renderer]
   (let [{:keys [desc component render-fn request]} @*renderer
         [new-component ^Exception exception] (try
@@ -24,9 +25,9 @@
                                                  [component e]))
         new-renderer (swap! *renderer complete-rendering desc new-component)]
     (some-> exception .printStackTrace)
-    (if (:request new-renderer)
-      (recur *renderer)
-      (deliver request new-component))))
+    (deliver request new-component)
+    (when (:request new-renderer)
+      (platform/run-later (perform-render *renderer)))))
 
 (defn- or-new-promise [x]
   (or x (promise)))
