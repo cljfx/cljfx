@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## [1.2.3](https://github.com/cljfx/cljfx/releases/tag/1.2.3) - 2019-03-20
+### Fixed
+- Improved responsiveness in the presence of flood of description changes,
+  see [examples/e24_concurrency.clj](examples/e24_concurrency.clj)
+
 ## [1.2.2](https://github.com/cljfx/cljfx/releases/tag/1.2.2) - 2019-03-19
 ### Changed
 - Update JavaFX dependencies to latest stable release
