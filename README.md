@@ -837,15 +837,19 @@ Some notable coercion examples and approaches:
 
 There are some "synthetic" properties that provide needed functionality
 usually used through some other API:
-- canvas has a `:draw` prop that is a function that receives Canvas as
+- Canvas has a `:draw` prop that is a function that receives Canvas as
   an argument and should use it to draw on it
-- media player has `:state` prop that can be either `:playing`,
+- MediaPlayer has `:state` prop that can be either `:playing`,
   `:paused` or `:stopped`, and will call `play`/`pause`/`stop` methods
   on media player when this prop is changed
-- `:selection-mode` prop set selection mode enum on selection model of a
-  control
-- `:url` prop of web view will call `load` method on this view's web
+- `:selection-mode` prop sets selection mode enum on selection model of
+  a control
+- `:url` prop of WebView will call `load` method on this view's web
   engine
+- Tooltip has `:install-to` prop that is a node component to install 
+  tooltip to. Note that all controls have `:tooltip` prop in JavaFX,
+  so `:install-to` is needed only to allow installing tooltips to other
+  types of nodes. See example in [examples/e26_tooltips.clj](examples/e26_tooltips.clj).
 
 #### No local mutable state
 
