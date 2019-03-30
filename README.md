@@ -1,4 +1,5 @@
-# Cljfx
+<img src="doc/logo.svg" width="128">
+
 [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
 [![Slack Channel](https://img.shields.io/badge/slack-cljfx@clojurians-blue.svg?logo=slack)](https://clojurians.slack.com/messages/cljfx/)
 
