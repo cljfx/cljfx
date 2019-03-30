@@ -76,3 +76,7 @@
 (defn mount [*ref renderer]
   (add-watch *ref [`mount renderer] #(renderer %4))
   (renderer @*ref))
+
+(defn unmount [*ref renderer]
+  (remove-watch *ref [`mount renderer])
+  (renderer nil))

@@ -34,6 +34,7 @@
       and passes down the description tree, used with [[fn->lifecycle-with-context]]
     - [[create-renderer]] - create function that automatically handles component lifecycle
     - [[mount-renderer]] - watch `*ref` for updates and re-render component
+    - [[unmount-renderer]] - stop watching `*ref` for updates and tear down component
   - context:
     - [[create-context]] - wrap map in a black box that memoizes function subscriptions to
       it
@@ -263,6 +264,14 @@
   function with `deref`-ed value"
   [*ref renderer]
   (renderer/mount *ref renderer))
+
+(defn unmount-renderer
+  "Stop using `*ref` to provide descriptions for renderer and tear down component tree
+
+  This is a convenient function that removes a watch added by [[mount-renderer]] +
+  immediately calls renderer function with `nil`"
+  [*ref renderer]
+  (renderer/unmount *ref renderer))
 
 (defn create-context
   "Create a memoizing context for a map
