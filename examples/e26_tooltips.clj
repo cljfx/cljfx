@@ -3,6 +3,8 @@
   (:import [javafx.scene.input ScrollEvent]))
 
 ;; Hover over circle, observe tooltip indicating radius, scroll to change it
+;; Note that this tooltip configuration only needed for non-control tooltips, because
+;; controls have `:tooltip` prop which makes it easier to specify tooltips for them
 
 (def *radius
   (atom 20))

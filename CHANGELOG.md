@@ -3,6 +3,13 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## [1.2.4](https://github.com/cljfx/cljfx/releases/tag/1.2.4) - 2019-03-30
+### Added
+- `:install-to` synthetic prop for Tooltips to allow declarative tooltip installation
+  to non-control components ([example](examples/e26_tooltips.clj))
+- `fx/unmount-renderer` function to remove watch from `*ref` that was added by
+  `fx/mount-renderer` and then tear down component tree
+
 ## [1.2.3](https://github.com/cljfx/cljfx/releases/tag/1.2.3) - 2019-03-20
 ### Fixed
 - Improved responsiveness in the presence of flood of description changes,
