@@ -555,3 +555,24 @@
     (delete [_ component opts]
       (doseq [v (vals (:components component))]
         (delete lifecycle v opts)))))
+
+(defn- create-if-desc-component [lifecycle child-desc opts]
+  (with-meta
+    {:lifecycle lifecycle
+     :child (create lifecycle child-desc opts)}
+    {`component/instance #(-> % :child component/instance)}))
+
+(defn if-desc [pred then-lifecycle else-lifecycle]
+  (reify Lifecycle
+    (create [_ desc opts]
+      (let [lifecycle (if (pred desc) then-lifecycle else-lifecycle)]
+        (create-if-desc-component lifecycle desc opts)))
+    (advance [_ component desc opts]
+      (let [old-lifecycle (:lifecycle component)
+            new-lifecycle (if (pred desc) then-lifecycle else-lifecycle)]
+        (if (identical? old-lifecycle new-lifecycle)
+          (update component :child #(advance old-lifecycle % desc opts))
+          (do (delete old-lifecycle (:child component) opts)
+              (create-if-desc-component new-lifecycle desc opts)))))
+    (delete [_ component opts]
+      (delete (:lifecycle component) (:child component) opts))))

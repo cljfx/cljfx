@@ -130,6 +130,7 @@
    :menu-button (lazy-load cljfx.fx.menu-button/lifecycle)
    :split-menu-button (lazy-load cljfx.fx.split-menu-button/lifecycle)
    :toggle-button (lazy-load cljfx.fx.toggle-button/lifecycle)
+   :toggle-group (lazy-load cljfx.fx.toggle-group/lifecycle)
    :radio-button (lazy-load cljfx.fx.radio-button/lifecycle)
    :label (lazy-load cljfx.fx.label/lifecycle)
    :list-view (lazy-load cljfx.fx.list-view/lifecycle)

@@ -16,7 +16,11 @@
       :style-class [:list lifecycle/scalar :coerce coerce/style-class
                     :default ["radio-menu-item" "menu-item"]]
       ;; definitions
-      :selected [:setter lifecycle/scalar :default false])))
+      :selected [:setter lifecycle/scalar :default false]
+      :on-selected-changed [:property-change-listener
+                            (lifecycle/wrap-coerce lifecycle/event-handler
+                                                   coerce/change-listener)]
+      :toggle-group [:setter lifecycle/dynamic])))
 
 (def lifecycle
   (composite/describe RadioMenuItem

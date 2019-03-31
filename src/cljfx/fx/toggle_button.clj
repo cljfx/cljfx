@@ -4,7 +4,7 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.fx.button-base :as fx.button-base]
             [cljfx.coerce :as coerce])
-  (:import [javafx.scene.control ToggleButton]
+  (:import [javafx.scene.control ToggleButton ToggleGroup]
            [javafx.scene AccessibleRole]))
 
 (set! *warn-on-reflection* true)
@@ -20,7 +20,12 @@
       :mnemonic-parsing [:setter lifecycle/scalar :default true]
       ;; definitions
       :selected [:setter lifecycle/scalar :default false]
-      :toggle-group [:setter lifecycle/scalar])))
+      :on-selected-changed [:property-change-listener
+                            (lifecycle/wrap-coerce lifecycle/event-handler
+                                                   coerce/change-listener)]
+      :toggle-group [:setter (lifecycle/if-desc #(instance? ToggleGroup %)
+                               lifecycle/scalar
+                               lifecycle/dynamic)])))
 
 (def lifecycle
   (composite/describe ToggleButton
