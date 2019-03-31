@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    
   <modelVersion>4.0.0</modelVersion>
-    
   <groupId>cljfx</groupId>
-    
   <artifactId>cljfx</artifactId>
-    
   <version>1.2.5</version>
-    
   <name>cljfx</name>
-    
   <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -43,18 +37,13 @@
       <version>12</version>
     </dependency>
   </dependencies>
-    
   <build>
-        
     <sourceDirectory>src</sourceDirectory>
-      
   </build>
-    
   <repositories>
     <repository>
       <id>clojars</id>
       <url>https://repo.clojars.org/</url>
     </repository>
   </repositories>
-  
 </project>

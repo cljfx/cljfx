@@ -3,7 +3,7 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-## [1.2.5](https://github.com/cljfx/cljfx/releases/tag/1.2.4) - 2019-03-31
+## [1.2.5](https://github.com/cljfx/cljfx/releases/tag/1.2.5) - 2019-03-31
 ### Added
 - ToggleGroup support
 - allow specifying `:toggle-group` in ToggleButton's descriptions declaratively ([example](examples/e25_radio_buttons.clj))
