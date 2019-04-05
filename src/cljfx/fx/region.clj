@@ -3,14 +3,14 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.fx.node :as fx.node])
+            [cljfx.fx.parent :as fx.parent])
   (:import [javafx.scene.layout Region]))
 
 (set! *warn-on-reflection* true)
 
 (def props
   (merge
-    fx.node/props
+    fx.parent/props
     (composite/props Region
       ;; overrides
       :pick-on-bounds [:setter lifecycle/scalar :default true]

@@ -1,10 +1,10 @@
 (ns cljfx.fx.web-view
   "Part of a public API"
   (:require [cljfx.composite :as composite]
-            [cljfx.fx.node :as fx.node]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator])
+            [cljfx.mutator :as mutator]
+            [cljfx.fx.parent :as fx.parent])
   (:import [javafx.scene.web WebView]
            [javafx.scene.text FontSmoothingType]
            [javafx.geometry NodeOrientation]))
@@ -13,7 +13,7 @@
 
 (def props
   (merge
-    fx.node/props
+    fx.parent/props
     (composite/props WebView
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "web-view"]
