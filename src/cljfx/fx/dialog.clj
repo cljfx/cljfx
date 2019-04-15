@@ -37,6 +37,7 @@
     :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-showing [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
+    :owner [(mutator/setter #(.initOwner ^Dialog %1 %2)) lifecycle/dynamic]
     :resizable [:setter lifecycle/scalar :default false]
     :result [:setter lifecycle/scalar]
     :result-converter [:setter lifecycle/scalar :coerce result-converter]

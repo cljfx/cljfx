@@ -29,6 +29,7 @@
                  lifecycle/scalar
                  :coerce (coerce/enum Modality)
                  :default :none]
+      :owner [(mutator/setter #(.initOwner ^Stage %1 %2)) lifecycle/dynamic]
       :resizable [:setter lifecycle/scalar :default true]
       :scene [:setter lifecycle/dynamic]
       :title [:setter lifecycle/scalar]
