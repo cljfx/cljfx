@@ -3,9 +3,13 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## [1.2.7](https://github.com/cljfx/cljfx/releases/tag/1.2.7) - 2019-04-15
+### Added
+- `:owner` prop for Stage and Dialog classes
+
 ## [1.2.6](https://github.com/cljfx/cljfx/releases/tag/1.2.6) - 2019-04-05
 ### Added
-- :stylesheets support in components extending Parent
+- `:stylesheets` support in components extending Parent
 
 ## [1.2.5](https://github.com/cljfx/cljfx/releases/tag/1.2.5) - 2019-03-31
 ### Added
