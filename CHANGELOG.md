@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## [1.2.8](https://github.com/cljfx/cljfx/releases/tag/1.2.8) - 2019-04-17
+### Added
+- `:on-focused-changed` prop for Window class
+
 ## [1.2.7](https://github.com/cljfx/cljfx/releases/tag/1.2.7) - 2019-04-15
 ### Added
 - `:owner` prop for Stage and Dialog classes

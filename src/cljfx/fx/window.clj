@@ -12,6 +12,9 @@
     :event-dispatcher [:setter lifecycle/scalar]
     :force-integer-render-scale [:setter lifecycle/scalar :default false]
     :height [:setter lifecycle/scalar :coerce double :default Double/NaN]
+    :on-focused-changed [:property-change-listener
+                         (lifecycle/wrap-coerce lifecycle/event-handler
+                                                coerce/change-listener)]
     :on-close-request [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-hidden [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-hiding [:setter lifecycle/event-handler :coerce coerce/event-handler]
