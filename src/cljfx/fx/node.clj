@@ -18,6 +18,7 @@
     :cache-hint [:setter lifecycle/scalar :coerce (coerce/enum CacheHint)
                  :default :default]
     :cache [:setter lifecycle/scalar :default false]
+    :clip [:setter lifecycle/dynamic]
     :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
     :depth-test [:setter lifecycle/scalar :coerce (coerce/enum DepthTest)]
     :disable [:setter lifecycle/scalar :default false]
