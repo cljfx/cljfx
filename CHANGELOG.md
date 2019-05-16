@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## [1.2.10](https://github.com/cljfx/cljfx/releases/tag/1.2.10) - 2019-05-16
+### Fixed
+- Bring back accidentally disabled `:image-view` props: `:y`, `:fit-width`,
+  `:fit-height`, `:preserve-ratio`, `:smooth` and `:viewport`
+
 ## [1.2.9](https://github.com/cljfx/cljfx/releases/tag/1.2.9) - 2019-05-14
 ### Added
 - `:clip` prop on Node

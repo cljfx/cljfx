@@ -22,13 +22,13 @@
                          :default :left-to-right]
       ;; definitions
       :image [:setter lifecycle/scalar :coerce coerce/image]
-      :x [:setter lifecycle/scalar :coerce double, :default 0
-          :y [:setter lifecycle/scalar :coerce double, :default 0]
-          :fit-width [:setter lifecycle/scalar :coerce double, :default 0]
-          :fit-height [:setter lifecycle/scalar :coerce double, :default 0]
-          :preserve-ratio [:setter lifecycle/scalar :default false]
-          :smooth [:setter lifecycle/scalar :default ImageView/SMOOTH_DEFAULT]
-          :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d]])))
+      :x [:setter lifecycle/scalar :coerce double, :default 0]
+      :y [:setter lifecycle/scalar :coerce double, :default 0]
+      :fit-width [:setter lifecycle/scalar :coerce double, :default 0]
+      :fit-height [:setter lifecycle/scalar :coerce double, :default 0]
+      :preserve-ratio [:setter lifecycle/scalar :default false]
+      :smooth [:setter lifecycle/scalar :default ImageView/SMOOTH_DEFAULT]
+      :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d])))
 
 (def lifecycle
   (composite/describe ImageView
