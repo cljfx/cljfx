@@ -383,7 +383,7 @@
   can be used to enqueue more events for asynchronous handling
 
   `agent-options` is map that is passed to [[clojure.core/agent]], has default
-  `:error-handler` that will print stack traces of thrown exceptions"
+  `:error-handler` that will print stack traces of thrown Throwables"
   [f & {:as agent-options}]
   (event-handler/wrap-async
     f
@@ -412,6 +412,9 @@
     [[wrap-async]]
   - `:renderer-middleware` (optional, default `identity`) - additional renderer
     middleware, such as [[wrap-many]]
+  - `:renderer-error-handler` (optional, prints Exception stack traces and re-throws
+    Errors by default) - 1-argument function that will receive Throwables thrown during
+    advancing
 
   Note that since events are handled using agents, you'll need to call
   [[clojure.core/shutdown-agents]] to gracefully stop JVM"
@@ -420,11 +423,13 @@
                       co-effects
                       effects
                       async-agent-options
-                      renderer-middleware]
+                      renderer-middleware
+                      renderer-error-handler]
                :or {co-effects {}
                     effects {}
                     async-agent-options {}
-                    renderer-middleware identity}}]
+                    renderer-middleware identity
+                    renderer-error-handler renderer/default-error-handler}}]
   (let [handler (-> event-handler
                     (event-handler/wrap-co-effects
                       (defaults/fill-co-effects co-effects *context))
@@ -433,6 +438,7 @@
                     (event-handler/wrap-async
                       (defaults/fill-async-handler-options async-agent-options)))
         renderer (create-renderer
+                   :error-handler renderer-error-handler
                    :middleware (comp
                                  wrap-context-desc
                                  (wrap-map-desc desc-fn)
