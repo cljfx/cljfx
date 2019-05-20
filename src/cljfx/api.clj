@@ -249,13 +249,16 @@
     - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
       of change-listener, event-handler or any other callback-like prop. It receives that
       map with `:fx/event` key containing appropriate event data
+  - `:error-handler` - 1-argument function that will receive Throwables thrown during
+    advancing, by default will print stack traces of Exceptions and re-throw Errors
 
   Calling renderer function with 0 arguments will re-render current state, which is useful
   during development"
-  [& {:keys [middleware opts]
+  [& {:keys [middleware opts error-handler]
       :or {middleware identity
-           opts {}}}]
-  (renderer/create middleware (defaults/fill-opts opts)))
+           opts {}
+           error-handler renderer/default-error-handler}}]
+  (renderer/create middleware (defaults/fill-opts opts) error-handler))
 
 (defn mount-renderer
   "Use `*ref` to provide descriptions for supplied `renderer` function

@@ -18,13 +18,14 @@
   may retry it. During advancing new render request may arrive, in that case we
   enqueue another re-render component to not lock JavaFX application thread"
   [*renderer]
-  (let [{:keys [desc component render-fn request]} @*renderer
-        [new-component ^Exception exception] (try
-                                               [(render-fn component desc) nil]
-                                               (catch Exception e
-                                                 [component e]))
+  (let [{:keys [desc component render-fn request] :as state} @*renderer
+        [new-component e] (try
+                            [(render-fn component desc) nil]
+                            (catch Throwable e
+                              [component e]))
         new-renderer (swap! *renderer complete-rendering desc new-component)]
-    (some-> exception .printStackTrace)
+    (when (some? e)
+      ((:error-handler state) e))
     (deliver request new-component)
     (when (:request new-renderer)
       (platform/run-later (perform-render *renderer)))))
@@ -61,17 +62,26 @@
     :else
     (lifecycle/advance lifecycle component desc opts)))
 
-(defn create [middleware opts]
-  (let [lifecycle (middleware lifecycle/root)
-        *renderer (atom {:component nil
-                         :render-fn #(render-component lifecycle %1 %2 opts)})]
-    (fn render
-      ([]
-       (let [desc (:desc @*renderer)]
-         @(render nil)
-         (render desc)))
-      ([desc]
-       (request-render *renderer desc)))))
+(defn default-error-handler [e]
+  (if (instance? Exception e)
+    (.printStackTrace ^Exception e)
+    (throw e)))
+
+(defn create
+  ([middleware opts]
+   (create middleware opts default-error-handler))
+  ([middleware opts error-handler]
+   (let [lifecycle (middleware lifecycle/root)
+         *renderer (atom {:component nil
+                          :error-handler error-handler
+                          :render-fn #(render-component lifecycle %1 %2 opts)})]
+     (fn render
+       ([]
+        (let [desc (:desc @*renderer)]
+          @(render nil)
+          (render desc)))
+       ([desc]
+        (request-render *renderer desc))))))
 
 (defn mount [*ref renderer]
   (add-watch *ref [`mount renderer] #(renderer %4))
