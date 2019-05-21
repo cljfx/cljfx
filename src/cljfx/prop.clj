@@ -1,13 +1,24 @@
 (ns cljfx.prop
   "Part of a public API
 
-  Shape of a prop is internal and subject to change"
+  Shape of a prop config is internal and subject to change"
   (:require [cljfx.component :as component]
             [cljfx.mutator :as mutator]))
 
-(defn make [mutator lifecycle & {:keys [coerce default]
-                                 :or {coerce identity
-                                      default ::no-default}}]
+(defn make
+  "Creates a prop config that describes how to manage a prop value and how to assign it
+
+  `mutator` is a Mutator that will assign prop value to a mutable java object
+  `lifecycle` is a Lifecycle for a prop value whose instance will be assigned whenever it
+  changes
+  Additional options:
+  - `:coerce` (optional, default `identity`) - last mile value transformation before
+    assigning it to a mutable java object
+  - `:default` (optional) - default non-coerced value that will be assigned to a mutable
+    java object when prop is removed from a prop map"
+  [mutator lifecycle & {:keys [coerce default]
+                        :or {coerce identity
+                             default ::no-default}}]
   {:mutator (if (= default ::no-default)
               mutator
               (mutator/wrap-default mutator default))

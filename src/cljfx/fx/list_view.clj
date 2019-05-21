@@ -3,10 +3,11 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator]
             [cljfx.fx.control :as fx.control]
-            [cljfx.fx.text-field-list-cell :as fx.text-field-list-cell])
-  (:import [javafx.scene.control ListView SelectionMode]
+            [cljfx.fx.text-field-list-cell :as fx.text-field-list-cell]
+            [cljfx.ext.selection-model :as ext.selection-model]
+            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
+  (:import [javafx.scene.control ListView SelectionModel]
            [javafx.geometry Orientation]
            [javafx.scene AccessibleRole]
            [javafx.util Callback]))
@@ -20,6 +21,9 @@
               (call [_ _]
                 (fx.text-field-list-cell/create x)))
     :else (coerce/fail Callback x)))
+
+(defn- get-selection-model ^SelectionModel [^ListView view]
+  (.getSelectionModel view))
 
 (def props
   (merge
@@ -42,16 +46,13 @@
       :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
                     :default :vertical]
       :placeholder [:setter lifecycle/dynamic]
-      :on-selected-item-changed [(mutator/property-change-listener
-                                   #(.selectedItemProperty
-                                      (.getSelectionModel ^ListView %)))
-                                 (lifecycle/wrap-coerce lifecycle/event-handler
-                                                        coerce/change-listener)]
-      :selection-mode [(mutator/setter
-                         #(.setSelectionMode (.getSelectionModel ^ListView %1) %2))
-                       lifecycle/scalar
-                       :coerce (coerce/enum SelectionMode)
-                       :default :single])))
+      ;; deprecated, use [[cljfx.ext.list-view/with-selection-props]] instead
+      :on-selected-item-changed (ext.selection-model/on-selected-item-changed-prop
+                                  get-selection-model)
+      ;; deprecated, use [[cljfx.ext.list-view/with-selection-props]] instead
+      :selection-mode (ext.multiple-selection-model/selection-mode-prop
+                        get-selection-model
+                        :single))))
 
 (def lifecycle
   (composite/describe ListView

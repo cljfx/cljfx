@@ -3,9 +3,10 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator]
-            [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TreeTableView SelectionMode TreeSortMode]
+            [cljfx.fx.control :as fx.control]
+            [cljfx.ext.selection-model :as ext.selection-model]
+            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
+  (:import [javafx.scene.control TreeTableView TreeSortMode MultipleSelectionModel]
            [javafx.util Callback]
            [javafx.scene AccessibleRole]))
 
@@ -23,6 +24,9 @@
     (instance? Callback x) x
     (= :default x) TreeTableView/DEFAULT_SORT_POLICY
     :else (coerce/fail Callback x)))
+
+(defn- get-selection-model ^MultipleSelectionModel [^TreeTableView tree-table-view]
+  (.getSelectionModel tree-table-view))
 
 (def props
   (merge
@@ -46,16 +50,13 @@
       :placeholder [:setter lifecycle/dynamic]
       :root [:setter lifecycle/dynamic]
       :row-factory [:setter lifecycle/scalar]
-      :on-selected-item-changed [(mutator/property-change-listener
-                                   #(.selectedItemProperty
-                                      (.getSelectionModel ^TreeTableView %)))
-                                 (lifecycle/wrap-coerce lifecycle/event-handler
-                                                        coerce/change-listener)]
-      :selection-mode [(mutator/setter
-                         #(.setSelectionMode (.getSelectionModel ^TreeTableView %1) %2))
-                       lifecycle/scalar
-                       :coerce (coerce/enum SelectionMode)
-                       :default :single]
+      ;; deprecated, use [[cljfx.ext.tree-table-view/with-selection-props]] instead
+      :on-selected-item-changed (ext.selection-model/on-selected-item-changed-prop
+                                  get-selection-model)
+      ;; deprecated, use [[cljfx.ext.tree-table-view/with-selection-props]] instead
+      :selection-mode (ext.multiple-selection-model/selection-mode-prop
+                        get-selection-model
+                        :single)
       :show-root [:setter lifecycle/scalar :default true]
       :sort-mode [:setter lifecycle/scalar :coerce (coerce/enum TreeSortMode)
                   :default :all-descendants]

@@ -715,7 +715,7 @@ prefix in their names.
    One use case is for using references in props that expect nodes in a 
    scene graph (such as label's `:label-for`), and another is having 
    dialogs defined close to usage places, you can find an example of 
-   such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj)
+   such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj) 
 
 4. `fx/ext-many`
 
@@ -736,7 +736,15 @@ prefix in their names.
    See [examples/e10_multiple_windows.clj](examples/e10_multiple_windows.clj)
    and [examples/e17_dialogs.clj](examples/e17_dialogs.clj)
 
-Examples of included extension lifecycles are available at 
+5. `fx/make-ext-with-props`
+
+   Using this function you can create extension lifecycles that handle whatever
+   additional props you need. These props will be applied after props of
+   original lifecycle. There are some predefined lifecycles providing extra
+   props for controlling default selection models in TabPane, ListView,
+   TableView, TreeView and TreeTableView, see [examples/e27_selection_models.clj](examples/e27_selection_models.clj).
+
+Examples of included extension lifecycles are available at
 [examples/e21_extension_lifecycles.clj](examples/e21_extension_lifecycles.clj).
 
 #### Writing extension lifecycles
@@ -862,14 +870,8 @@ usually used through some other API:
 - MediaPlayer has `:state` prop that can be either `:playing`,
   `:paused` or `:stopped`, and will call `play`/`pause`/`stop` methods
   on media player when this prop is changed
-- `:selection-mode` prop sets selection mode enum on selection model of
-  a control
 - `:url` prop of WebView will call `load` method on this view's web
   engine
-- Tooltip has `:install-to` prop that is a node component to install 
-  tooltip to. Note that all controls have `:tooltip` prop in JavaFX,
-  so `:install-to` is needed only to allow installing tooltips to other
-  types of nodes. See example in [examples/e26_tooltips.clj](examples/e26_tooltips.clj).
 
 #### No local mutable state
 

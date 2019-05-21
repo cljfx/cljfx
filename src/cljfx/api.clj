@@ -19,7 +19,8 @@
     - [[ext-let-refs]] - manage component lifecycles decoupled from component tree
     - [[ext-get-ref]] - use offscreen component instance introduced by [[ext-let-refs]],
       possibly in multiple places
-    - [[ext-many]] - create a vector of components
+    - [[ext-many]] - manage a vector of components
+    - [[make-ext-with-props]] - create lifecycle that uses user-defined props
   - automatic component lifecycle:
     - [[keyword->lifecycle]] - component/renderer `:fx.opt/type->lifecycle` opt function
       that returns lifecycle of keyword fx-types
@@ -191,6 +192,18 @@
   (-> lifecycle/dynamic
       lifecycle/wrap-many
       (lifecycle/wrap-map-desc :desc)))
+
+(defn make-ext-with-props
+  "Creates extension lifecycle that provides additional props to a component
+
+  `props-config` is a map from arbitrary keys to values created by [[cljfx.prop/make]]
+
+  Returned extension lifecycle supports these keys:
+  - `:desc` (required) - component description whose instance will be modified by provided
+    props
+  - `:props` (optional) - a prop map that will be handled by provided `props-config`"
+  [props-config]
+  (lifecycle/make-ext-with-props lifecycle/dynamic props-config))
 
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class

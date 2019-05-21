@@ -141,29 +141,28 @@
             (partition 2)
             (mapcat
               (fn [[k v]]
-                (when-not (vector? v)
-                  (throw (ex-info "Prop description should be a vector"
-                                  {:k k :v v})))
-                (let [[mutator & args] v
-                      prop `(prop/make
-                              ~(case mutator
-                                 :setter
-                                 `(mutator/setter (setter ~type-expr ~k))
+                (if (vector? v)
+                  (let [[mutator & args] v
+                        prop `(prop/make
+                                ~(case mutator
+                                   :setter
+                                   `(mutator/setter (setter ~type-expr ~k))
 
-                                 :list
-                                 `(mutator/observable-list
-                                    (observable-list ~type-expr ~k))
+                                   :list
+                                   `(mutator/observable-list
+                                      (observable-list ~type-expr ~k))
 
-                                 :map
-                                 `(mutator/observable-map
-                                    (observable-map ~type-expr ~k))
+                                   :map
+                                   `(mutator/observable-map
+                                      (observable-map ~type-expr ~k))
 
-                                 :property-change-listener
-                                 `(mutator/property-change-listener
-                                    (property-change-listener ~type-expr ~k))
-                                 mutator)
-                              ~@args)]
-                  [k prop]))))))
+                                   :property-change-listener
+                                   `(mutator/property-change-listener
+                                      (property-change-listener ~type-expr ~k))
+                                   mutator)
+                                ~@args)]
+                    [k prop])
+                  [k v]))))))
 
 (defmacro describe [type-expr & kvs]
   (let [kv-map (apply hash-map kvs)]

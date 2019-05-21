@@ -20,9 +20,7 @@
       :mnemonic-parsing [:setter lifecycle/scalar :default true]
       ;; definitions
       :selected [:setter lifecycle/scalar :default false]
-      :on-selected-changed [:property-change-listener
-                            (lifecycle/wrap-coerce lifecycle/event-handler
-                                                   coerce/change-listener)]
+      :on-selected-changed [:property-change-listener lifecycle/change-listener]
       :toggle-group [:setter (lifecycle/if-desc #(instance? ToggleGroup %)
                                lifecycle/scalar
                                lifecycle/dynamic)])))

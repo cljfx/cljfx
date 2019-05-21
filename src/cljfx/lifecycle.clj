@@ -7,6 +7,7 @@
   All Component implementations created by lifecycles should be treated as Component
   protocol implementations only, their internals are subject to change"
   (:require [cljfx.component :as component]
+            [cljfx.coerce :as coerce]
             [cljfx.prop :as prop]
             [cljfx.context :as context]
             [clojure.set :as set]))
@@ -151,6 +152,12 @@
                   component
                   (create-event-handler-component desc opts)))
      `delete (fn [_ _ _])}))
+
+(def change-listener
+  (wrap-coerce event-handler coerce/change-listener))
+
+(def list-change-listener
+  (wrap-coerce event-handler coerce/list-change-listener))
 
 (defn wrap-factory [lifecycle]
   (with-meta
@@ -366,6 +373,7 @@
            (if (identical? instance new-instance)
              (update with-child :props advance-prop-map props-desc props-config instance opts)
              (do
+               ;; TODO this is wrong, should re-create props
                (doseq [[k v] props-desc]
                  (prop/assign! (get props-config k) new-instance v))
                (assoc with-child :props props-desc)))))
@@ -375,6 +383,50 @@
          (doseq [[k v] (:props component)]
            (delete (prop/lifecycle (get props-config k)) v opts))
          (delete lifecycle (:child component) opts))})))
+
+(defn- props-on [props-config instance]
+  (reify Lifecycle
+    (create [_ desc opts]
+      (reduce-kv
+        (fn [acc k v]
+          (let [prop (get props-config k)
+                prop-value (create (prop/lifecycle prop) v opts)]
+            (prop/assign! prop instance prop-value)
+            (assoc acc k prop-value)))
+        desc
+        desc))
+    (advance [_ component desc opts]
+      (advance-prop-map component desc props-config instance opts))
+    (delete [_ component opts]
+      (doseq [[k v] component]
+        (delete (prop/lifecycle (get props-config k)) v opts)))))
+
+(defn make-ext-with-props [lifecycle props-config]
+  (reify Lifecycle
+    (create [_ {child-desc :desc props-desc :props} opts]
+      (let [child (create lifecycle child-desc opts)
+            instance (component/instance child)
+            props-lifecycle (props-on props-config instance)]
+        (with-meta {:child child
+                    :props-lifecycle props-lifecycle
+                    :props (create props-lifecycle props-desc opts)}
+                   {`component/instance #(-> % :child component/instance)})))
+    (advance [_ component {child-desc :desc props-desc :props} opts]
+      (let [{:keys [child props props-lifecycle]} component
+            old-instance (component/instance child)
+            new-child (advance lifecycle child child-desc opts)
+            new-instance (component/instance new-child)
+            with-child (assoc component :child new-child)]
+        (if (identical? old-instance new-instance)
+          (assoc with-child :props (advance props-lifecycle props props-desc opts))
+          (do
+            (delete props-lifecycle props opts)
+            (let [new-props-lifecycle (props-on props-config new-instance)]
+              (assoc with-child :props-lifecycle new-props-lifecycle
+                                :props (create new-props-lifecycle props-desc opts)))))))
+    (delete [_ {:keys [child props props-lifecycle]} opts]
+      (delete props-lifecycle props opts)
+      (delete lifecycle child opts))))
 
 (defn wrap-on-delete [lifecycle f]
   (with-meta

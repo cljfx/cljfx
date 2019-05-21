@@ -24,9 +24,7 @@
                     :default :horizontal]
       :unit-increment [:setter lifecycle/scalar :coerce double :default 1.0]
       :value [:setter lifecycle/scalar :coerce double :default 0.0]
-      :on-value-changed [:property-change-listener
-                         (lifecycle/wrap-coerce lifecycle/event-handler
-                                                coerce/change-listener)]
+      :on-value-changed [:property-change-listener lifecycle/change-listener]
       :visible-amount [:setter lifecycle/scalar :coerce double :default 15.0])))
 
 (def lifecycle

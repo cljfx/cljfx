@@ -47,9 +47,7 @@
       :hmax [:setter lifecycle/scalar :coerce double :default 1.0]
       :hmin [:setter lifecycle/scalar :coerce double :default 0.0]
       :hvalue [:setter lifecycle/scalar :coerce double :default 0.0]
-      :on-hvalue-changed [:property-change-listener
-                          (lifecycle/wrap-coerce lifecycle/event-handler
-                                                 coerce/change-listener)]
+      :on-hvalue-changed [:property-change-listener lifecycle/change-listener]
       :min-viewport-height [:setter lifecycle/scalar :coerce double :default 0.0]
       :min-viewport-width [:setter lifecycle/scalar :coerce double :default 0.0]
       :pannable [:setter lifecycle/scalar :default false]
@@ -62,9 +60,7 @@
       :vmax [:setter lifecycle/scalar :coerce double :default 1.0]
       :vmin [:setter lifecycle/scalar :coerce double :default 0.0]
       :vvalue [:setter lifecycle/scalar :coerce double :default 0.0]
-      :on-vvalue-changed [:property-change-listener
-                          (lifecycle/wrap-coerce lifecycle/event-handler
-                                                 coerce/change-listener)])))
+      :on-vvalue-changed [:property-change-listener lifecycle/change-listener])))
 
 (def lifecycle
   (composite/describe ScrollPane

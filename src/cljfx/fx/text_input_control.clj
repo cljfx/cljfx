@@ -28,7 +28,5 @@
                                (when-not (= text (.getText control))
                                  (.setText control text))))
              lifecycle/scalar]
-      :on-text-changed [:property-change-listener
-                        (lifecycle/wrap-coerce lifecycle/event-handler
-                                               coerce/change-listener)]
+      :on-text-changed [:property-change-listener lifecycle/change-listener]
       :text-formatter [:setter lifecycle/scalar :coerce text-formatter])))

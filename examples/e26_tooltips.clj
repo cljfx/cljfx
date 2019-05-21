@@ -1,5 +1,6 @@
 (ns e26-tooltips
-  (:require [cljfx.api :as fx])
+  (:require [cljfx.api :as fx]
+            [cljfx.ext.node :as fx.ext.node])
   (:import [javafx.scene.input ScrollEvent]))
 
 ;; Hover over circle, observe tooltip indicating radius, scroll to change it
@@ -10,16 +11,13 @@
   (atom 20))
 
 (defn- circle-view [{:keys [radius]}]
-  {:fx/type fx/ext-let-refs
-   :refs {::node {:fx/type :circle
-                  :radius radius
-                  :on-scroll {:event/type ::scroll}}}
-   :desc {:fx/type fx/ext-let-refs
-          :refs {::tooltip {:fx/type :tooltip
-                            :show-duration [1 :h]
-                            :text (str "My radius is " radius)
-                            :install-to {:fx/type fx/ext-get-ref :ref ::node}}}
-          :desc {:fx/type fx/ext-get-ref :ref ::node}}})
+  {:fx/type fx.ext.node/with-tooltip-props
+   :props {:tooltip {:fx/type :tooltip
+                     :show-duration [1 :h]
+                     :text (str "My radius is " radius)}}
+   :desc {:fx/type :circle
+          :radius radius
+          :on-scroll {:event/type ::scroll}}})
 
 (def renderer
   (fx/create-renderer

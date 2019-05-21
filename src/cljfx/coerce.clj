@@ -28,7 +28,8 @@
            [javafx.scene.input KeyCombination KeyCode]
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.beans Observable InvalidationListener]
-           [java.io InputStream]))
+           [java.io InputStream]
+           [javafx.collections ListChangeListener]))
 
 (set! *warn-on-reflection* true)
 
@@ -489,6 +490,19 @@
 
     :else
     (fail ChangeListener x)))
+
+(defn list-change-listener ^ListChangeListener [x]
+  (cond
+    (instance? ListChangeListener x)
+    x
+
+    (fn? x)
+    (reify ListChangeListener
+      (onChanged [_ change]
+        (x (vec (.getList change)))))
+
+    :else
+    (fail ListChangeListener x)))
 
 (defn style-class [x]
   (if (string? x) [x] x))

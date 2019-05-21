@@ -63,7 +63,6 @@
 
 (defmethod md->fx :heading [{children :children {:keys [level]} :attrs}]
   {:fx/type :text-flow
-   :cache true
    :style-class ["heading" (str "level-" level)]
    :children (for [node children]
                {:fx/type md-view
@@ -71,7 +70,6 @@
 
 (defmethod md->fx :paragraph [{children :children}]
   {:fx/type :text-flow
-   :cache true
    :style-class "paragraph"
    :children (for [node children]
                {:fx/type md-view
@@ -80,11 +78,13 @@
 (defmethod md->fx :text [{{:keys [literal]} :attrs}]
   {:fx/type :text
    :cache true
+   :cache-hint :speed
    :text literal})
 
 (defmethod md->fx :code [{{:keys [literal]} :attrs}]
   {:fx/type :label
    :cache true
+   :cache-hint :speed
    :style-class "code"
    :text literal})
 
@@ -96,6 +96,7 @@
                :fit-to-width true
                :content {:fx/type :label
                          :cache true
+                         :cache-hint :speed
                          :max-width ##Inf
                          :min-width :use-pref-size
                          :text literal}}]})
@@ -108,6 +109,7 @@
                :fit-to-width true
                :content {:fx/type :label
                          :cache true
+                         :cache-hint :speed
                          :max-width ##Inf
                          :min-width :use-pref-size
                          :text literal}}]})
@@ -135,6 +137,7 @@
            (= :text (:tag (first children))))
     {:fx/type :text
      :cache true
+     :cache-hint :speed
      :style-class "strong-emphasis"
      :text (-> children first :attrs :literal)}
     {:fx/type :h-box
@@ -149,10 +152,10 @@
            (= :text (:tag (first children))))
     {:fx/type :text
      :cache true
+     :cache-hint :speed
      :style-class "emphasis"
      :text (-> children first :attrs :literal)}
     {:fx/type :h-box
-     :cache true
      :style-class "emphasis"
      :children (for [node children]
                  {:fx/type md-view
@@ -185,6 +188,8 @@
                 :spacing 4
                 :children [{:fx/type :label
                             :min-width :use-pref-size
+                            :cache true
+                            :cache-hint :speed
                             :text (str bullet-marker)}
                            {:fx/type md-view
                             :node node}]})})
@@ -198,6 +203,8 @@
                      :alignment :baseline-left
                      :spacing 4
                      :children [{:fx/type :label
+                                 :cache true
+                                 :cache-hint :speed
                                  :min-width :use-pref-size
                                  :text (str number delimiter)}
                                 (assoc (md->fx child)
@@ -214,6 +221,8 @@
 (defmethod md->fx :default [{:keys [tag attrs children]}]
   {:fx/type :v-box
    :children [{:fx/type :label
+               :cache true
+               :cache-hint :speed
                :style {:-fx-background-color :red}
                :text (str tag " " attrs)}
               {:fx/type :v-box

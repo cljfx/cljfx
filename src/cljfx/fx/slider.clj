@@ -31,9 +31,7 @@
       :show-tick-marks [:setter lifecycle/scalar :default false]
       :snap-to-ticks [:setter lifecycle/scalar :default false]
       :value [:setter lifecycle/scalar :coerce double :default 0.0]
-      :on-value-changed [:property-change-listener
-                         (lifecycle/wrap-coerce lifecycle/event-handler
-                                                coerce/change-listener)]
+      :on-value-changed [:property-change-listener lifecycle/change-listener]
       :value-changing [:setter lifecycle/scalar :default false])))
 
 (def lifecycle

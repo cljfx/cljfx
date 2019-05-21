@@ -3,9 +3,10 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator]
-            [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TableView SelectionMode]
+            [cljfx.fx.control :as fx.control]
+            [cljfx.ext.selection-model :as ext.selection-model]
+            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
+  (:import [javafx.scene.control TableView]
            [javafx.util Callback]
            [javafx.scene AccessibleRole]))
 
@@ -27,6 +28,9 @@
     (= :default x) TableView/DEFAULT_SORT_POLICY
     :else (coerce/fail Callback x)))
 
+(defn- get-selection-model [^TableView %]
+  (.getSelectionModel %))
+
 (def props
   (merge
     fx.control/props
@@ -47,16 +51,13 @@
       :on-sort [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :placeholder [:setter lifecycle/dynamic]
       :row-factory [:setter lifecycle/scalar]
-      :on-selected-item-changed [(mutator/property-change-listener
-                                   #(.selectedItemProperty
-                                      (.getSelectionModel ^TableView %)))
-                                 (lifecycle/wrap-coerce lifecycle/event-handler
-                                                        coerce/change-listener)]
-      :selection-mode [(mutator/setter
-                         #(.setSelectionMode (.getSelectionModel ^TableView %1) %2))
-                       lifecycle/scalar
-                       :coerce (coerce/enum SelectionMode)
-                       :default :single]
+      ;; deprecated, use [[cljfx.ext.table-view/with-selection-props]] instead
+      :on-selected-item-changed (ext.selection-model/on-selected-item-changed-prop
+                                  get-selection-model)
+      ;; deprecated, use [[cljfx.ext.table-view/with-selection-props]] instead
+      :selection-mode (ext.multiple-selection-model/selection-mode-prop
+                        get-selection-model
+                        :single)
       :sort-order [:list lifecycle/dynamics]
       :sort-policy [:setter lifecycle/scalar :coerce table-sort-policy
                     :default :default]

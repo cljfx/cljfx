@@ -17,9 +17,7 @@
                     :default ["radio-menu-item" "menu-item"]]
       ;; definitions
       :selected [:setter lifecycle/scalar :default false]
-      :on-selected-changed [:property-change-listener
-                            (lifecycle/wrap-coerce lifecycle/event-handler
-                                                   coerce/change-listener)]
+      :on-selected-changed [:property-change-listener lifecycle/change-listener]
       :toggle-group [:setter lifecycle/dynamic])))
 
 (def lifecycle

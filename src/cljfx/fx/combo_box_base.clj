@@ -24,6 +24,4 @@
       :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :prompt-text [:setter lifecycle/scalar]
       :value [:setter lifecycle/scalar]
-      :on-value-changed [:property-change-listener
-                         (lifecycle/wrap-coerce lifecycle/event-handler
-                                                coerce/change-listener)])))
+      :on-value-changed [:property-change-listener lifecycle/change-listener])))

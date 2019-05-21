@@ -3,10 +3,11 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator]
             [cljfx.fx.tree-cell :as fx.tree-cell]
-            [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control TreeView SelectionMode]
+            [cljfx.fx.control :as fx.control]
+            [cljfx.ext.selection-model :as ext.selection-model]
+            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
+  (:import [javafx.scene.control TreeView MultipleSelectionModel]
            [javafx.scene AccessibleRole]
            [javafx.util Callback]))
 
@@ -19,6 +20,9 @@
               (call [_ _]
                 (fx.tree-cell/create x)))
     :else (coerce/fail Callback x)))
+
+(defn- get-selection-model ^MultipleSelectionModel [^TreeView view]
+  (.getSelectionModel view))
 
 (def props
   (merge
@@ -38,16 +42,13 @@
       :on-edit-start [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :on-scroll-to [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :root [:setter lifecycle/dynamic]
-      :on-selected-item-changed [(mutator/property-change-listener
-                                   #(.selectedItemProperty
-                                      (.getSelectionModel ^TreeView %)))
-                                 (lifecycle/wrap-coerce lifecycle/event-handler
-                                                        coerce/change-listener)]
-      :selection-mode [(mutator/setter
-                         #(.setSelectionMode (.getSelectionModel ^TreeView %1) %2))
-                       lifecycle/scalar
-                       :coerce (coerce/enum SelectionMode)
-                       :default :single]
+      ;; deprecated, use [[cljfx.ext.tree-view/with-selection-props]] instead
+      :on-selected-item-changed (ext.selection-model/on-selected-item-changed-prop
+                                  get-selection-model)
+      ;; deprecated, use [[cljfx.ext.tree-view/with-selection-props]] instead
+      :selection-mode (ext.multiple-selection-model/selection-mode-prop
+                        get-selection-model
+                        :single)
       :show-root [:setter lifecycle/scalar :default true])))
 
 (def lifecycle

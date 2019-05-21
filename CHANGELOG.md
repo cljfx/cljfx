@@ -34,8 +34,9 @@ documented in this file.
 - Allowed specifying `:toggle-group` in ToggleButton's descriptions declaratively ([example](examples/e25_radio_buttons.clj))
 
 ### [1.2.4](https://github.com/cljfx/cljfx/releases/tag/1.2.4) - 2019-03-30
-- Added `:install-to` synthetic prop for Tooltips to allow declarative tooltip
-  installation to non-control components ([example](examples/e26_tooltips.clj))
+- Added `:install-to` synthetic prop (deprecated!) for Tooltips to allow
+  declarative tooltip installation to non-control components
+  ([example](examples/e26_tooltips.clj))
 - Added `fx/unmount-renderer` function to remove watch from `*ref` that was
   added by `fx/mount-renderer` and then tear down component tree
 

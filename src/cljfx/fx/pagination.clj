@@ -33,9 +33,7 @@
                         :default :pagination]
       ;; definitions
       :current-page-index [:setter lifecycle/scalar :coerce int :default 0]
-      :on-current-page-index-changed [:property-change-listener
-                                      (lifecycle/wrap-coerce lifecycle/event-handler
-                                                             coerce/change-listener)]
+      :on-current-page-index-changed [:property-change-listener lifecycle/change-listener]
       :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
       :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
       :page-factory [:setter (lifecycle/wrap-factory lifecycle/dynamic)

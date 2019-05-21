@@ -35,6 +35,7 @@
       :graphic [:setter lifecycle/dynamic]
       :graphic-text-gap [:setter lifecycle/scalar :coerce double :default 4.0]
       :hide-delay [:setter lifecycle/scalar :coerce coerce/duration :default [200 :ms]]
+      ;; deprecated, prefer [[cljfx.ext.node/with-tooltip-props]] instead
       :install-to [install-mutator lifecycle/dynamic]
       :show-delay [:setter lifecycle/scalar :coerce coerce/duration :default [1 :s]]
       :show-duration [:setter lifecycle/scalar :coerce coerce/duration :default [5 :s]]

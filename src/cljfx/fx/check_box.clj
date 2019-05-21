@@ -26,9 +26,7 @@
       :allow-indeterminate [:setter lifecycle/scalar :default false]
       :indeterminate [:setter lifecycle/scalar :default false]
       :selected [:setter lifecycle/scalar :default false]
-      :on-selected-changed [:property-change-listener
-                            (lifecycle/wrap-coerce lifecycle/event-handler
-                                                   coerce/change-listener)])))
+      :on-selected-changed [:property-change-listener lifecycle/change-listener])))
 
 (def lifecycle
   (composite/describe CheckBox

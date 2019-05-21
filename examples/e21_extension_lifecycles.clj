@@ -1,5 +1,6 @@
 (ns e21-extension-lifecycles
-  (:require [cljfx.api :as fx])
+  (:require [cljfx.api :as fx]
+            [cljfx.ext.node :as fx.ext.node])
   (:import [javafx.scene Node]
            [javafx.animation TranslateTransition Interpolator]
            [javafx.util Duration]
@@ -58,6 +59,22 @@
                      {:fx/type fx/ext-get-ref
                       :ref ::button-b}]}})
 
+;; Use make-ext-with-props to create extension lifecycle that allows specifying additional
+;; props on a component if there is something missing. Some extension lifecycles for
+;; commonly used functionality not covered by essential props are provided in cljfx.ext.*
+;; namespaces
+
+(defn ext-with-props-example [_]
+  {:fx/type :h-box
+   :padding 5
+   :spacing 5
+   :children [{:fx/type :label
+               :text "Hover this circle for a tooltip →"}
+              {:fx/type fx.ext.node/with-tooltip-props
+               :props {:tooltip {:fx/type :tooltip :text "Hello there"}}
+               :desc {:fx/type :circle
+                      :radius 10}}]})
+
 (fx/on-fx-thread
   (fx/create-component
     {:fx/type fx/ext-many
@@ -71,7 +88,8 @@
                             :padding 100
                             :children [{:fx/type ext-on-instance-lifecycle-example}
                                        {:fx/type ext-instance-factory-example}
-                                       {:fx/type ext-ref-examples}]}}}
+                                       {:fx/type ext-ref-examples}
+                                       {:fx/type ext-with-props-example}]}}}
             {:fx/type :stage
              :showing true
              :x 0
