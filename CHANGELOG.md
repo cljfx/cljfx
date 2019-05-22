@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.2.13](https://github.com/cljfx/cljfx/releases/tag/1.2.13) - 2019-05-22
+- Added `fx/ext-many` extension lifecycle that is preferred over `fx/wrap-many`
+  renderer middleware
+
 ### [1.2.12](https://github.com/cljfx/cljfx/releases/tag/1.2.12) - 2019-05-20
 - Added `:renderer-error-handler` option to `fx/create-app`
 
