@@ -2,9 +2,6 @@
   (:require [cljfx.api :as fx])
   (:import [javafx.stage Screen]))
 
-(def renderer
-  (fx/create-renderer :middleware fx/wrap-many))
-
 (defn window [{:keys [x y width height]}]
   {:fx/type :stage
    :always-on-top true
@@ -36,24 +33,26 @@
       .getWidth
       (- width)))
 
-(renderer
-  [{:fx/type window
-    :x 0
-    :y 0
-    :width width
-    :height height}
-   {:fx/type window
-    :x 0
-    :y bottom
-    :width width
-    :height height}
-   {:fx/type window
-    :x right
-    :y 0
-    :width width
-    :height height}
-   {:fx/type window
-    :x right
-    :y bottom
-    :width width
-    :height height}])
+(fx/on-fx-thread
+  (fx/create-component
+    {:fx/type fx/ext-many
+     :desc [{:fx/type window
+             :x 0
+             :y 0
+             :width width
+             :height height}
+            {:fx/type window
+             :x 0
+             :y bottom
+             :width width
+             :height height}
+            {:fx/type window
+             :x right
+             :y 0
+             :width width
+             :height height}
+            {:fx/type window
+             :x right
+             :y bottom
+             :width width
+             :height height}]}))

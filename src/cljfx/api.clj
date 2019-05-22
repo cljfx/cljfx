@@ -19,6 +19,7 @@
     - [[ext-let-refs]] - manage component lifecycles decoupled from component tree
     - [[ext-get-ref]] - use offscreen component instance introduced by [[ext-let-refs]],
       possibly in multiple places
+    - [[ext-many]] - create a vector of components
   - automatic component lifecycle:
     - [[keyword->lifecycle]] - component/renderer `:fx.opt/type->lifecycle` opt function
       that returns lifecycle of keyword fx-types
@@ -182,6 +183,15 @@
     map"
   (lifecycle/get-ref :ref))
 
+(def ext-many
+  "Extension lifecycle that allows to create a vector of components
+
+  Supported keys:
+  - `:desc` (required) - a coll of component descriptions"
+  (-> lifecycle/dynamic
+      lifecycle/wrap-many
+      (lifecycle/wrap-map-desc :desc)))
+
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class
 
@@ -212,8 +222,10 @@
   (fn [lifecycle]
     (apply lifecycle/wrap-map-desc lifecycle f args)))
 
-(defn wrap-many
-  "Middleware function that allows to use multiple components instead of a single one"
+(defn ^:deprecated wrap-many
+  "Middleware function that allows to use multiple components instead of a single one
+
+  Deprecated, prefer [[ext-many]]"
   [lifecycle]
   (lifecycle/wrap-many lifecycle))
 

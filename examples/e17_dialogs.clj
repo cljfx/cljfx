@@ -72,16 +72,15 @@
 
 (def renderer
   (fx/create-renderer
-    :middleware (comp
-                  (fx/wrap-map-desc
-                    (fn [nuke-launch-stage]
-                      (case nuke-launch-stage
-                        :select-action [{:fx/type window}]
-                        :confirm [{:fx/type dialog}]
-                        :confirmed [{:fx/type alert}]
-                        :choose-vault [{:fx/type choice-dialog}]
-                        :final-notes [{:fx/type text-input-dialog}]
-                        nil)))
-                  fx/wrap-many)))
+    :middleware (fx/wrap-map-desc
+                  (fn [nuke-launch-stage]
+                    {:fx/type fx/ext-many
+                     :desc (case nuke-launch-stage
+                             :select-action [{:fx/type window}]
+                             :confirm [{:fx/type dialog}]
+                             :confirmed [{:fx/type alert}]
+                             :choose-vault [{:fx/type choice-dialog}]
+                             :final-notes [{:fx/type text-input-dialog}]
+                             [])}))))
 
 (fx/mount-renderer *state renderer)

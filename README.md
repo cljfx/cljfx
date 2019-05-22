@@ -715,7 +715,26 @@ prefix in their names.
    One use case is for using references in props that expect nodes in a 
    scene graph (such as label's `:label-for`), and another is having 
    dialogs defined close to usage places, you can find an example of 
-   such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj) 
+   such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj)
+
+4. `fx/ext-many`
+
+   Usually props that expect collections of elements already ask for a
+   collection of descriptions, but there might be cases where you want to manage
+   a coll even though you are asked for a single element. In this case you can
+   use `fx/ext-many` to describe multiple of components, for example, to show
+   multiple windows at once:
+   ```clj
+   (fx/on-fx-thread
+     (fx/create-component
+       {:fx/type fx/ext-many
+        :desc [{:fx/type :stage
+                :showing true}
+               {:fx/type :stage
+                :showing true}]}))
+   ```
+   See [examples/e10_multiple_windows.clj](examples/e10_multiple_windows.clj)
+   and [examples/e17_dialogs.clj](examples/e17_dialogs.clj)
 
 Examples of included extension lifecycles are available at 
 [examples/e21_extension_lifecycles.clj](examples/e21_extension_lifecycles.clj).

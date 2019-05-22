@@ -60,14 +60,23 @@
 
 (fx/on-fx-thread
   (fx/create-component
-    {:fx/type :stage
-     :showing true
-     :always-on-top true
-     :scene {:fx/type :scene
-             :root {:fx/type :v-box
-                    :alignment :center
-                    :fill-width false
-                    :padding 100
-                    :children [{:fx/type ext-on-instance-lifecycle-example}
-                               {:fx/type ext-instance-factory-example}
-                               {:fx/type ext-ref-examples}]}}}))
+    {:fx/type fx/ext-many
+     :desc [{:fx/type :stage
+             :showing true
+             :always-on-top true
+             :scene {:fx/type :scene
+                     :root {:fx/type :v-box
+                            :alignment :center
+                            :fill-width false
+                            :padding 100
+                            :children [{:fx/type ext-on-instance-lifecycle-example}
+                                       {:fx/type ext-instance-factory-example}
+                                       {:fx/type ext-ref-examples}]}}}
+            {:fx/type :stage
+             :showing true
+             :x 0
+             :scene {:fx/type :scene
+                     :root {:fx/type :v-box
+                            :padding 100
+                            :children [{:fx/type :label
+                                        :text "Extra window thanks to `fx/ext-many`!"}]}}}]}))
