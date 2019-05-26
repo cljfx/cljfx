@@ -3,6 +3,12 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.3.0](https://github.com/cljfx/cljfx/releases/tag/1.3.0) - 2019-05-23
+- Added lifecycles allowing extra props for ultimate extensibility
+- Added commonly useful extra-props extension lifecycles (see
+  [selection models](examples/e27_selection_models.clj) and
+  [tooltip](examples/e26_tooltips.clj) examples)
+
 ### [1.2.13](https://github.com/cljfx/cljfx/releases/tag/1.2.13) - 2019-05-22
 - Added `fx/ext-many` extension lifecycle that is preferred over `fx/wrap-many`
   renderer middleware
