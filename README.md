@@ -866,7 +866,7 @@ Some notable coercion examples and approaches:
 There are some "synthetic" properties that provide needed functionality
 usually used through some other API:
 - Canvas has a `:draw` prop that is a function that receives Canvas as
-  an argument and should use it to draw on it
+  an argument and should use it to draw on it ([example](examples/e28_canvas.clj))
 - MediaPlayer has `:state` prop that can be either `:playing`,
   `:paused` or `:stopped`, and will call `play`/`pause`/`stop` methods
   on media player when this prop is changed
