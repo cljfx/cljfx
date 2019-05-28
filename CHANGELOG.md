@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.3.1](https://github.com/cljfx/cljfx/releases/tag/1.3.1) - 2019-05-28
+- Fixed a bug with `:shadow` fx-type keyword pointing to sepia-tone lifecycle
+- Added TextFormatter support ([example](examples/e29_text_formatter.clj))
+
 ### [1.3.0](https://github.com/cljfx/cljfx/releases/tag/1.3.0) - 2019-05-23
 - Added lifecycles allowing extra props for ultimate extensibility
 - Added commonly useful extra-props extension lifecycles (see
