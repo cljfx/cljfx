@@ -42,7 +42,7 @@
    :perspective-transform (lazy-load cljfx.fx.perspective-transform/lifecycle)
    :reflection (lazy-load cljfx.fx.reflection/lifecycle)
    :sepia-tone (lazy-load cljfx.fx.sepia-tone/lifecycle)
-   :shadow (lazy-load cljfx.fx.sepia-tone/lifecycle)
+   :shadow (lazy-load cljfx.fx.shadow/lifecycle)
    ;; scene
    :image-view (lazy-load cljfx.fx.image-view/lifecycle)
    :canvas (lazy-load cljfx.fx.canvas/lifecycle)
@@ -153,6 +153,7 @@
    :tab (lazy-load cljfx.fx.tab/lifecycle)
    :text-area (lazy-load cljfx.fx.text-area/lifecycle)
    :text-field (lazy-load cljfx.fx.text-field/lifecycle)
+   :text-formatter (lazy-load cljfx.fx.text-formatter/lifecycle)
    :password-field (lazy-load cljfx.fx.password-field/lifecycle)
    :tool-bar (lazy-load cljfx.fx.tool-bar/lifecycle)
    :tree-table-view (lazy-load cljfx.fx.tree-table-view/lifecycle)

@@ -9,11 +9,6 @@
 
 (set! *warn-on-reflection* true)
 
-(defn- text-formatter [x]
-  (cond
-    (instance? TextFormatter x) x
-    :else (coerce/fail TextFormatter x)))
-
 (def props
   (merge
     fx.control/props
@@ -29,4 +24,6 @@
                                  (.setText control text))))
              lifecycle/scalar]
       :on-text-changed [:property-change-listener lifecycle/change-listener]
-      :text-formatter [:setter lifecycle/scalar :coerce text-formatter])))
+      :text-formatter [:setter (lifecycle/if-desc #(instance? TextFormatter %)
+                                 lifecycle/scalar
+                                 lifecycle/dynamic)])))
