@@ -24,4 +24,8 @@
     :user-data [:setter lifecycle/scalar]
     :width [:setter lifecycle/scalar :coerce double :default Double/NaN]
     :x [:setter lifecycle/scalar :coerce double :default Double/NaN]
-    :y [:setter lifecycle/scalar :coerce double :default Double/NaN]))
+    :y [:setter lifecycle/scalar :coerce double :default Double/NaN]
+    :on-height-changed [:property-change-listener lifecycle/change-listener]
+    :on-width-changed [:property-change-listener lifecycle/change-listener]
+    :on-x-changed [:property-change-listener lifecycle/change-listener]
+    :on-y-changed [:property-change-listener lifecycle/change-listener]))

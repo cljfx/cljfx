@@ -11,26 +11,28 @@
 (set! *warn-on-reflection* true)
 
 (def props
-  (composite/props Canvas
-    ;; overrides
-    :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)
-                       :default :left-to-right]
-    ;; definitions
-    :height [:setter lifecycle/scalar :coerce double :default 0.0]
-    :width [:setter lifecycle/scalar :coerce double :default 0.0]
-    :draw [(mutator/setter #(%2 %1))
-           lifecycle/scalar
-           :default
-           (fn [^Canvas canvas]
-             (.clearRect
-               (.getGraphicsContext2D canvas)
-               0
-               0
-               (.getWidth canvas)
-               (.getHeight canvas)))]))
+  (merge
+    fx.node/props
+    (composite/props Canvas
+      ;; overrides
+      :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)
+                         :default :left-to-right]
+      ;; definitions
+      :height [:setter lifecycle/scalar :coerce double :default 0.0]
+      :width [:setter lifecycle/scalar :coerce double :default 0.0]
+      :draw [(mutator/setter #(%2 %1))
+             lifecycle/scalar
+             :default
+             (fn [^Canvas canvas]
+               (.clearRect
+                 (.getGraphicsContext2D canvas)
+                 0
+                 0
+                 (.getWidth canvas)
+                 (.getHeight canvas)))])))
 
 (def lifecycle
   (composite/describe Canvas
     :ctor []
     :prop-order {:draw 1}
-    :props (merge fx.node/props props)))
+    :props props))
