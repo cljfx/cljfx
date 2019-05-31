@@ -952,9 +952,6 @@ Internal list of ideas to explore:
   - changing media should re-create media player
 - big app with everything in it to check if/how it works (generative
   tests maybe?)
-- special lifecycles: one that tracks object as "offscreen" - it exists
-  in lifecycle graph, but is not a part of a component graph. use case:
-  have dialogs close to their usage place.
 - if animation is to be implemented, it probably should be done as in
   https://popmotion.io/
 - declarative timers? problem is to figure out start/loop semantics. 
