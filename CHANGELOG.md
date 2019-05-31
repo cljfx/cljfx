@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.3.2](https://github.com/cljfx/cljfx/releases/tag/1.3.2) - 2019-05-31
+- Added window listener props `:on-x-changed`, `:on-y-changed`,
+  `:on-width-changed` and `:on-height-changed`
+- Made `cljfx.fx.canvas/props` prop map include parent props too
+
 ### [1.3.1](https://github.com/cljfx/cljfx/releases/tag/1.3.1) - 2019-05-28
 - Fixed a bug with `:shadow` fx-type keyword pointing to sepia-tone lifecycle
 - Added TextFormatter support ([example](examples/e29_text_formatter.clj))
