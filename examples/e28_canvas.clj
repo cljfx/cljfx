@@ -13,9 +13,9 @@
    :draw (fn [^Canvas canvas]
            (doto (.getGraphicsContext2D canvas)
              (.clearRect 0 0 width height)
-             (.setFill (Color/LIGHTGREY))
+             (.setFill Color/LIGHTGREY)
              (.fillRoundRect 0 0 width height height height)
-             (.setFill (Color/GREEN))
+             (.setFill Color/GREEN)
              (.fillRoundRect 0 0 (* width progress) height height height)))})
 
 (def renderer

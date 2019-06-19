@@ -3,7 +3,9 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.fx.control :as fx.control])
+            [cljfx.fx.control :as fx.control]
+            [cljfx.prop :as prop]
+            [cljfx.mutator :as mutator])
   (:import [javafx.scene.control TabPane TabPane$TabClosingPolicy TabPane$TabDragPolicy]
            [javafx.geometry Side]
            [javafx.scene AccessibleRole]))
@@ -30,7 +32,9 @@
       :tab-max-width [:setter lifecycle/scalar :coerce double :default Double/MAX_VALUE]
       :tab-min-height [:setter lifecycle/scalar :coerce double :default 0.0]
       :tab-min-width [:setter lifecycle/scalar :coerce double :default 0.0]
-      :tabs [:list lifecycle/dynamics])))
+      :tabs [:list lifecycle/dynamics]
+      :on-tabs-changed (prop/make (mutator/list-change-listener #(.getTabs ^TabPane %))
+                                  lifecycle/list-change-listener))))
 
 (def lifecycle
   (composite/describe TabPane
