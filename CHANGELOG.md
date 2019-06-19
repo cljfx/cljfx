@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.3.3](https://github.com/cljfx/cljfx/releases/tag/1.3.3) - 2019-06-20
+- Added `:on-tabs-changed` prop to `:tab-pane` to observe reordering of tabs
+
 ### [1.3.2](https://github.com/cljfx/cljfx/releases/tag/1.3.2) - 2019-05-31
 - Added window listener props `:on-x-changed`, `:on-y-changed`,
   `:on-width-changed` and `:on-height-changed`
