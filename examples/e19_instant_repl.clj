@@ -54,8 +54,11 @@
                                               (pprint/pprint (eval form))
                                               (recur))))
                                         (catch Throwable ex
-                                          (pprint/pprint
-                                            (ex-data ex))))))}}]}}})
+                                          (println
+                                            (-> ex
+                                                Throwable->map
+                                                clojure.main/ex-triage
+                                                clojure.main/ex-str))))))}}]}}})
 
 (def renderer
   (fx/create-renderer
