@@ -230,11 +230,11 @@
 
   Example:
   ```
-  (ordered-keys+key->val [{:x 1}
+  (ordered-keys+key->val #(-> % meta (get :key ::no-key))
+                         [{:x 1}
                           (with-meta {:key 1} {:key 1})
                           (with-meta {:also 1} {:key 1})
-                          {}]
-                         #(-> % meta (get :key ::no-key)))
+                          {}])
   => [[[::no-key 0]
        [1 0]
        [1 1]
