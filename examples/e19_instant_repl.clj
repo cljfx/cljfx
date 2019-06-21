@@ -1,6 +1,9 @@
 (ns e19-instant-repl
   (:require [cljfx.api :as fx]
-            [clojure.pprint :as pprint]))
+            [clojure.pprint :as pprint]
+            [clojure.java.io :as io])
+  (:import (java.io BufferedReader)
+           (clojure.lang LineNumberingPushbackReader)))
 
 (def *text
   (atom "{:a 1}"))
@@ -13,7 +16,7 @@
 (defn root-view [{:keys [text]}]
   {:fx/type :stage
    :width 960
-   :height 960
+   :height 400
    :showing true
    :scene {:fx/type :scene
            :root {:fx/type :grid-pane
@@ -31,17 +34,28 @@
                               :on-text-changed {:event/type ::text-changed}}
                              {:fx/type :scroll-pane
                               :grid-pane/column 1
-                              :content {:fx/type :label
-                                        :style {:-fx-font-family "monospace"}
-                                        :wrap-text true
-                                        :text (with-out-str
-                                                (try
-                                                  (let [form (read-string text)]
-                                                    (pprint/pprint form)
-                                                    (print "=> ")
-                                                    (pprint/pprint (eval form)))
-                                                  (catch Exception e
-                                                    (pprint/pprint e))))}}]}}})
+
+                              :content
+                              {:fx/type :label
+                               :style {:-fx-font-family "monospace"}
+                               :wrap-text true
+                               :text
+                               (with-out-str
+                                 (let [EOF (Object.)
+                                       rdr
+                                       (-> text char-array (io/reader)
+                                           BufferedReader.
+                                           LineNumberingPushbackReader.)]
+                                   (try (loop []
+                                          (let [form (read {:eof EOF} rdr)]
+                                            (when-not (identical? form EOF)
+                                              (pprint/pprint form)
+                                              (print ";=> ")
+                                              (pprint/pprint (eval form))
+                                              (recur))))
+                                        (catch Throwable ex
+                                          (pprint/pprint
+                                            (ex-data ex))))))}}]}}})
 
 (def renderer
   (fx/create-renderer
@@ -49,7 +63,8 @@
                                     {:fx/type root-view
                                      :text text}))
     :opts {:fx.opt/map-event-handler (-> handle
-                                         (fx/wrap-effects {:text (fx/make-reset-effect *text)})
+                                         (fx/wrap-effects
+                                           {:text (fx/make-reset-effect *text)})
                                          (fx/wrap-async))}))
 
 (fx/mount-renderer *text renderer)
