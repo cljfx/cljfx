@@ -2,8 +2,11 @@
   "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.coerce :as coerce])
-  (:import [javafx.scene Node AccessibleRole CacheHint DepthTest]
+            [cljfx.coerce :as coerce]
+            [cljfx.prop :as prop]
+            [cljfx.mutator :as mutator])
+  (:import [javafx.event Event EventHandler]
+           [javafx.scene Node AccessibleRole CacheHint DepthTest]
            [javafx.scene.effect BlendMode]
            [javafx.geometry NodeOrientation]))
 
@@ -24,6 +27,12 @@
     :disable [:setter lifecycle/scalar :default false]
     :effect [:setter lifecycle/dynamic]
     :event-dispatcher [:setter lifecycle/scalar]
+    ; takes an event description that receives filtered Events with event type Event/ANY
+    :event-filter [(mutator/adder-remover
+                     #(.addEventFilter ^Node %1 Event/ANY ^EventHandler %2)
+                     #(.removeEventFilter ^Node %1 Event/ANY ^EventHandler %2))
+                   lifecycle/event-handler
+                   :coerce coerce/event-handler]
     :focus-traversable [:setter lifecycle/scalar :default false]
     :id [:setter lifecycle/scalar]
     :input-method-requests [:setter lifecycle/scalar]
