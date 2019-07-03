@@ -1,7 +1,6 @@
 ; Author: Ambrose Bonnaire-Sergeant
 (ns e30-devtools-via-event-filters
-  (:require [cljfx.api :as fx]
-            [cljfx.ext.node :as fx.ext.node])
+  (:require [cljfx.api :as fx])
   (:import [javafx.scene.input MouseEvent]
            [javafx.scene Node]
            [javafx.event Event]))

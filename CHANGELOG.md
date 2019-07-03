@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.3.4](https://github.com/cljfx/cljfx/releases/tag/1.3.4) - 2019-07-03
+- Added `:event-filter` prop to all nodes ([example](examples/e30_devtools_via_event_filters.clj))
+
 ### [1.3.3](https://github.com/cljfx/cljfx/releases/tag/1.3.3) - 2019-06-20
 - Added `:on-tabs-changed` prop to `:tab-pane` to observe reordering of tabs
 
