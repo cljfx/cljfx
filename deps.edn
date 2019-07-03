@@ -4,7 +4,6 @@
         org.openjfx/javafx-graphics {:mvn/version "12"}
         org.openjfx/javafx-media {:mvn/version "12"}
         org.openjfx/javafx-web {:mvn/version "12"}}
- :paths ["src"]
  :aliases {:examples {:extra-paths ["examples"]
                       :extra-deps {org.jsoup/jsoup {:mvn/version "1.11.3"}
                                    clj-http {:mvn/version "3.9.1"}
