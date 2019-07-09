@@ -1,7 +1,7 @@
 (ns cljfx.ext.tree-view
   (:require [cljfx.lifecycle :as lifecycle]
             [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
-  (:import [javafx.scene.control TreeView]))
+  (:import [javafx.scene.control TreeView TreeItem]))
 
 (def with-selection-props
   "Extension lifecycle providing selection-related props to tree-view component
@@ -12,7 +12,7 @@
     - `:selection-mode` - either `:single` or `:multiple`
     - selection, one of:
       - `:selected-index` - int
-      - `:selected-item` - description of a tree item
+      - `:selected-item` - a TreeItem, otherwise a tree item description
       - `:selected-indices` - coll of ints, prefer this when selection mode is `:multiple`
       - `:selected-items` - coll of descriptions of tree items, prefer this when selection
         mode is `:multiple`
@@ -24,5 +24,8 @@
   (ext.multiple-selection-model/make-with-props
     lifecycle/dynamic
     #(.getSelectionModel ^TreeView %)
+    (lifecycle/if-desc #(instance? TreeItem %)
+      lifecycle/scalar
+      lifecycle/dynamic)
     lifecycle/dynamics
     :single))

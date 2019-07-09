@@ -58,13 +58,16 @@
         (lifecycle/make-ext-with-props props-config)
         (lifecycle/wrap-map-desc lift-ext-props keys))))
 
-(defn make-with-props [lifecycle get-model items-lifecycle default-mode]
-  (-> lifecycle
-      (ext.selection-model/make-with-props get-model)
-      (add-ext-flat-props
-        {:selection-mode (selection-mode-prop get-model default-mode)})
-      (add-ext-flat-props
-        {:selected-indices (selected-indices-prop get-model)
-         :selected-items (selected-items-prop get-model items-lifecycle)
-         :on-selected-indices-changed (on-selected-indices-changed-prop get-model)
-         :on-selected-items-changed (on-selected-items-changed-prop get-model)})))
+(defn make-with-props
+  ([lifecycle get-model items-lifecycle default-mode]
+   (make-with-props lifecycle get-model lifecycle/scalar items-lifecycle default-mode))
+  ([lifecycle get-model item-lifecycle items-lifecycle default-mode]
+   (-> lifecycle
+       (ext.selection-model/make-with-props get-model item-lifecycle)
+       (add-ext-flat-props
+         {:selection-mode (selection-mode-prop get-model default-mode)})
+       (add-ext-flat-props
+         {:selected-indices (selected-indices-prop get-model)
+          :selected-items (selected-items-prop get-model items-lifecycle)
+          :on-selected-indices-changed (on-selected-indices-changed-prop get-model)
+          :on-selected-items-changed (on-selected-items-changed-prop get-model)}))))
