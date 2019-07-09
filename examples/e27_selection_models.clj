@@ -88,6 +88,21 @@
             :root {:fx/type :tree-item
                    :children (children-refs "" tree)}}}))
 
+; chooses the (lexicographically) smallest selection
+(defn single-tree-view [{:keys [tree selection]}]
+  (make-tree-item-refs
+    tree
+    {:fx/type fx.ext.tree-view/with-selection-props
+     :props (merge
+              {:on-selected-item-changed {:event/type ::select-tree-item}}
+              (when (seq selection)
+                {:selected-item {:fx/type fx/ext-get-ref
+                                 :ref (-> selection sort first)}}))
+     :desc {:fx/type :tree-view
+            :show-root false
+            :root {:fx/type :tree-item
+                   :children (children-refs "" tree)}}}))
+
 ;; For list-view and table view we don't need such complicated setup, since their
 ;; selection is described by the same values they have in `:items`, so we just create a
 ;; map from paths to "directory" contents on these paths
@@ -109,11 +124,13 @@
      :scene {:fx/type :scene
              :root {:fx/type :grid-pane
                     :column-constraints [{:fx/type :column-constraints
-                                          :percent-width 100/3}
+                                          :percent-width 100/4}
                                          {:fx/type :column-constraints
-                                          :percent-width 100/3}
+                                          :percent-width 100/4}
                                          {:fx/type :column-constraints
-                                          :percent-width 100/3}]
+                                          :percent-width 100/4}
+                                         {:fx/type :column-constraints
+                                          :percent-width 100/4}]
                     :children [{:fx/type list-view
                                 :grid-pane/column 0
                                 :items (keys path->value)
@@ -124,6 +141,10 @@
                                 :selection selection}
                                {:fx/type tree-view
                                 :grid-pane/column 2
+                                :tree tree
+                                :selection selection}
+                               {:fx/type single-tree-view
+                                :grid-pane/column 3
                                 :tree tree
                                 :selection selection}]}}}))
 
@@ -139,6 +160,8 @@
            #(case (:event/type %)
               ::select-tree-items
               (swap! *state assoc :selection (->> % :fx/event (mapv tree-item-value)))
+              ::select-tree-item
+              (swap! *state assoc :selection (->> % :fx/event tree-item-value vector))
 
               ::select
               (swap! *state assoc :selection (:fx/event %)))}))

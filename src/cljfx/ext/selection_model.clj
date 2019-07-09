@@ -24,7 +24,7 @@
     (mutator/setter #(doto ^SelectionModel (get-model %1)
                        (.clearSelection)
                        (.select ^Object %2)))
-    lifecycle/scalar))
+    lifecycle/dynamic))
 
 (defn on-selected-item-changed-prop [get-model]
   (prop/make
