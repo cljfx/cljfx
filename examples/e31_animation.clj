@@ -15,7 +15,7 @@
            [javafx.scene.layout Region]
            [javafx.animation AnimationTimer Animation ParallelTransition RotateTransition
             PathTransition$OrientationType
-            FadeTransition FillTransition PauseTransition
+            FadeTransition StrokeTransition FillTransition PauseTransition
             ScaleTransition
             KeyFrame KeyValue SequentialTransition PathTransition]))
 
@@ -310,6 +310,25 @@
     :prop-order {:status 1}
     :props fill-transition-props))
 
+;; StrokeTransition
+
+(def stroke-transition-props
+  (merge transition-props
+         (composite/props
+           StrokeTransition
+           :shape [:setter lifecycle/dynamic]
+           :duration [:setter lifecycle/scalar :coerce coerce/duration
+                      :default 400]
+           :from-value [:setter lifecycle/scalar :coerce coerce/color :default nil]
+           :to-value [:setter lifecycle/scalar :coerce coerce/color :default nil])))
+
+(def stroke-transition-lifecycle
+  (composite/describe StrokeTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props stroke-transition-props))
+
+
 ;; ScaleTransition
 
 (def scale-transition-props
@@ -382,6 +401,7 @@
    ::fill-transition fill-transition-lifecycle
    ::pause-transition pause-transition-lifecycle
    ::scale-transition scale-transition-lifecycle
+   ::stroke-transition stroke-transition-lifecycle
    ::timeline timeline-lifecycle})
 
 ;;;;;;;;;;;;;;;
@@ -477,6 +497,7 @@
                       :path {:fx/type :circle
                              :radius 35}
                       :duration [1 :s]
+                      :orientation :orthogonal-to-tanget
                       :cycle-count :indefinite
                       :status :running}}
       (get-ref :node))))
@@ -516,6 +537,18 @@
                       :auto-reverse true
                       :status :running}}
       (get-ref :node))))
+
+(defn stroke-transition [{:keys [desc]}]
+  (let-refs {:shape desc}
+    (let-refs {:fade {:fx/type ::stroke-transition
+                      :shape (get-ref :shape)
+                      :from-value :red
+                      :to-value :blue
+                      :cycle-count :indefinite
+                      :duration [1 :s]
+                      :auto-reverse true
+                      :status :running}}
+      (get-ref :shape))))
 
 (defn grow-shrink [current limit]
   (if (= current -1)
@@ -601,7 +634,14 @@
                                {:fx/type scale-transition
                                 :desc {:fx/type :rectangle
                                        :width 50
-                                       :height 15}})]}}})
+                                       :height 15}})
+                             (with-header
+                               "Stroke transition"
+                               3 1
+                               {:fx/type stroke-transition
+                                :desc {:fx/type :rectangle
+                                       :width 50
+                                       :height 100}})]}}})
 
 (def renderer
   (fx/create-renderer
