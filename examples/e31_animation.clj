@@ -15,6 +15,8 @@
            [javafx.scene.layout Region]
            [javafx.animation AnimationTimer Animation ParallelTransition RotateTransition
             PathTransition$OrientationType
+            FadeTransition FillTransition PauseTransition
+            ScaleTransition
             KeyFrame KeyValue SequentialTransition PathTransition]))
 
 (set! *warn-on-reflection* true)
@@ -271,6 +273,84 @@
     :prop-order {:status 1}
     :props path-transition-props))
 
+;; FadeTransition
+
+(def fade-transition-props
+  (merge transition-props
+         (composite/props
+           FadeTransition
+           :node [:setter lifecycle/dynamic]
+           :duration [:setter lifecycle/scalar :coerce coerce/duration
+                      :default 400]
+           :from-value [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :to-value [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :by-value [:setter lifecycle/scalar :coerce double])))
+
+(def fade-transition-lifecycle
+  (composite/describe FadeTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props fade-transition-props))
+
+;; FillTransition
+
+(def fill-transition-props
+  (merge transition-props
+         (composite/props
+           FillTransition
+           :shape [:setter lifecycle/dynamic]
+           :duration [:setter lifecycle/scalar :coerce coerce/duration
+                      :default 400]
+           :from-value [:setter lifecycle/scalar :coerce coerce/color :default nil]
+           :to-value [:setter lifecycle/scalar :coerce coerce/color :default nil])))
+
+(def fill-transition-lifecycle
+  (composite/describe FillTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props fill-transition-props))
+
+;; ScaleTransition
+
+(def scale-transition-props
+  (merge transition-props
+         (composite/props
+           ScaleTransition
+           :node [:setter lifecycle/dynamic]
+           :duration [:setter lifecycle/scalar :coerce coerce/duration
+                      :default 400]
+           :from-x [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :from-y [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :from-z [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :to-x [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :to-y [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :to-z [:setter lifecycle/scalar :coerce double :default ##NaN]
+           :by-x [:setter lifecycle/scalar :coerce double]
+           :by-y [:setter lifecycle/scalar :coerce double]
+           :by-z [:setter lifecycle/scalar :coerce double])))
+
+(def scale-transition-lifecycle
+  (composite/describe ScaleTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props scale-transition-props))
+
+;; PauseTransition
+
+(def pause-transition-props
+  (merge transition-props
+         (composite/props
+           PauseTransition
+           :duration [:setter lifecycle/scalar :coerce coerce/duration
+                      :default 400])))
+
+(def pause-transition-lifecycle
+  (composite/describe PauseTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props pause-transition-props))
+
+
 ;; Timeline
 
 (def timeline-props
@@ -298,6 +378,10 @@
    ::parallel-transition parallel-transition-lifecycle
    ::sequential-transition sequential-transition-lifecycle
    ::path-transition path-transition-lifecycle
+   ::fade-transition fade-transition-lifecycle
+   ::fill-transition fill-transition-lifecycle
+   ::pause-transition pause-transition-lifecycle
+   ::scale-transition scale-transition-lifecycle
    ::timeline timeline-lifecycle})
 
 ;;;;;;;;;;;;;;;
@@ -332,26 +416,23 @@
     (let-refs {:animation1
                {:fx/type ::parallel-transition
                 :node (get-ref :node)
+                :auto-reverse true
+                :cycle-count :indefinite
+                :status :running
                 :children [; rotate 180 degrees
                            {:fx/type ::rotate-transition
                             :node (get-ref :node)
-                            :auto-reverse true
                             :duration [0.5 :s]
-                            :cycle-count :indefinite
                             :from-angle 0
                             :to-angle 185
-                            :interpolator :ease-both
-                            :status :running}
+                            :interpolator :ease-both}
                            ; while also moving left to right
                            {:fx/type ::translate-transition
                             :node (get-ref :node)
-                            :auto-reverse true
                             :duration [0.5 :s]
-                            :cycle-count :indefinite
                             :from-x 0
-                            :to-x 200
-                            :interpolator :ease-both
-                            :status :running}]}}
+                            :to-x 75
+                            :interpolator :ease-both}]}}
       (get-ref :node))))
 
 (defn timeline [{:keys [desc ^Node instance]}]
@@ -367,36 +448,72 @@
     (let-refs (when instance
                 {:timeline {:fx/type ::sequential-transition
                             :node (get-ref :node)
+                            :cycle-count :indefinite
+                            :auto-reverse true
+                            :status :running
                             :children
                             [{:fx/type ::timeline
-                              :cycle-count :indefinite
-                              :auto-reverse true
                               :key-frames [{:time [2 :s]
                                             :values [[(.translateXProperty instance)
-                                                      300]]}
-                                           {:time [1 :s]
+                                                      75]]}
+                                           {:time [0.5 :s]
                                             :values [[(.translateYProperty instance)
-                                                      50]]}]
-                              :status :running}
+                                                      50]]}]}
+                             {:fx/type ::pause-transition
+                              :duration [0.1 :s]}
                              {:fx/type ::timeline
-                              :cycle-count :indefinite
-                              :auto-reverse true
                               :key-frames [{:time [2 :s]
                                             :values [[(.translateYProperty instance)
                                                       -33]]}
                                            {:time [1 :s]
                                             :values [[(.translateYProperty instance)
-                                                      50]]}]
-                              :status :running}]}})
+                                                      50]]}]}]}})
       (get-ref :node))))
 
 (defn path-transition [{:keys [desc]}]
   (let-refs {:node desc}
     (let-refs {:path {:fx/type ::path-transition
                       :node (get-ref :node)
-                      :path desc
+                      :path {:fx/type :circle
+                             :radius 35}
                       :duration [1 :s]
                       :cycle-count :indefinite
+                      :status :running}}
+      (get-ref :node))))
+
+(defn fade-transition [{:keys [desc]}]
+  (let-refs {:node desc}
+    (let-refs {:fade {:fx/type ::fade-transition
+                      :node (get-ref :node)
+                      :from-value 1.0
+                      :to-value 0.3
+                      :cycle-count :indefinite
+                      :duration [1 :s]
+                      :auto-reverse true
+                      :status :running}}
+      (get-ref :node))))
+
+(defn fill-transition [{:keys [desc]}]
+  (let-refs {:shape desc}
+    (let-refs {:fade {:fx/type ::fill-transition
+                      :shape (get-ref :shape)
+                      :from-value :green
+                      :to-value :red
+                      :cycle-count :indefinite
+                      :duration [1 :s]
+                      :auto-reverse true
+                      :status :running}}
+      (get-ref :shape))))
+
+(defn scale-transition [{:keys [desc]}]
+  (let-refs {:node desc}
+    (let-refs {:fade {:fx/type ::scale-transition
+                      :node (get-ref :node)
+                      :by-x 1
+                      :by-y 5
+                      :cycle-count :indefinite
+                      :duration [1 :s]
+                      :auto-reverse true
                       :status :running}}
       (get-ref :node))))
 
@@ -422,12 +539,14 @@
   {:fx/type :stage
    :showing true
    :always-on-top true
-   :width 500
+   :width 600
    :height 600
    :scene {:fx/type :scene
            :root {:fx/type :grid-pane
                   :row-constraints (repeat 4 {:fx/type :row-constraints
                                               :percent-height 100/4})
+                  :column-constraints (repeat 2 {:fx/type :column-constraints
+                                                 :percent-width 100/2})
                   :children [(with-header
                                "Parallel rotate+translate"
                                0 0
@@ -461,7 +580,28 @@
                                {:fx/type path-transition
                                 :desc {:fx/type :rectangle
                                        :width 50
-                                       :height 100}})]}}})
+                                       :height 100}})
+                             (with-header
+                               "Fade transition"
+                               0 1
+                               {:fx/type fade-transition
+                                :desc {:fx/type :rectangle
+                                       :width 50
+                                       :height 100}})
+                             (with-header
+                               "Fill transition"
+                               1 1
+                               {:fx/type fill-transition
+                                :desc {:fx/type :rectangle
+                                       :width 50
+                                       :height 100}})
+                             (with-header
+                               "Scale transition"
+                               2 1
+                               {:fx/type scale-transition
+                                :desc {:fx/type :rectangle
+                                       :width 50
+                                       :height 15}})]}}})
 
 (def renderer
   (fx/create-renderer
