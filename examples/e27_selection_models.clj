@@ -198,6 +198,9 @@
          (<= (count descs)
              (* rows columns))]}
   {:fx/type :grid-pane
+   :hgap 20
+   :vgap 20
+   :padding 30
    :row-constraints (repeat rows {:fx/type :row-constraints
                                   :percent-height (/ 100 rows)})
    :column-constraints (repeat columns {:fx/type :column-constraints
@@ -279,8 +282,7 @@
                                {:fx/type tab-pane
                                 :items (keys path->value)
                                 :selection-capabilities #{:read :write}
-                                :selection selection})
-                             ]}}}}))
+                                :selection selection})]}}}}))
 
 (defn tree-item-value [^TreeItem x]
   (.getValue x))
@@ -299,15 +301,14 @@
               ::select-tree-items
               (swap! *state assoc :selection (->> % :fx/event (mapv tree-item-value)))
               ::select-tree-item
-              (swap! *state assoc :selection (->> % :fx/event tree-item-value vector))
+              (swap! *state assoc :selection [(-> % :fx/event tree-item-value)])
 
               ::select-multiple
               (swap! *state assoc :selection (:fx/event %))
               ::select-single
-              (swap! *state assoc :selection (-> (:fx/event %) vector))
+              (swap! *state assoc :selection [(:fx/event %)])
 
               ::select-tab
-              (swap! *state assoc :selection (->> % :fx/event tab-id vector))
-              )}))
+              (swap! *state assoc :selection [(-> % :fx/event tab-id)]))}))
 
 (fx/mount-renderer *state renderer)
