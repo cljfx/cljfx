@@ -19,12 +19,14 @@
          ^SelectionModel (get-model %)))
     lifecycle/change-listener))
 
-(defn selected-item-prop [get-model]
-  (prop/make
-    (mutator/setter #(doto ^SelectionModel (get-model %1)
-                       (.clearSelection)
-                       (.select ^Object %2)))
-    lifecycle/scalar))
+(defn selected-item-prop
+  ([get-model] (selected-item-prop get-model lifecycle/scalar))
+  ([get-model item-lifecycle]
+   (prop/make
+     (mutator/setter #(doto ^SelectionModel (get-model %1)
+                        (.clearSelection)
+                        (.select ^Object %2)))
+     item-lifecycle)))
 
 (defn on-selected-item-changed-prop [get-model]
   (prop/make
@@ -32,10 +34,12 @@
       #(.selectedItemProperty ^SelectionModel (get-model %)))
     lifecycle/change-listener))
 
-(defn make-with-props [lifecycle get-model]
-  (lifecycle/make-ext-with-props
-    lifecycle
-    {:selected-index (selected-index-prop get-model)
-     :on-selected-index-changed (on-selected-index-changed-prop get-model)
-     :selected-item (selected-item-prop get-model)
-     :on-selected-item-changed (on-selected-item-changed-prop get-model)}))
+(defn make-with-props 
+  ([lifecycle get-model] (make-with-props lifecycle get-model lifecycle/scalar))
+  ([lifecycle get-model item-lifecycle]
+   (lifecycle/make-ext-with-props
+     lifecycle
+     {:selected-index (selected-index-prop get-model)
+      :on-selected-index-changed (on-selected-index-changed-prop get-model)
+      :selected-item (selected-item-prop get-model item-lifecycle)
+      :on-selected-item-changed (on-selected-item-changed-prop get-model)})))
