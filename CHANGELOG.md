@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.3.5](https://github.com/cljfx/cljfx/releases/tag/1.3.5) - 2019-07-11
+- Allow `:selected-item` in extra-props lifecycles to be descriptions
+
 ### [1.3.4](https://github.com/cljfx/cljfx/releases/tag/1.3.4) - 2019-07-03
 - Added `:event-filter` prop to all nodes ([example](examples/e30_devtools_via_event_filters.clj))
 
