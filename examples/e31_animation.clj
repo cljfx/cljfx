@@ -5,6 +5,7 @@
             [cljfx.mutator :as mutator]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
+            [cljfx.component :as component]
             )
   (:import [java.util Collection]
            [javafx.event EventHandler]
@@ -13,6 +14,7 @@
            [javafx.animation TranslateTransition Interpolator Transition Timeline]
            [javafx.util Duration]
            [javafx.scene.layout Region]
+           [javafx.beans.value WritableValue]
            [javafx.animation AnimationTimer Animation ParallelTransition RotateTransition
             PathTransition$OrientationType
             FadeTransition StrokeTransition FillTransition PauseTransition
@@ -80,33 +82,6 @@
             :linear Interpolator/LINEAR
             (coerce/fail Interpolator x))))
 
-(defn coerce-key-value [x]
-  (cond
-    (instance? KeyValue x) x
-    (vector? x) (case (count x)
-                  2 (let [[target end-value] x]
-                      (KeyValue. target end-value))
-                  3 (let [[target end-value interpolator] x]
-                      (KeyValue. target
-                                 end-value
-                                 (coerce-interpolator interpolator)))
-                  (coerce/fail KeyValue x))
-    (map? x) (let [target (:target x)
-                   end-value (:end-value x)
-                   interpolator (coerce-interpolator (:interpolator x :linear))]
-               (KeyValue. target end-value interpolator))
-    :else (coerce/fail KeyValue x)))
-
-(defn coerce-key-frame [x]
-  (cond
-    (instance? KeyFrame x) x
-    (map? x) (let [^Duration d (coerce/duration (:time x))
-                   ^String s (some-> (:name x) str)
-                   ^EventHandler e (some-> (:on-finished x) coerce/event-handler)
-                   ^Collection c (some->> (:values x) (mapv coerce-key-value))]
-               (KeyFrame. d s e c))
-    :else (coerce/fail KeyFrame x)))
-
 ;; Animation
 
 (def animation-props
@@ -159,7 +134,8 @@
                                    lifecycle/scalar
                                    :default :stopped)}})
       (lifecycle/wrap-on-delete
-        #(.stop ^AnimationTimer %1))))
+        #(try (.stop ^AnimationTimer %)
+              (catch IllegalStateException _)))))
 
 
 ;; Transition
@@ -372,12 +348,136 @@
 
 ;; Timeline
 
+(defn wrap-coerce-with-prop [lifecycle child-prop coerce-prop]
+  (with-meta
+    [::coerce-with-prop lifecycle child-prop coerce-prop]
+    {`lifecycle/create (fn [_ desc opts]
+                         (let [child-desc (get desc child-prop)
+                               child (lifecycle/create lifecycle child-desc opts)
+                               coerce (get desc coerce-prop)]
+                           (when-not (fn? coerce)
+                             (throw (ex-info "Coercion must be fn"
+                                             {:coerce-prop coerce-prop
+                                              :coerce coerce})))
+                           (with-meta {:child child
+                                       :coerce coerce
+                                       :value (coerce (component/instance child))}
+                                      {`component/instance :value})))
+     `lifecycle/advance (fn [_ component desc opts]
+                          (let [old-coerce (:coerce component)
+                                new-coerce (get desc coerce-prop)
+                                child (:child component)
+                                old-instance (component/instance child)
+                                child-desc (get desc child-prop)
+                                new-child (lifecycle/advance lifecycle child child-desc opts)
+                                new-instance (component/instance new-child)]
+                            (when-not (fn? new-coerce)
+                              (throw (ex-info "Coercion must be fn"
+                                              {:coerce-prop coerce-prop
+                                               :coerce new-coerce})))
+                            (cond-> component
+                              :always
+                              (assoc :child new-child)
+
+                              (or (not= old-instance new-instance)
+                                  (not= old-coerce new-coerce))
+                              (assoc :value (new-coerce new-instance)))))
+     `lifecycle/delete (fn [_ component opts]
+                         (lifecycle/delete lifecycle (:child component) opts))}))
+
+(def coerce-lifecycle
+  (wrap-coerce-with-prop lifecycle/dynamic :desc :coerce))
+
+(def key-value-props
+  {:target (prop/make mutator/forbidden
+                      (lifecycle/if-desc #(instance? WritableValue %)
+                        lifecycle/scalar
+                        lifecycle/dynamic))
+   :end-value (prop/make mutator/forbidden
+                         lifecycle/scalar)
+   ; :default and :coerce handled in :ctor because :interpolator is immutable
+   :interpolator (prop/make mutator/forbidden
+                            lifecycle/scalar)})
+
+(def key-value-lifecycle
+  (composite/lifecycle
+    {:ctor (fn [target end-value interpolator]
+             (KeyValue. target
+                        end-value
+                        (if interpolator
+                          (coerce-interpolator interpolator)
+                          Interpolator/LINEAR)))
+     :args [:target :end-value :interpolator]
+     :props key-value-props}))
+
+(def key-frame-props
+  {:time (prop/make mutator/forbidden
+                    lifecycle/scalar
+                    :coerce coerce/duration)
+   :name (prop/make mutator/forbidden
+                    lifecycle/scalar
+                    :default nil)
+   :on-finished (prop/make mutator/forbidden
+                           lifecycle/event-handler
+                           :default nil)
+   :values (prop/make mutator/forbidden
+                      (lifecycle/wrap-many
+                        ;TODO allow vector case
+                        (lifecycle/if-desc #(instance? KeyValue %)
+                          lifecycle/scalar
+                          (lifecycle/if-desc #(and (map? %)
+                                                   (contains? % :fx/type))
+                            lifecycle/dynamic
+                            key-value-lifecycle))))})
+
+(def key-frame-lifecycle
+  (composite/lifecycle
+    {:ctor (fn [^Duration time
+                ^String name
+                ^EventHandler on-finished
+                ^Collection values]
+             (KeyFrame. time name on-finished values))
+     :args [:time :name :on-finished :values]
+     :props key-frame-props}))
+
 (def timeline-props
   (merge animation-props
          (composite/props
            Timeline
-           ; cannot alter while playing
-           :key-frames [:list lifecycle/scalar :coerce #(map coerce-key-frame %)])))
+           ; Future syntax ideas for key-frames
+           ; eg. At 2 sec, move node's x prop to 30
+           ;     {[2 :s] [(get-ref :node-x) 30}
+           ;
+           ; (defalias KeyFrameKey
+           ;    (U TimeDesc
+           ;       (HMap :mandatory {:time TimeDesc}
+           ;             :optional {:interpolator InterpolatorDesc
+           ;                        :name Str
+           ;                        :on-finished EventHandlerDesc}
+           ;             :absent-keys #{:fx/type})))
+           ; (defalias KeyFrameValue
+           ;   (U '[Desc Any]
+           ;      '[Desc Any Interpolator]
+           ;      (HMap :mandatory {:target Desc}
+           ;            :optional {:end-value Any
+           ;                       :interpolator Interpolator}
+           ;            :absent-keys #{:fx/type})))
+           ; (defalias KeyFrameDesc
+           ;   (U javafx.animation.KeyFrame
+           ;      '[KeyFrameKey (U KeyFrameValue (Vec KeyFrameValue))]
+           ;      (HMap :mandatory {:time TimeDesc}
+           ;            :optional {:values KeyFrameValues}
+           ;            :absent-keys #{:fx/type})))
+           ; (defalias KeyFrameValues
+           ;   (Seqable KeyFrameDesc))
+           :key-frames [:list (lifecycle/wrap-many
+                                (lifecycle/if-desc #(instance? KeyFrame %)
+                                  lifecycle/scalar
+                                  ; reserve Descs for now
+                                  (lifecycle/if-desc #(and (map? %)
+                                                           (contains? % :fx/type))
+                                    lifecycle/dynamic
+                                    key-frame-lifecycle)))])))
 
 (def timeline-lifecycle
   (->
@@ -386,12 +486,15 @@
       :prop-order {:status 1}
       :props timeline-props)
     (lifecycle/wrap-on-delete
-      #(.stop ^Timeline %1))))
+      #(try (.stop ^Timeline %)
+            ; cannot stop children in nested animations
+            (catch IllegalStateException _)))))
 
 ;; keyword->lifecycle
 
 (def keyword->lifecycle
-  {::animation-timer animation-timer-lifecycle
+  {::coerce coerce-lifecycle
+   ::animation-timer animation-timer-lifecycle
    ::translate-transition translate-transition-lifecycle
    ::rotate-transition rotate-transition-lifecycle
    ::parallel-transition parallel-transition-lifecycle
@@ -455,40 +558,48 @@
                             :interpolator :ease-both}]}}
       (get-ref :node))))
 
-(defn timeline [{:keys [desc ^Node instance]}]
+(defn translate-x-property [^Node instance]
+  (.translateXProperty instance))
+
+(defn translate-y-property [^Node instance]
+  (.translateYProperty instance))
+
+(defn timeline [{:keys [desc]}]
   {:pre [desc]}
-  (let-refs {:node {:fx/type fx/ext-on-instance-lifecycle
-                    :on-created (fn [n]
-                                  (swap! *state assoc :instance n))
-                    :on-advanced (fn [_ n]
-                                   (swap! *state assoc :instance n))
-                    :on-deleted (fn [n]
-                                  (swap! *state update :instance #(when (= n %) %)))
-                    :desc desc}}
-    (let-refs (when instance
-                {:timeline {:fx/type ::sequential-transition
+  (let-refs {:node desc}
+    (let-refs {:node-x {:fx/type ::coerce
+                        :desc (get-ref :node)
+                        :coerce translate-x-property}
+               :node-y {:fx/type ::coerce
+                        :desc (get-ref :node)
+                        :coerce translate-y-property}}
+      (let-refs {:timeline {:fx/type ::sequential-transition
                             :node (get-ref :node)
                             :cycle-count :indefinite
                             :auto-reverse true
                             :status :running
                             :children
                             [{:fx/type ::timeline
-                              :key-frames [{:time [2 :s]
-                                            :values [[(.translateXProperty instance)
-                                                      75]]}
-                                           {:time [0.5 :s]
-                                            :values [[(.translateYProperty instance)
-                                                      50]]}]}
+                              :key-frames 
+                              #{{:time [2 :s]
+                                 :values [{:target (get-ref :node-x)
+                                           :end-value 30}]}
+                                {:time [0.5 :s]
+                                 :values [{:target (get-ref :node-y)
+                                           :end-value 50}]}
+                                {:time [1 :s]
+                                 :values [{:target (get-ref :node-y)
+                                           :end-value 0}]}}}
                              {:fx/type ::pause-transition
-                              :duration [0.1 :s]}
+                              :duration [0.4 :s]}
                              {:fx/type ::timeline
-                              :key-frames [{:time [2 :s]
-                                            :values [[(.translateYProperty instance)
-                                                      -33]]}
-                                           {:time [1 :s]
-                                            :values [[(.translateYProperty instance)
-                                                      50]]}]}]}})
-      (get-ref :node))))
+                              :key-frames #{{:time [2 :s]
+                                             :values [{:target (get-ref :node-y)
+                                                       :end-value 0}]}
+                                            {:time [1 :s]
+                                             :values [{:target (get-ref :node-y)
+                                                       :end-value 50}]}}}]}}
+        (get-ref :node)))))
 
 (defn path-transition [{:keys [desc]}]
   (let-refs {:node desc}
@@ -543,20 +654,17 @@
     (let-refs {:fade {:fx/type ::stroke-transition
                       :shape (get-ref :shape)
                       :from-value :red
-                      :to-value :blue
+                      :to-value :yellow
                       :cycle-count :indefinite
-                      :duration [1 :s]
+                      :duration [0.5 :s]
                       :auto-reverse true
                       :status :running}}
       (get-ref :shape))))
 
 (defn grow-shrink [current limit]
-  (if (= current -1)
-    ; start at the largest size to inform parent
-    limit
-    (if (even? (int (/ current limit)))
-      (mod current limit)
-      (- limit (mod current limit)))))
+  (if (even? (int (/ current limit)))
+    (mod current limit)
+    (- limit (mod current limit))))
 
 (defn with-header [text row col desc]
   {:fx/type :h-box
@@ -568,7 +676,7 @@
                :text text}
               desc]})
 
-(defn view [{{:keys [timer-duration instance] :or {timer-duration -1}} :state}]
+(defn view [{{:keys [timer-duration] :or {timer-duration 0}} :state}]
   {:fx/type :stage
    :showing true
    :always-on-top true
@@ -603,7 +711,6 @@
                                "Sequential Timelines"
                                2 0
                                {:fx/type timeline
-                                :instance instance
                                 :desc {:fx/type :rectangle
                                        :width 50
                                        :height 100}})
@@ -640,6 +747,9 @@
                                3 1
                                {:fx/type stroke-transition
                                 :desc {:fx/type :rectangle
+                                       :stroke-width 10
+                                       :arc-height 20
+                                       :arc-width 20
                                        :width 50
                                        :height 100}})]}}})
 
