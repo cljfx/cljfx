@@ -5,8 +5,7 @@
             [cljfx.mutator :as mutator]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.component :as component]
-            )
+            [cljfx.component :as component])
   (:import [java.util Collection]
            [javafx.event EventHandler]
            [javafx.scene Node]
@@ -22,6 +21,37 @@
             KeyFrame KeyValue SequentialTransition PathTransition]))
 
 (set! *warn-on-reflection* true)
+
+;;;;;;;;;;;
+;; Notes ;;
+;;;;;;;;;;;
+
+; This file runs a bunch of animations when evaluated.
+; The `Demo` section below contains the source for those
+; animations. It uses the below implementation,
+; in particular the `keyword->lifecycle` map in this namespace.
+
+; This is a first crack at animation with cljfx. It's mostly
+; as you might expect, using implementing lifecycles for the
+; various packages javafx.animation classes, but here are some
+; notes on the more interesting parts.
+
+; `Timeline`s take KeyFrames which must be passed `WritableValue`s,
+; which means things like (.translateXProperty node) and (.translateXProperty node)
+; in practice. This is somewhat awkward to do with descs.
+; To get a property out of a desc, I added the
+; lifecycle ::coerce, which takes a :desc and a :coerce function
+; that is called on the result of `component/instance`.
+;   eg., the component created from desc
+;          {:fx/type ::coerce
+;           :desc {:fx/type :rectangle ...}
+;           :coerce #(.translateYProperty ^Node %)}
+;        returns the .translateYProperty as the `component/instance`.
+
+; This is particularly effective when combined with let-refs, so you
+; can declare the node beforehand and extract what Properties you need
+; as you go. See the `timeline` function in this namespace for example
+; usage.
 
 ;;;;;;;;;;;
 ;; Setup ;;
@@ -507,9 +537,9 @@
    ::stroke-transition stroke-transition-lifecycle
    ::timeline timeline-lifecycle})
 
-;;;;;;;;;;;;;;;
-;; Start app ;;
-;;;;;;;;;;;;;;;
+;;;;;;;;;;
+;; Demo ;;
+;;;;;;;;;;
 
 (defn init-state []
   {})
