@@ -14,7 +14,8 @@
            [javafx.util Duration]
            [javafx.scene.layout Region]
            [javafx.animation AnimationTimer Animation ParallelTransition RotateTransition
-            KeyFrame KeyValue]))
+            PathTransition$OrientationType
+            KeyFrame KeyValue SequentialTransition PathTransition]))
 
 (set! *warn-on-reflection* true)
 
@@ -38,6 +39,14 @@
   (cond
     (= :indefinite x) Animation/INDEFINITE
     :else (int x)))
+
+(defn coerce-orientation [x]
+  (cond
+    (instance? PathTransition$OrientationType x) x
+    :else (case x
+            :none PathTransition$OrientationType/NONE
+            :orthogonal-to-tanget PathTransition$OrientationType/ORTHOGONAL_TO_TANGENT
+            (coerce/fail PathTransition$OrientationType x))))
 
 (defn coerce-interpolator [x]
   (cond
@@ -213,6 +222,21 @@
     :prop-order {:status 1}
     :props rotate-transition-props))
 
+;; SequentialTransition
+
+(def sequential-transition-props
+  (merge transition-props
+         (composite/props
+           SequentialTransition
+           :children [:list lifecycle/dynamics]
+           :node [:setter lifecycle/dynamic])))
+
+(def sequential-transition-lifecycle
+  (composite/describe SequentialTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props sequential-transition-props))
+
 ;; ParallelTransition
 
 (def parallel-transition-props
@@ -227,6 +251,25 @@
     :ctor []
     :prop-order {:status 1}
     :props parallel-transition-props))
+
+;; PathTransition
+
+(def path-transition-props
+  (merge transition-props
+         (composite/props
+           PathTransition
+           :node [:setter lifecycle/dynamic]
+           :duration [:setter lifecycle/scalar :coerce coerce/duration
+                      :default 400]
+           :path [:setter lifecycle/dynamic]
+           :orientation [:setter lifecycle/scalar :coerce coerce-orientation
+                         :default :none])))
+
+(def path-transition-lifecycle
+  (composite/describe PathTransition
+    :ctor []
+    :prop-order {:status 1}
+    :props path-transition-props))
 
 ;; Timeline
 
@@ -253,6 +296,8 @@
    ::translate-transition translate-transition-lifecycle
    ::rotate-transition rotate-transition-lifecycle
    ::parallel-transition parallel-transition-lifecycle
+   ::sequential-transition sequential-transition-lifecycle
+   ::path-transition path-transition-lifecycle
    ::timeline timeline-lifecycle})
 
 ;;;;;;;;;;;;;;;
@@ -287,7 +332,8 @@
     (let-refs {:animation1
                {:fx/type ::parallel-transition
                 :node (get-ref :node)
-                :children [{:fx/type ::rotate-transition
+                :children [; rotate 180 degrees
+                           {:fx/type ::rotate-transition
                             :node (get-ref :node)
                             :auto-reverse true
                             :duration [0.5 :s]
@@ -296,6 +342,7 @@
                             :to-angle 185
                             :interpolator :ease-both
                             :status :running}
+                           ; while also moving left to right
                            {:fx/type ::translate-transition
                             :node (get-ref :node)
                             :auto-reverse true
@@ -312,21 +359,46 @@
   (let-refs {:node {:fx/type fx/ext-on-instance-lifecycle
                     :on-created (fn [n]
                                   (swap! *state assoc :instance n))
+                    :on-advanced (fn [_ n]
+                                   (swap! *state assoc :instance n))
                     :on-deleted (fn [n]
                                   (swap! *state update :instance #(when (= n %) %)))
                     :desc desc}}
-    (let-refs {:timeline {:fx/type ::timeline
-                          :cycle-count :indefinite
-                          :auto-reverse true
-                          :key-frames (when instance
-                                        [{:time [5000 :ms]
-                                          :values [[(.translateXProperty instance)
-                                                    300]]}])
-                          :status (if instance
-                                    :running
-                                    :stopped)}}
+    (let-refs (when instance
+                {:timeline {:fx/type ::sequential-transition
+                            :node (get-ref :node)
+                            :children
+                            [{:fx/type ::timeline
+                              :cycle-count :indefinite
+                              :auto-reverse true
+                              :key-frames [{:time [2 :s]
+                                            :values [[(.translateXProperty instance)
+                                                      300]]}
+                                           {:time [1 :s]
+                                            :values [[(.translateYProperty instance)
+                                                      50]]}]
+                              :status :running}
+                             {:fx/type ::timeline
+                              :cycle-count :indefinite
+                              :auto-reverse true
+                              :key-frames [{:time [2 :s]
+                                            :values [[(.translateYProperty instance)
+                                                      -33]]}
+                                           {:time [1 :s]
+                                            :values [[(.translateYProperty instance)
+                                                      50]]}]
+                              :status :running}]}})
       (get-ref :node))))
 
+(defn path-transition [{:keys [desc]}]
+  (let-refs {:node desc}
+    (let-refs {:path {:fx/type ::path-transition
+                      :node (get-ref :node)
+                      :path desc
+                      :duration [1 :s]
+                      :cycle-count :indefinite
+                      :status :running}}
+      (get-ref :node))))
 
 (defn grow-shrink [current limit]
   (if (= current -1)
@@ -354,8 +426,8 @@
    :height 600
    :scene {:fx/type :scene
            :root {:fx/type :grid-pane
-                  :row-constraints (repeat 3 {:fx/type :row-constraints
-                                              :percent-height 100/3})
+                  :row-constraints (repeat 4 {:fx/type :row-constraints
+                                              :percent-height 100/4})
                   :children [(with-header
                                "Parallel rotate+translate"
                                0 0
@@ -376,10 +448,17 @@
                                     :width (grow-shrink timer-duration max-width)
                                     :height (grow-shrink timer-duration max-height)})))
                              (with-header
-                               "Timeline"
+                               "Sequential Timelines"
                                2 0
                                {:fx/type timeline
                                 :instance instance
+                                :desc {:fx/type :rectangle
+                                       :width 50
+                                       :height 100}})
+                             (with-header
+                               "Path transition"
+                               3 0
+                               {:fx/type path-transition
                                 :desc {:fx/type :rectangle
                                        :width 50
                                        :height 100}})]}}})
