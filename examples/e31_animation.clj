@@ -31,19 +31,19 @@
 ; animations. It uses the below implementation,
 ; in particular the `keyword->lifecycle` map in this namespace.
 
-; This is a first crack at animation with cljfx. It's mostly
-; as you might expect, using implementing lifecycles for the
+; This is my first crack at animation with cljfx or JavaFX. It's mostly
+; as you might expect, implementing lifecycles for the
 ; various packages javafx.animation classes, but here are some
 ; notes on the more interesting parts.
 
-; `Timeline`s take KeyFrames which must be passed `WritableValue`s,
-; which means things like (.translateXProperty node) and (.translateXProperty node)
-; in practice. This is somewhat awkward to do with descs.
-; To get a property out of a desc, I added the
-; lifecycle ::coerce, which takes a :desc and a :coerce function
+; `Timeline`s take KeyFrames which must be passed `WritableValue`s
+; like (.translateXProperty node) and (.translateXProperty node).
+; This is somewhat awkward to extract from descs.
+; To get a Property from a desc instance, I added the extension
+; lifecycle `ext-coerce`, which takes a :desc and a :coerce function
 ; that is called on the result of `component/instance`.
 ;   eg., the component created from desc
-;          {:fx/type ::coerce
+;          {:fx/type ext-coerce
 ;           :desc {:fx/type :rectangle ...}
 ;           :coerce #(.translateYProperty ^Node %)}
 ;        returns the .translateYProperty as the `component/instance`.
@@ -52,6 +52,19 @@
 ; can declare the node beforehand and extract what Properties you need
 ; as you go. See the `timeline` function in this namespace for example
 ; usage.
+; I'm not sure if `ext-coerce` is a good name here, but I couldn't think
+; of anything better.
+
+; There are several `lifecycle/wrap-on-delete` calls here that work
+; around the fact that calling `.stop` on a "nested" animation throws
+; an IllegalStateException. I'm not sure how to get around this.
+
+; There are many `mutator/forbidden` usages for immutable values here,
+; it would be nice to have a lifecycle that more effectively deals with immutable values
+; as alluded to at the bottom of the README.md.
+; The :interpolator prop on ::key-value seemed to need
+; special handling for defaults and coersion in the :ctor, IIRC `prop/make`
+; didn't do what I expected when omitting :interpolator.
 
 ;;;;;;;;;;;
 ;; Setup ;;
@@ -111,6 +124,48 @@
             :ease-out Interpolator/EASE_OUT
             :linear Interpolator/LINEAR
             (coerce/fail Interpolator x))))
+
+;; Extension lifecycles
+
+(defn wrap-coerce-with-prop [lifecycle child-prop coerce-prop]
+  (with-meta
+    [::coerce-with-prop lifecycle child-prop coerce-prop]
+    {`lifecycle/create (fn [_ desc opts]
+                         (let [child-desc (get desc child-prop)
+                               child (lifecycle/create lifecycle child-desc opts)
+                               coerce (get desc coerce-prop)]
+                           (when-not (fn? coerce)
+                             (throw (ex-info "Coercion must be fn"
+                                             {:coerce-prop coerce-prop
+                                              :coerce coerce})))
+                           (with-meta {:child child
+                                       :coerce coerce
+                                       :value (coerce (component/instance child))}
+                                      {`component/instance :value})))
+     `lifecycle/advance (fn [_ component desc opts]
+                          (let [old-coerce (:coerce component)
+                                new-coerce (get desc coerce-prop)
+                                child (:child component)
+                                old-instance (component/instance child)
+                                child-desc (get desc child-prop)
+                                new-child (lifecycle/advance lifecycle child child-desc opts)
+                                new-instance (component/instance new-child)]
+                            (when-not (fn? new-coerce)
+                              (throw (ex-info "Coercion must be fn"
+                                              {:coerce-prop coerce-prop
+                                               :coerce new-coerce})))
+                            (cond-> component
+                              :always
+                              (assoc :child new-child)
+
+                              (or (not= old-instance new-instance)
+                                  (not= old-coerce new-coerce))
+                              (assoc :value (new-coerce new-instance)))))
+     `lifecycle/delete (fn [_ component opts]
+                         (lifecycle/delete lifecycle (:child component) opts))}))
+
+(def coerce-lifecycle
+  (wrap-coerce-with-prop lifecycle/dynamic :desc :coerce))
 
 ;; Animation
 
@@ -334,7 +389,6 @@
     :prop-order {:status 1}
     :props stroke-transition-props))
 
-
 ;; ScaleTransition
 
 (def scale-transition-props
@@ -377,46 +431,6 @@
 
 
 ;; Timeline
-
-(defn wrap-coerce-with-prop [lifecycle child-prop coerce-prop]
-  (with-meta
-    [::coerce-with-prop lifecycle child-prop coerce-prop]
-    {`lifecycle/create (fn [_ desc opts]
-                         (let [child-desc (get desc child-prop)
-                               child (lifecycle/create lifecycle child-desc opts)
-                               coerce (get desc coerce-prop)]
-                           (when-not (fn? coerce)
-                             (throw (ex-info "Coercion must be fn"
-                                             {:coerce-prop coerce-prop
-                                              :coerce coerce})))
-                           (with-meta {:child child
-                                       :coerce coerce
-                                       :value (coerce (component/instance child))}
-                                      {`component/instance :value})))
-     `lifecycle/advance (fn [_ component desc opts]
-                          (let [old-coerce (:coerce component)
-                                new-coerce (get desc coerce-prop)
-                                child (:child component)
-                                old-instance (component/instance child)
-                                child-desc (get desc child-prop)
-                                new-child (lifecycle/advance lifecycle child child-desc opts)
-                                new-instance (component/instance new-child)]
-                            (when-not (fn? new-coerce)
-                              (throw (ex-info "Coercion must be fn"
-                                              {:coerce-prop coerce-prop
-                                               :coerce new-coerce})))
-                            (cond-> component
-                              :always
-                              (assoc :child new-child)
-
-                              (or (not= old-instance new-instance)
-                                  (not= old-coerce new-coerce))
-                              (assoc :value (new-coerce new-instance)))))
-     `lifecycle/delete (fn [_ component opts]
-                         (lifecycle/delete lifecycle (:child component) opts))}))
-
-(def coerce-lifecycle
-  (wrap-coerce-with-prop lifecycle/dynamic :desc :coerce))
 
 (def key-value-props
   {:target (prop/make mutator/forbidden
@@ -523,8 +537,7 @@
 ;; keyword->lifecycle
 
 (def keyword->lifecycle
-  {::coerce coerce-lifecycle
-   ::animation-timer animation-timer-lifecycle
+  {::animation-timer animation-timer-lifecycle
    ::translate-transition translate-transition-lifecycle
    ::rotate-transition rotate-transition-lifecycle
    ::parallel-transition parallel-transition-lifecycle
@@ -536,6 +549,8 @@
    ::scale-transition scale-transition-lifecycle
    ::stroke-transition stroke-transition-lifecycle
    ::timeline timeline-lifecycle})
+
+(def ext-coerce coerce-lifecycle)
 
 ;;;;;;;;;;
 ;; Demo ;;
@@ -597,10 +612,10 @@
 (defn timeline [{:keys [desc]}]
   {:pre [desc]}
   (let-refs {:node desc}
-    (let-refs {:node-x {:fx/type ::coerce
+    (let-refs {:node-x {:fx/type ext-coerce
                         :desc (get-ref :node)
                         :coerce translate-x-property}
-               :node-y {:fx/type ::coerce
+               :node-y {:fx/type ext-coerce
                         :desc (get-ref :node)
                         :coerce translate-y-property}}
       (let-refs {:timeline {:fx/type ::sequential-transition
