@@ -29,7 +29,8 @@
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.beans Observable InvalidationListener]
            [java.io InputStream]
-           [javafx.collections ListChangeListener]))
+           [javafx.collections ListChangeListener]
+           [javafx.animation Animation Interpolator PathTransition$OrientationType]))
 
 (set! *warn-on-reflection* true)
 
@@ -517,3 +518,46 @@
   (case x
     :use-computed-size -1.0
     (double x)))
+
+(defn animation [x]
+  (cond
+    (= :indefinite x) Animation/INDEFINITE
+    :else (int x)))
+
+(defn interpolator [x]
+  (cond
+    (instance? Interpolator x) x
+    (vector? x) (condp = (nth x 0)
+                  :spline (case (count x)
+                            5 (let [[_ x1 y1 x2 y2] x]
+                                (Interpolator/SPLINE (double x1)
+                                                     (double y1)
+                                                     (double x2)
+                                                     (double y2)))
+                             (fail Interpolator x))
+                  :tangent (case (count x)
+                             3 (let [[_ t v] x]
+                                 (Interpolator/TANGENT (duration t)
+                                                       (double v)))
+                             5 (let [[_ t1 v1 t2 v2] x]
+                                 (Interpolator/TANGENT (duration t1)
+                                                       (double v1)
+                                                       (duration t2)
+                                                       (double v2)))
+                             (fail Interpolator x))
+                  (fail Interpolator x))
+    :else (case x
+            :discrete Interpolator/DISCRETE
+            :ease-both Interpolator/EASE_BOTH
+            :ease-in Interpolator/EASE_IN
+            :ease-out Interpolator/EASE_OUT
+            :linear Interpolator/LINEAR
+            (fail Interpolator x))))
+
+(defn path-transition-orientation [x]
+  (cond
+    (instance? PathTransition$OrientationType x) x
+    :else (case x
+            :none PathTransition$OrientationType/NONE
+            :orthogonal-to-tanget PathTransition$OrientationType/ORTHOGONAL_TO_TANGENT
+            (fail PathTransition$OrientationType x))))
