@@ -172,20 +172,27 @@
 (def animation-props
   (composite/props Animation
     :auto-reverse [:setter lifecycle/scalar :default false]
+    :on-auto-reverse-changed [:property-change-listener lifecycle/change-listener]
+    :on-current-time-changed [:property-change-listener lifecycle/change-listener]
+    ; TODO
+    ;:on-cue-points-changed [:property-change-listener lifecycle/change-listener]
     :cycle-count [:setter lifecycle/scalar :coerce coerce-animation :default 1.0]
     :on-cycle-count-changed [:property-change-listener lifecycle/change-listener]
-    :delay [:setter lifecycle/scalar :default (coerce/duration 0)]
+    :on-cycle-duration-changed [:property-change-listener lifecycle/change-listener]
+    :delay [:setter lifecycle/scalar :coerce coerce/duration :default 0]
+    :on-delay-changed [:property-change-listener lifecycle/change-listener]
     :on-finished [:setter lifecycle/event-handler :coerce coerce/event-handler :default nil]
+    :on-on-finished-changed [:property-change-listener lifecycle/change-listener]
     :rate [:setter lifecycle/scalar :coerce double :default 1.0]
+    :on-rate-changed [:property-change-listener lifecycle/change-listener]
     :jump-to [(mutator/setter
                 #(if (string? %2)
                    (.jumpTo ^Animation %1 ^String %2)
                    (.jumpTo ^Animation %1 ^Duration %2)))
               lifecycle/scalar
-              :coerce (fn [x]
-                        (if (string? x)
-                          x
-                          (coerce/duration x)))]
+              :coerce #(if (string? %)
+                         %
+                         (coerce/duration %))]
     :on-status-changed [:property-change-listener lifecycle/change-listener]
     :status [(mutator/setter
                #(case %2
@@ -488,40 +495,10 @@
   (merge animation-props
          (composite/props
            Timeline
-           ; Future syntax ideas for key-frames
-           ; eg. At 2 sec, move node's x prop to 30
-           ;     {[2 :s] [(get-ref :node-x) 30}
-           ;
-           ; (defalias KeyFrameKey
-           ;    (U TimeDesc
-           ;       (HMap :mandatory {:time TimeDesc}
-           ;             :optional {:interpolator InterpolatorDesc
-           ;                        :name Str
-           ;                        :on-finished EventHandlerDesc}
-           ;             :absent-keys #{:fx/type})))
-           ; (defalias KeyFrameValue
-           ;   (U '[Desc Any]
-           ;      '[Desc Any Interpolator]
-           ;      (HMap :mandatory {:target Desc}
-           ;            :optional {:end-value Any
-           ;                       :interpolator Interpolator}
-           ;            :absent-keys #{:fx/type})))
-           ; (defalias KeyFrameDesc
-           ;   (U javafx.animation.KeyFrame
-           ;      '[KeyFrameKey (U KeyFrameValue (Vec KeyFrameValue))]
-           ;      (HMap :mandatory {:time TimeDesc}
-           ;            :optional {:values KeyFrameValues}
-           ;            :absent-keys #{:fx/type})))
-           ; (defalias KeyFrameValues
-           ;   (Seqable KeyFrameDesc))
            :key-frames [:list (lifecycle/wrap-many
                                 (lifecycle/if-desc #(instance? KeyFrame %)
                                   lifecycle/scalar
-                                  ; reserve Descs for now
-                                  (lifecycle/if-desc #(and (map? %)
-                                                           (contains? % :fx/type))
-                                    lifecycle/dynamic
-                                    key-frame-lifecycle)))])))
+                                  key-frame-lifecycle))])))
 
 (def timeline-lifecycle
   (->
@@ -578,7 +555,7 @@
   {:fx/type fx/ext-get-ref
    :ref ref})
 
-(defn animate-entrance-desc [{:keys [desc]}]
+(defn animate-entrance-desc [{:keys [desc status] :or {status :running}}]
   {:pre [desc]}
   (let-refs {:node desc}
     (let-refs {:animation1
@@ -586,7 +563,7 @@
                 :node (get-ref :node)
                 :auto-reverse true
                 :cycle-count :indefinite
-                :status :running
+                :status status
                 :children [; rotate 180 degrees
                            {:fx/type ::rotate-transition
                             :node (get-ref :node)
@@ -612,12 +589,12 @@
 (defn timeline [{:keys [desc]}]
   {:pre [desc]}
   (let-refs {:node desc}
-    (let-refs {:node-x {:fx/type ext-coerce
-                        :desc (get-ref :node)
-                        :coerce translate-x-property}
-               :node-y {:fx/type ext-coerce
-                        :desc (get-ref :node)
-                        :coerce translate-y-property}}
+    (let [node-x {:fx/type ext-coerce
+                  :desc (get-ref :node)
+                  :coerce translate-x-property}
+          node-y {:fx/type ext-coerce
+                  :desc (get-ref :node)
+                  :coerce translate-y-property}]
       (let-refs {:timeline {:fx/type ::sequential-transition
                             :node (get-ref :node)
                             :cycle-count :indefinite
@@ -627,22 +604,22 @@
                             [{:fx/type ::timeline
                               :key-frames 
                               #{{:time [2 :s]
-                                 :values [{:target (get-ref :node-x)
+                                 :values [{:target node-x
                                            :end-value 30}]}
                                 {:time [0.5 :s]
-                                 :values [{:target (get-ref :node-y)
+                                 :values [{:target node-y
                                            :end-value 50}]}
                                 {:time [1 :s]
-                                 :values [{:target (get-ref :node-y)
+                                 :values [{:target node-y
                                            :end-value 0}]}}}
                              {:fx/type ::pause-transition
                               :duration [0.4 :s]}
                              {:fx/type ::timeline
                               :key-frames #{{:time [2 :s]
-                                             :values [{:target (get-ref :node-y)
+                                             :values [{:target node-y
                                                        :end-value 0}]}
                                             {:time [1 :s]
-                                             :values [{:target (get-ref :node-y)
+                                             :values [{:target node-y
                                                        :end-value 50}]}}}]}}
         (get-ref :node)))))
 
@@ -712,8 +689,8 @@
     (- limit (mod current limit))))
 
 (defn with-header [text row col desc]
-  {:fx/type :h-box
-   :fill-height true
+  {:fx/type :v-box
+   :fill-width true
    :grid-pane/row row
    :grid-pane/column col
    :spacing 10
@@ -731,8 +708,8 @@
            :root {:fx/type :grid-pane
                   :row-constraints (repeat 4 {:fx/type :row-constraints
                                               :percent-height 100/4})
-                  :column-constraints (repeat 2 {:fx/type :column-constraints
-                                                 :percent-width 100/2})
+                  :column-constraints (repeat 3 {:fx/type :column-constraints
+                                                 :percent-width 100/3})
                   :children [(with-header
                                "Parallel rotate+translate"
                                0 0
@@ -796,7 +773,15 @@
                                        :arc-height 20
                                        :arc-width 20
                                        :width 50
-                                       :height 100}})]}}})
+                                       :height 100}})
+                             (with-header
+                               "Parallel rotate+translate"
+                               0 2
+                               (let [rect (keyword (gensym))]
+                                 {:fx/type animate-entrance-desc
+                                  :desc {:fx/type :rectangle
+                                         :width 50
+                                         :height 100}}))]}}})
 
 (def renderer
   (fx/create-renderer

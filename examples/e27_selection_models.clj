@@ -205,13 +205,15 @@
                                   :percent-height (/ 100 rows)})
    :column-constraints (repeat columns {:fx/type :column-constraints
                                         :percent-width (/ 100 columns)})
-   :children (for [row (range rows)
-                   col (range columns)
-                   :let [loc (+ (* row rows) col)]
-                   :when (< loc (count descs))]
-               (-> (nth descs loc)
-                   (assoc :grid-pane/row row
-                          :grid-pane/column col)))})
+   :children (let [loc (atom -1)]
+               (vec
+                 (for [row (range rows)
+                       col (range columns)
+                       :let [_ (swap! loc inc)]
+                       :when (< @loc (count descs))]
+                   (-> (nth descs @loc)
+                       (assoc :grid-pane/row row
+                              :grid-pane/column col)))))})
 
 (defn view [{{:keys [tree selection]} :state}]
   (let [path->value (make-path->value tree)]
