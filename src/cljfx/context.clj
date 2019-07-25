@@ -66,13 +66,15 @@
     (catch FileNotFoundException _
       identity)))
 
-(defn- assert-not-leaked [cache sub-id]
-  (assert (not (has? cache sub-id))
-          (str (first sub-id) " is attempting to subscribe to bound context which already has value
+(defn- assert-not-leaked [cache sub-id & data-flat]
+  (when (has? cache sub-id)
+    (throw (ex-info 
+             (str (first sub-id) " is attempting to subscribe to bound context which already has value
 
 Possible reasons:
 - you return lazy seq which uses `cljfx.api/sub` while calculating elements
-- you leaked context from subscription function's scope without unbinding it first (call `cljfx.api/unbind-context` on it in that case)")))
+- you leaked context from subscription function's scope without unbinding it first (call `cljfx.api/unbind-context` on it in that case)")
+             (into (apply hash-map data-flat) {:parent-sub-id sub-id})))))
 
 (defn unbind [context]
   (dissoc context ::*direct-deps ::*key-deps ::parent-sub-id))
@@ -90,17 +92,27 @@ Possible reasons:
      ::direct-deps @*direct-deps
      ::key-deps @*key-deps}))
 
-(declare sub)
+(declare sub register-cache-entry)
+
+(def ^:dynamic *processing-dirty* #{})
 
 (defn- sub-from-dirty [context *cache cache sub-id]
   (let [dirty-sub (lookup cache [::dirty sub-id])
-        deps (::direct-deps dirty-sub)
-        unbound-context (unbind context)]
-    (if (every? #(= (get deps %) (apply sub unbound-context %)) (keys deps))
+        unbound-context (unbind context)
+        key-deps (reduce
+                   (fn [key-deps [dep-id dep-v]]
+                     (let [v (-> (register-cache-entry unbound-context *cache @*cache dep-id)
+                                 (lookup dep-id))]
+                       (if (not= dep-v (::value v))
+                         (reduced nil)
+                         (into key-deps (::key-deps v)))))
+                   (::key-deps dirty-sub)
+                   (::direct-deps dirty-sub))]
+    (if key-deps
       (swap! *cache (fn [cache]
                       (-> cache
                           (evict [::dirty sub-id])
-                          (miss sub-id dirty-sub))))
+                          (miss sub-id (assoc dirty-sub ::key-deps key-deps)))))
       (let [v (calc-cache-entry context sub-id)]
         (swap! *cache (fn [cache]
                         (-> cache
@@ -112,21 +124,24 @@ Possible reasons:
     ::context
     (assoc deps k v)))
 
+(defn- register-cache-entry [context *cache cache sub-id]
+  (if (has? cache sub-id)
+    (swap! *cache hit sub-id)
+    (let [recalc #(swap! *cache miss sub-id (calc-cache-entry context sub-id))]
+      (if (has? cache [::dirty sub-id])
+        (if (*processing-dirty* sub-id)
+          (do (swap! *cache evict [::dirty sub-id])
+              (recalc))
+          (binding [*processing-dirty* (conj *processing-dirty* sub-id)]
+            (sub-from-dirty context *cache cache sub-id)))
+        (recalc)))))
+
 (defn sub [context k & args]
   (let [sub-id (apply vector k args)
         {::keys [*cache *direct-deps *key-deps]} context
         cache @*cache
         ret (if (fn? k)
-              (let [entry (-> (cond
-                                (has? cache sub-id)
-                                (do (swap! *cache hit sub-id)
-                                    cache)
-
-                                (has? cache [::dirty sub-id])
-                                (sub-from-dirty context *cache cache sub-id)
-
-                                :else
-                                (swap! *cache miss sub-id (calc-cache-entry context sub-id)))
+              (let [entry (-> (register-cache-entry context *cache cache sub-id)
                               (lookup sub-id))]
                 (when *key-deps
                   (swap! *key-deps set/union (::key-deps entry)))
@@ -139,7 +154,7 @@ Possible reasons:
                   (swap! *key-deps conj k))
                 (get-in context [::m k])))]
     (when *direct-deps
-      (assert-not-leaked cache (::parent-sub-id context))
+      (assert-not-leaked cache (::parent-sub-id context) :child-sub-id sub-id)
       (swap! *direct-deps add-dep sub-id ret))
     ret))
 

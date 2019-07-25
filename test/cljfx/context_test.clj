@@ -83,6 +83,45 @@
           (context/sub context-3 template) => "Привет, %s!"
           @*template-call-counter => 2)))))
 
+; case where a dependency changes its key deps, but returns the same result.
+; Dirty dependents should update
+; their key deps, regardless if they need a full recalculation.
+(deftest dirty-cache-entry-always-updates-its-key-deps
+  ;; TODO test that circular dirty deps don't do unnecessary recalculation
+  (let [*template-counter (atom 0)
+        *parent-child-counter (atom 0)
+        parent-child (fn [context]
+                       (swap! *parent-child-counter inc)
+                       (when (context/sub context :parent)
+                         (context/sub context :child)))
+        template (fn [context]
+                   (swap! *template-counter inc)
+                   (context/sub context parent-child))
+
+        context (context/create {} identity)
+        _ (facts
+            "[template] directly depends on [parent-child]. Both have key deps #{:parent}"
+            (context/sub context template) => nil
+            @*template-counter => 1
+            @*parent-child-counter => 1)
+        context (context/swap context assoc :parent :parent)
+        _ (facts
+            "[template] not recalculated because parent-child returns same result"
+            (context/sub context template) => nil
+            @*template-counter => 1)
+        _ (facts
+            "[parent-child] recalculated because it is a dependency of [template]"
+            @*parent-child-counter => 2)
+        context (context/swap context assoc :child :child)
+        _ (facts
+            "[template] has #{:parent :child} key deps and so is recalculated."
+            (context/sub context template) => :child
+            @*template-counter => 2)
+        _ (facts
+            "[parent-child] recalculated exactly once to verify that [template] cache entry should be evicted"
+            @*parent-child-counter => 3)
+        ]))
+
 (deftest creating-derived-contexts-inside-subs-add-dependency-on-context-itself
   (let [*sub-context-call-counter (atom 0)
         context (context/create {:db 1} identity)
