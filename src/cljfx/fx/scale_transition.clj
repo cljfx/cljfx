@@ -20,9 +20,9 @@
       :to-x [:setter lifecycle/scalar :coerce double :default ##NaN]
       :to-y [:setter lifecycle/scalar :coerce double :default ##NaN]
       :to-z [:setter lifecycle/scalar :coerce double :default ##NaN]
-      :by-x [:setter lifecycle/scalar :coerce double]
-      :by-y [:setter lifecycle/scalar :coerce double]
-      :by-z [:setter lifecycle/scalar :coerce double])))
+      :by-x [:setter lifecycle/scalar :coerce double :default 0]
+      :by-y [:setter lifecycle/scalar :coerce double :default 0]
+      :by-z [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
   (composite/describe ScaleTransition

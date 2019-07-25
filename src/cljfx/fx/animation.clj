@@ -9,17 +9,22 @@
 
 (set! *warn-on-reflection* true)
 
+(defn coerce-animation [x]
+  (case x
+    :indefinite Animation/INDEFINITE
+    (int x)))
+
 (def props
   (composite/props Animation
     :auto-reverse [:setter lifecycle/scalar :default false]
     :on-auto-reverse-changed [:property-change-listener lifecycle/change-listener]
     :on-current-time-changed [:property-change-listener lifecycle/change-listener]
-    :cycle-count [:setter lifecycle/scalar :coerce coerce/animation :default 1.0]
+    :cycle-count [:setter lifecycle/scalar :coerce coerce-animation :default 1]
     :on-cycle-count-changed [:property-change-listener lifecycle/change-listener]
     :on-cycle-duration-changed [:property-change-listener lifecycle/change-listener]
     :delay [:setter lifecycle/scalar :coerce coerce/duration :default 0]
     :on-delay-changed [:property-change-listener lifecycle/change-listener]
-    :on-finished [:setter lifecycle/event-handler :coerce coerce/event-handler :default nil]
+    :on-finished [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-on-finished-changed [:property-change-listener lifecycle/change-listener]
     :rate [:setter lifecycle/scalar :coerce double :default 1.0]
     :on-rate-changed [:property-change-listener lifecycle/change-listener]

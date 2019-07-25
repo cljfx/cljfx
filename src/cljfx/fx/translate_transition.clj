@@ -24,13 +24,7 @@
       :node [:setter lifecycle/dynamic]
       :to-x [:setter lifecycle/scalar :coerce double :default ##NaN]
       :to-y [:setter lifecycle/scalar :coerce double :default ##NaN]
-      :to-z [:setter lifecycle/scalar :coerce double :default ##NaN]
-      :state [(mutator/setter
-                #(case %2
-                   :playing (.play ^TranslateTransition %1)
-                   :stopped (.stop ^TranslateTransition %1)))
-              lifecycle/scalar
-              :default :stopped])))
+      :to-z [:setter lifecycle/scalar :coerce double :default ##NaN])))
 
 (def lifecycle
   (composite/describe TranslateTransition

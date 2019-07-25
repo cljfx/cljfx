@@ -14,19 +14,6 @@
 
 (set! *warn-on-reflection* true)
 
-(defn init-state []
-  {})
-
-(declare *state renderer)
-
-(when (and (.hasRoot #'*state)
-           (.hasRoot #'renderer))
-  (fx/unmount-renderer *state renderer)
-  (reset! *state (init-state)))
-
-(def *state
-  (atom (init-state)))
-
 (defn- let-refs [refs desc]
   {:fx/type fx/ext-let-refs
    :refs refs
@@ -149,7 +136,7 @@
                    :radius 35}
             :duration [1 :s]
             :interpolator :linear
-            :orientation :orthogonal-to-tanget
+            :orientation :orthogonal-to-tangent
             :cycle-count :indefinite}]
    ["Parallel" {:fx/type :parallel-transition
                 :auto-reverse true
@@ -239,6 +226,25 @@
                                           :height 50}}))
                               indefinite-animations)}}})
 
+(fx/on-fx-thread
+  (fx/create-component
+    {:fx/type view}))
+
+; how to add state
+(comment
+(defn init-state []
+  {})
+
+(declare *state renderer)
+
+(when (and (.hasRoot #'*state)
+           (.hasRoot #'renderer))
+  (fx/unmount-renderer *state renderer)
+  (reset! *state (init-state)))
+
+(def *state
+  (atom (init-state)))
+
 (def renderer
   (fx/create-renderer
     :middleware (fx/wrap-map-desc (fn [state]
@@ -246,3 +252,4 @@
                                      :state state}))))
 
 (fx/mount-renderer *state renderer)
+)

@@ -3,7 +3,6 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.mutator :as mutator]
             [cljfx.fx.transition :as fx.transition])
   (:import [javafx.animation RotateTransition]))
 

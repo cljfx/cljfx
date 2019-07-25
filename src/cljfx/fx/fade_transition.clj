@@ -16,7 +16,7 @@
       :duration [:setter lifecycle/scalar :coerce coerce/duration :default 400]
       :from-value [:setter lifecycle/scalar :coerce double :default ##NaN]
       :to-value [:setter lifecycle/scalar :coerce double :default ##NaN]
-      :by-value [:setter lifecycle/scalar :coerce double])))
+      :by-value [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
   (composite/describe FadeTransition

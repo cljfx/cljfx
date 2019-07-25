@@ -4,7 +4,7 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.transition :as fx.transition])
-  (:import [javafx.animation PathTransition]))
+  (:import [javafx.animation PathTransition PathTransition$OrientationType]))
 
 (set! *warn-on-reflection* true)
 
@@ -15,7 +15,7 @@
       :node [:setter lifecycle/dynamic]
       :duration [:setter lifecycle/scalar :coerce coerce/duration :default 400]
       :path [:setter lifecycle/dynamic]
-      :orientation [:setter lifecycle/scalar :coerce coerce/path-transition-orientation :default :none])))
+      :orientation [:setter lifecycle/scalar :coerce (coerce/enum PathTransition$OrientationType) :default :none])))
 
 (def lifecycle
   (composite/describe PathTransition

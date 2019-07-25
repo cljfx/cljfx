@@ -14,8 +14,8 @@
     (composite/props FillTransition
       :shape [:setter lifecycle/dynamic]
       :duration [:setter lifecycle/scalar :coerce coerce/duration :default 400]
-      :from-value [:setter lifecycle/scalar :coerce coerce/color :default nil]
-      :to-value [:setter lifecycle/scalar :coerce coerce/color :default nil])))
+      :from-value [:setter lifecycle/scalar :coerce coerce/color]
+      :to-value [:setter lifecycle/scalar :coerce coerce/color])))
 
 (def lifecycle
   (composite/describe FillTransition
