@@ -149,7 +149,11 @@ Possible reasons:
     (some #(contains? s2 %) s1)))
 
 (defn- invalidate-cache [cache old-m new-m]
-  (let [changed-keys (into #{} (remove #(= (old-m %) (new-m %))) (keys old-m))
+  (let [changed-keys (into #{}
+                           (comp (mapcat keys)
+                                 (distinct)
+                                 (remove #(= (old-m %) (new-m %))))
+                           [old-m new-m])
         changed-sub-ids (into #{} (map vector) changed-keys)]
     (reduce (fn [acc [k v]]
               (let [direct-deps (::direct-deps v)]
