@@ -42,4 +42,4 @@
   (merge
     fx.animation/props
     (composite/props Transition
-      :interpolator [:setter lifecycle/scalar :coerce coerce-interpolator :default :ease-in])))
+      :interpolator [:setter lifecycle/scalar :coerce coerce-interpolator :default :ease-both])))

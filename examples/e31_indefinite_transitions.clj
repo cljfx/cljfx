@@ -232,24 +232,23 @@
 
 ; how to add state
 (comment
-(defn init-state []
-  {})
+  (defn init-state []
+    {})
 
-(declare *state renderer)
+  (declare *state renderer)
 
-(when (and (.hasRoot #'*state)
-           (.hasRoot #'renderer))
-  (fx/unmount-renderer *state renderer)
-  (reset! *state (init-state)))
+  (when (and (.hasRoot #'*state)
+             (.hasRoot #'renderer))
+    (fx/unmount-renderer *state renderer)
+    (reset! *state (init-state)))
 
-(def *state
-  (atom (init-state)))
+  (def *state
+    (atom (init-state)))
 
-(def renderer
-  (fx/create-renderer
-    :middleware (fx/wrap-map-desc (fn [state]
-                                    {:fx/type view
-                                     :state state}))))
+  (def renderer
+    (fx/create-renderer
+      :middleware (fx/wrap-map-desc (fn [state]
+                                      {:fx/type view
+                                       :state state}))))
 
-(fx/mount-renderer *state renderer)
-)
+  (fx/mount-renderer *state renderer))
