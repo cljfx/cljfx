@@ -170,7 +170,18 @@
    :choice-dialog (lazy-load cljfx.fx.choice-dialog/lifecycle)
    :dialog (lazy-load cljfx.fx.dialog/lifecycle)
    :dialog-pane (lazy-load cljfx.fx.dialog-pane/lifecycle)
-   :text-input-dialog (lazy-load cljfx.fx.text-input-dialog/lifecycle)})
+   :text-input-dialog (lazy-load cljfx.fx.text-input-dialog/lifecycle)
+   ;; transitions
+   :fade-transition (lazy-load cljfx.fx.fade-transition/lifecycle)
+   :fill-transition (lazy-load cljfx.fx.fill-transition/lifecycle)
+   :parallel-transition (lazy-load cljfx.fx.parallel-transition/lifecycle)
+   :path-transition (lazy-load cljfx.fx.path-transition/lifecycle)
+   :pause-transition (lazy-load cljfx.fx.pause-transition/lifecycle)
+   :rotate-transition (lazy-load cljfx.fx.rotate-transition/lifecycle)
+   :scale-transition (lazy-load cljfx.fx.scale-transition/lifecycle)
+   :sequential-transition (lazy-load cljfx.fx.sequential-transition/lifecycle)
+   :stroke-transition (lazy-load cljfx.fx.stroke-transition/lifecycle)
+   :translate-transition (lazy-load cljfx.fx.translate-transition/lifecycle)})
 
 (defn keyword->lifecycle [kw]
   (when-let [*delay (keyword->lifecycle-delay kw)]
