@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.4.0](https://github.com/cljfx/cljfx/releases/tag/1.4.0) - 2019-07-27
+- Added basic animation support ([example](examples/e31_indefinite_transitions.clj))
+
 ### [1.3.5](https://github.com/cljfx/cljfx/releases/tag/1.3.5) - 2019-07-11
 - Allow `:selected-item` in extra-props lifecycles to be descriptions
 
