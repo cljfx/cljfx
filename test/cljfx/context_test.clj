@@ -26,8 +26,7 @@
           f #(context/sub % :entry)
           _ (fact (context/sub context f) => nil)
           context (context/swap context assoc :entry 0)
-          _ (fact (context/sub context f) => 0)
-          ])))
+          _ (fact (context/sub context f) => 0)])))
 
 (deftest after-changing-context-only-affected-subscriptions-are-recalculated
   (let [*greeting-call-counter (atom 0)

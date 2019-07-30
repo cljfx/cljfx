@@ -37,7 +37,7 @@
                                {:fx/type :button
                                 :on-action {:event/type ::clicked
                                             :clicked clicked}
-                                :text (str "Clicked x" (or clicked 0))}) ]}}})
+                                :text (str "Clicked x" (or clicked 0))})]}}})
 
 ; Handlers
 
