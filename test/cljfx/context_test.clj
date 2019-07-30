@@ -20,7 +20,14 @@
                  (context/sub context fib (- n 1)))))]
     (context/sub context f 10)
     (fact
-      @*tracker => 11)))
+      @*tracker => 11))
+  (testing "a missing entry is treated like a nil entry"
+    (let [context (context/create {} identity)
+          f #(context/sub % :entry)
+          _ (fact (context/sub context f) => nil)
+          context (context/swap context assoc :entry 0)
+          _ (fact (context/sub context f) => 0)
+          ])))
 
 (deftest after-changing-context-only-affected-subscriptions-are-recalculated
   (let [*greeting-call-counter (atom 0)
@@ -162,4 +169,3 @@
             "Updating context with independent change does not trigger recalculation"
             (context/sub context-3 inc-db) => 3
             @*inc-db-call-counter => 2)]))
-
