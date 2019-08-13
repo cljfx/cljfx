@@ -119,8 +119,7 @@
             @*template-counter => 2)
         _ (facts
             "[parent-child] recalculated exactly once to verify that [template] cache entry should be evicted"
-            @*parent-child-counter => 3)
-        ]))
+            @*parent-child-counter => 3)]))
 
 (deftest creating-derived-contexts-inside-subs-add-dependency-on-context-itself
   (let [*sub-context-call-counter (atom 0)
