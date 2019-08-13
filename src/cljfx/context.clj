@@ -95,12 +95,13 @@ Possible reasons:
 (defn- sub-from-dirty [context *cache cache sub-id]
   (let [dirty-sub (lookup cache [::dirty sub-id])
         deps (::direct-deps dirty-sub)
-        unbound-context (unbind context)]
+        *key-deps (atom #{})
+        unbound-context (assoc (unbind context) ::*key-deps *key-deps)]
     (if (every? #(= (get deps %) (apply sub unbound-context %)) (keys deps))
       (swap! *cache (fn [cache]
                       (-> cache
                           (evict [::dirty sub-id])
-                          (miss sub-id dirty-sub))))
+                          (miss sub-id (assoc dirty-sub ::key-deps @*key-deps)))))
       (let [v (calc-cache-entry context sub-id)]
         (swap! *cache (fn [cache]
                         (-> cache

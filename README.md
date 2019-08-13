@@ -374,7 +374,7 @@ flavors:
 Returned values from subscription functions are memoized in this context
 (so it actually is a *memoization* context), and subsequent `sub` calls
 will result in cache lookup. The best thing about context is that not
-only it supports updating wrapped values via `swap-context` and
+only does it support updating wrapped values via `swap-context` and
 `reset-context`, it also reuses this memoization cache to minimize
 re-calculation of subscription functions in successors of this context.
 This is done via tracking of `fx/sub` calls inside subscription
