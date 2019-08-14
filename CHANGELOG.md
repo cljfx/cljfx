@@ -3,7 +3,7 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.4.1](https://github.com/cljfx/cljfx/releases/tag/1.4.0) - 2019-08-13
+### [1.4.1](https://github.com/cljfx/cljfx/releases/tag/1.4.1) - 2019-08-13
 - Fixed context issue that manifested itself in returning stale sub values
 
 ### [1.4.0](https://github.com/cljfx/cljfx/releases/tag/1.4.0) - 2019-07-27
