@@ -14,6 +14,8 @@
            :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
            :test {:extra-paths ["test"]
                   :extra-deps {metosin/testit {:mvn/version "0.2.0"}}}
+           :headless {:jvm-opts ["-Dtestfx.robot=glass" "-Dglass.platform=Monocle" "-Dmonocle.platform=Headless" "-Dprism.order=sw"]
+                      :extra-deps {org.testfx/openjfx-monocle {:mvn/version "jdk-12.0.1+2"}}}
            :runner {:extra-deps {com.cognitect/test-runner
                                  {:git/url "https://github.com/cognitect-labs/test-runner"
                                   :sha "3cb0a9daf1cb746259dc8309b218f9211ad3b33b"}}
