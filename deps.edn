@@ -14,6 +14,12 @@
            :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
            :test {:extra-paths ["test"]
                   :extra-deps {metosin/testit {:mvn/version "0.2.0"}}}
+           :runner {:extra-deps {com.cognitect/test-runner
+                                 {:git/url "https://github.com/cognitect-labs/test-runner"
+                                  :sha "3cb0a9daf1cb746259dc8309b218f9211ad3b33b"}}
+                    :main-opts ["-m" "cognitect.test-runner"
+                                "-d" "test"
+                                "-d" "src/test/clojure"]}
            :depstar {:extra-deps {seancorfield/depstar {:mvn/version "0.2.1"}}
                      :main-opts ["-m" "hf.depstar.jar" "cljfx.jar"]}
            :deploy {:extra-deps {deps-deploy {:mvn/version "0.0.9"}}
