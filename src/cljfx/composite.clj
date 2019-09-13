@@ -17,7 +17,7 @@
     (fn [acc k v]
       (let [prop-config (get props-config k)]
         (when-not prop-config
-          (throw (ex-info "No such prop" {:prop k})))
+          (throw (ex-info (str "No such prop: " (pr-str k)) {:prop k})))
         (assoc acc k (lifecycle/create (prop/lifecycle prop-config) v opts))))
     props-desc
     props-desc))
