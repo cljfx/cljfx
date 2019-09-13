@@ -2,6 +2,7 @@
 
 [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
 [![Slack Channel](https://img.shields.io/badge/slack-cljfx@clojurians-blue.svg?logo=slack)](https://clojurians.slack.com/messages/cljfx/)
+![Clojure CI](https://github.com/cljfx/cljfx/workflows/Clojure%20CI/badge.svg)
 
 Cljfx is a declarative, functional and extensible wrapper of JavaFX
 inspired by better parts of react and re-frame.
