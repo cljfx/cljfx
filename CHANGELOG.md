@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.4.2](https://github.com/cljfx/cljfx/releases/tag/1.4.2) - 2019-09-13
+- Improved error message on wrong prop key
+
 ### [1.4.1](https://github.com/cljfx/cljfx/releases/tag/1.4.1) - 2019-08-13
 - Fixed context issue that manifested itself in returning stale sub values
 

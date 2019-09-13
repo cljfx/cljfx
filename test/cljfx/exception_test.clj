@@ -3,7 +3,7 @@
             [testit.core :refer :all]
             [cljfx.api :as fx]))
 
-(deftest boop
+(deftest non-existent-key
   (fact
     (fx/create-component {:fx/type :label "non-existent-key" true})
     =throws=>
