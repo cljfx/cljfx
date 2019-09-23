@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.4.3](https://github.com/cljfx/cljfx/releases/tag/1.4.3) - 2019-09-23
+- Fixed enum coercion in turkish locale
+
 ### [1.4.2](https://github.com/cljfx/cljfx/releases/tag/1.4.2) - 2019-09-13
 - Improved error message on wrong prop key
 

@@ -1,7 +1,7 @@
 (ns cljfx.coerce
   "Part of a public API"
   (:require [clojure.string :as str])
-  (:import [java.util List]
+  (:import [java.util List Locale]
            [javafx.event EventHandler]
            [javafx.scene Cursor]
            [javafx.scene.image Image]
@@ -37,7 +37,7 @@
   (-> kw
       name
       (str/replace "-" "_")
-      str/upper-case))
+      (.toUpperCase Locale/ROOT)))
 
 (defn fail [target x]
   (throw (ex-info "Don't know how to coerce" {:target target :x x})))
@@ -453,7 +453,7 @@
     (vector? x)
     (let [modifiers (->> x
                          butlast
-                         (map #(-> % name (str/replace "-" " ") str/upper-case)))
+                         (map #(-> % name (str/replace "-" " ") (.toUpperCase Locale/ROOT))))
           code (last x)
           code-str (cond
                      (instance? KeyCode code) (.getName ^KeyCode code)
