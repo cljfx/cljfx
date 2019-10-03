@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.4.4](https://github.com/cljfx/cljfx/releases/tag/1.4.4) - 2019-10-03
+- Added `:fx/executor` agent option to `wrap-async` that allows specifying
+  custom executor
+
 ### [1.4.3](https://github.com/cljfx/cljfx/releases/tag/1.4.3) - 2019-09-23
 - Fixed enum coercion in turkish locale
 
