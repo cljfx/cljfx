@@ -408,7 +408,8 @@
   can be used to enqueue more events for asynchronous handling
 
   `agent-options` is map that is passed to [[clojure.core/agent]], has default
-  `:error-handler` that will print stack traces of thrown Throwables"
+  `:error-handler` that will print stack traces of thrown Throwables. Additional option
+  `:fx/executor` may be used to specify executor"
   [f & {:as agent-options}]
   (event-handler/wrap-async
     f

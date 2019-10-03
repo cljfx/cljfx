@@ -1,5 +1,6 @@
 (ns cljfx.event-handler
-  "Part of a public API")
+  "Part of a public API"
+  (:import [clojure.lang Agent]))
 
 (defn make-deref-co-effect [*ref]
   #(deref *ref))
@@ -32,11 +33,12 @@
     (deliver *maybe-promise nil)))
 
 (defn wrap-async [f agent-options]
-  (let [*agent (apply agent nil (mapcat identity agent-options))]
+  (let [*agent (apply agent nil (mapcat identity agent-options))
+        executor (:fx/executor agent-options Agent/pooledExecutor)]
     (fn dispatch-async! [event]
       (if (:fx/sync event)
         (let [*promise (promise)]
-          (send *agent process-event f event dispatch-async! *promise)
+          (send-via executor *agent process-event f event dispatch-async! *promise)
           @*promise)
-        (send *agent process-event f event dispatch-async! nil))
+        (send-via executor *agent process-event f event dispatch-async! nil))
       nil)))
