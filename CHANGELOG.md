@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.4.5](https://github.com/cljfx/cljfx/releases/tag/1.4.5) - 2019-10-09
+- Bumped used JavaFX and Clojure versions
+
 ### [1.4.4](https://github.com/cljfx/cljfx/releases/tag/1.4.4) - 2019-10-03
 - Added `:fx/executor` agent option to `wrap-async` that allows specifying
   custom executor
