@@ -33,6 +33,11 @@
                      #(.removeEventFilter ^Node %1 Event/ANY ^EventHandler %2))
                    lifecycle/event-handler
                    :coerce coerce/event-handler]
+    :event-handler [(mutator/adder-remover
+                      #(.addEventHandler ^Node %1 Event/ANY ^EventHandler %2)
+                      #(.removeEventHandler ^Node %1 Event/ANY ^EventHandler %2))
+                    lifecycle/event-handler
+                    :coerce coerce/event-handler]
     :focus-traversable [:setter lifecycle/scalar :default false]
     :id [:setter lifecycle/scalar]
     :input-method-requests [:setter lifecycle/scalar]

@@ -2,14 +2,26 @@
   "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.coerce :as coerce])
-  (:import [javafx.stage Window]))
+            [cljfx.coerce :as coerce]
+            [cljfx.mutator :as mutator])
+  (:import [javafx.stage Window]
+           [javafx.event Event EventHandler]))
 
 (set! *warn-on-reflection* true)
 
 (def props
   (composite/props Window
     :event-dispatcher [:setter lifecycle/scalar]
+    :event-filter [(mutator/adder-remover
+                     #(.addEventFilter ^Window %1 Event/ANY ^EventHandler %2)
+                     #(.removeEventFilter ^Window %1 Event/ANY ^EventHandler %2))
+                   lifecycle/event-handler
+                   :coerce coerce/event-handler]
+    :event-handler [(mutator/adder-remover
+                      #(.addEventHandler ^Window %1 Event/ANY ^EventHandler %2)
+                      #(.removeEventHandler ^Window %1 Event/ANY ^EventHandler %2))
+                    lifecycle/event-handler
+                    :coerce coerce/event-handler]
     :force-integer-render-scale [:setter lifecycle/scalar :default false]
     :height [:setter lifecycle/scalar :coerce double :default Double/NaN]
     :on-focused-changed [:property-change-listener lifecycle/change-listener]
