@@ -3,7 +3,7 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.5.0](https://github.com/cljfx/cljfx/releases/tag/1.4.5) - 2019-10-17
+### [1.5.0](https://github.com/cljfx/cljfx/releases/tag/1.5.0) - 2019-10-17
 - Added `fx/ext-set-env` and `fx/ext-get-env` to set and get values in 
   component tree's environment
 
