@@ -568,6 +568,32 @@
       (get-in opts [::refs (desc->ref desc)]))
     (delete [_ _ _])))
 
+(defn- merge-env [env m]
+  (reduce-kv assoc env m))
+
+(defn wrap-set-env [lifecycle]
+  (reify Lifecycle
+    (create [_ {:keys [env desc]} opts]
+      (create lifecycle desc (update opts ::env merge-env env)))
+    (advance [_ component {:keys [env desc]} opts]
+      (advance lifecycle component desc (update opts ::env merge-env env)))
+    (delete [_ component opts]
+      (delete lifecycle component opts))))
+
+(defn- put-env [desc env keys]
+  (if (map? keys)
+    (reduce-kv #(assoc %1 %3 (get env %2)) desc keys)
+    (reduce #(assoc %1 %2 (get env %2)) desc keys)))
+
+(defn wrap-get-env [lifecycle]
+  (reify Lifecycle
+    (create [_ {:keys [env desc]} opts]
+      (create lifecycle (put-env desc (::env opts) env) opts))
+    (advance [_ component {:keys [env desc]} opts]
+      (advance lifecycle component (put-env desc (::env opts) env) opts))
+    (delete [_ component opts]
+      (delete lifecycle component opts))))
+
 (defn map-of [lifecycle]
   (reify Lifecycle
     (create [_ desc opts]

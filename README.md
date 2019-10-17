@@ -718,7 +718,22 @@ prefix in their names.
    dialogs defined close to usage places, you can find an example of 
    such dialog at [examples/e22_button_with_confirmation_dialog.clj](examples/e22_button_with_confirmation_dialog.clj) 
 
-4. `fx/ext-many`
+4. `fx/ext-set-env` and `fx/ext-get-env`
+
+   You can put any values into component tree environment with `fx/ext-set-env`, and then
+   retrieve values from this environment with `fx/ext-get-env`:
+   ```clj
+   {:fx/type fx/ext-set-env
+    :env {::global-text-style {:-fx-text-fill :red}}
+    :desc {:fx/type :v-box
+           :children [{:fx/type fx/ext-get-env
+                       :env {::global-text-style :style}
+                       :desc {:fx/type :label 
+                              ;; will receive :style prop that makes text red
+                              :text "Hello world"}}]}}
+   ```
+
+5. `fx/ext-many`
 
    Usually props that expect collections of elements already ask for a
    collection of descriptions, but there might be cases where you want to manage
@@ -737,7 +752,7 @@ prefix in their names.
    See [examples/e10_multiple_windows.clj](examples/e10_multiple_windows.clj)
    and [examples/e17_dialogs.clj](examples/e17_dialogs.clj)
 
-5. `fx/make-ext-with-props`
+6. `fx/make-ext-with-props`
 
    Using this function you can create extension lifecycles that handle whatever
    additional props you need. These props will be applied after props of

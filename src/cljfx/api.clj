@@ -19,6 +19,8 @@
     - [[ext-let-refs]] - manage component lifecycles decoupled from component tree
     - [[ext-get-ref]] - use offscreen component instance introduced by [[ext-let-refs]],
       possibly in multiple places
+    - [[ext-set-env]] - put values into environment
+    - [[ext-get-env]] - get values from environment
     - [[ext-many]] - manage a vector of components
     - [[make-ext-with-props]] - create lifecycle that uses user-defined props
   - automatic component lifecycle:
@@ -183,6 +185,31 @@
   - `:ref` (required) - component identifier used as a key in [[ext-let-ref]]'s `:refs`
     map"
   (lifecycle/get-ref :ref))
+
+(def ext-set-env
+  "Extension lifecycle that sets environment values for later access with [[ext-get-env]]
+
+  Returned component described by `:desc` can access environment using [[ext-get-env]].
+  Using [[ext-set-env]] with same keys in that scope will shadow previously established
+  environment values.
+
+  Supported keys:
+  - `:env` (required) - map from arbitrary keys to arbitrary values
+  - `:desc` (required) - component description that will have access to specified values
+    using [[ext-get-env]]"
+  (lifecycle/wrap-set-env lifecycle/dynamic))
+
+(def ext-get-env
+  "Extension lifecycle that puts values from environment to wrapped component description
+
+  Supported keys:
+  - `:env` (required) - either:
+     - list of keys that were put into environment by [[ext-set-env]], will put same keys
+       to wrapped component description
+     - map of keys in an environment to keys that will be put into component description
+  - `:desc` (required) - component description that will receive additional keys specified
+    in `:env`"
+  (lifecycle/wrap-get-env lifecycle/dynamic))
 
 (def ext-many
   "Extension lifecycle that allows to create a vector of components

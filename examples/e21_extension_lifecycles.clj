@@ -90,11 +90,14 @@
                                        {:fx/type ext-instance-factory-example}
                                        {:fx/type ext-ref-examples}
                                        {:fx/type ext-with-props-example}]}}}
-            {:fx/type :stage
-             :showing true
-             :x 0
-             :scene {:fx/type :scene
-                     :root {:fx/type :v-box
-                            :padding 100
-                            :children [{:fx/type :label
-                                        :text "Extra window thanks to `fx/ext-many`!"}]}}}]}))
+            {:fx/type fx/ext-set-env
+             :env {::label-text "Extra window thanks to `fx/ext-many`"}
+             :desc {:fx/type :stage
+                    :showing true
+                    :x 0
+                    :scene {:fx/type :scene
+                            :root {:fx/type :v-box
+                                   :padding 100
+                                   :children [{:fx/type fx/ext-get-env
+                                               :env {::label-text :text}
+                                               :desc {:fx/type :label}}]}}}}]}))
