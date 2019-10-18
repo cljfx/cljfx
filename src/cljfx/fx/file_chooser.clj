@@ -2,7 +2,6 @@
   "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.mutator :as mutator]
             [cljfx.coerce :as coerce])
   (:import [javafx.stage FileChooser FileChooser$ExtensionFilter]))
 
