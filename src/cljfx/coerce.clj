@@ -3,6 +3,7 @@
   (:require [clojure.string :as str])
   (:import [java.util List Locale]
            [javafx.event EventHandler]
+           [javafx.stage FileChooser$ExtensionFilter]
            [javafx.scene Cursor]
            [javafx.scene.image Image]
            [javafx.scene.paint Paint Color LinearGradient ImagePattern CycleMethod
@@ -28,7 +29,8 @@
            [javafx.scene.input KeyCombination KeyCode]
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.beans Observable InvalidationListener]
-           [java.io InputStream]
+           [java.io InputStream File]
+           [java.net URI]
            [javafx.collections ListChangeListener]))
 
 (set! *warn-on-reflection* true)
@@ -517,3 +519,21 @@
   (case x
     :use-computed-size -1.0
     (double x)))
+
+(defn file [x]
+  (cond
+    (instance? File x) x
+    (string? x) (File. ^String x)
+    (instance? URI x) (File. ^URI x)
+    (vector? x) (let [[parent child] x]
+                  (if (instance? File parent)
+                    (File. ^File parent ^String child)
+                    (File. ^String parent ^String child)))
+    (map? x) (file [(:parent x) (:child x)])
+    :else (fail File x)))
+
+(defn extension-filter [x]
+  (cond
+    (instance? FileChooser$ExtensionFilter x) x
+    (map? x) (FileChooser$ExtensionFilter. ^String (:description x) ^List (seq (:extensions x)))
+    :else (fail FileChooser$ExtensionFilter x)))
