@@ -171,6 +171,7 @@
    :dialog (lazy-load cljfx.fx.dialog/lifecycle)
    :dialog-pane (lazy-load cljfx.fx.dialog-pane/lifecycle)
    :text-input-dialog (lazy-load cljfx.fx.text-input-dialog/lifecycle)
+   :file-chooser (lazy-load cljfx.fx.file-chooser/lifecycle)
    ;; transitions
    :fade-transition (lazy-load cljfx.fx.fade-transition/lifecycle)
    :fill-transition (lazy-load cljfx.fx.fill-transition/lifecycle)
