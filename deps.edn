@@ -8,7 +8,9 @@
                       :extra-deps {org.jsoup/jsoup {:mvn/version "1.11.3"}
                                    clj-http {:mvn/version "3.9.1"}
                                    com.atlassian.commonmark/commonmark {:mvn/version "0.12.1"}
-                                   de.codecentric.centerdevice/javafxsvg {:mvn/version "1.3.0"}}}
+                                   de.codecentric.centerdevice/javafxsvg {:mvn/version "1.3.0"}
+                                   datascript {:mvn/version "0.18.6"}
+                                   org.clojure/core.cache {:mvn/version "0.7.1"}}}
            :cache {:extra-deps {org.clojure/core.cache {:mvn/version "0.7.1"}}}
            :dev {:extra-paths ["dev"]}
            :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
