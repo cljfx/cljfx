@@ -168,6 +168,7 @@
   (cond
     (keyword? x) (name x)
     (vector? x) (str/join " " (map stringify-style-value x))
+    (sequential? x) (str/join (map stringify-style-value x))
     :else (str x)))
 
 (defn- map->style [m]
