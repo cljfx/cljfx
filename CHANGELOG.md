@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.6.0](https://github.com/cljfx/cljfx/releases/tag/1.6.0) - 2019-11-05
+- Add Java 8 support
+
 ### [1.5.1](https://github.com/cljfx/cljfx/releases/tag/1.5.1) - 2019-10-25
 - Support sequentials in style maps: `{:-fx-padding '(10 :px)}` → `-fx-padding: 10px`
 
