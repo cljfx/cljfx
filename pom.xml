@@ -33,8 +33,8 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>com.github.vlaaad</groupId>
-          <artifactId>cljfx-jdk8</artifactId>
+          <groupId>cljfx</groupId>
+          <artifactId>cljfx</artifactId>
           <version>${cljfx.version}</version>
           <classifier>jdk8</classifier>
         </dependency>
@@ -47,8 +47,8 @@
       </activation>
       <dependencies>
         <dependency>
-          <groupId>com.github.vlaaad</groupId>
-          <artifactId>cljfx-jdk8</artifactId>
+          <groupId>cljfx</groupId>
+          <artifactId>cljfx</artifactId>
           <version>${cljfx.version}</version>
           <classifier>jdk11</classifier>
         </dependency>

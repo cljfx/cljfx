@@ -25,20 +25,6 @@
             (recur tags parent (zip/right child)))
           parent)))))
 
-#_(defn- zip-find-tag [loc pred])
-
-#_(let [version "5.5.5"]
-    (-> (slurp "pom.xml")
-        (xml/parse-str :skip-whitespace true)
-        (xml-assoc-in [::pom/version] (constantly [::pom/version version]))
-        (xml-assoc-in [::pom/scm ::pom/tag] (constantly [::pom/tag version]))
-        (xml-assoc-in [::pom/profiles] (fn [profiles]
-                                         (update profiles :content
-                                                 (fn [profiles]
-                                                   (map)))))
-        (xml/indent-str)
-        (println)))
-
 (defn -main [& version]
   (with-open [reader (io/reader "pom.xml")]
     (let [xml (-> reader
