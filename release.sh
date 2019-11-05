@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 VERSION=$1
+clj -A:build -m version "$VERSION"
 git commit -am "Release $1"
 git tag "$1"
 git push
@@ -8,7 +9,6 @@ git push origin "$1"
 clj -A:base:depstar cljfx-"$VERSION".jar
 clj -A:jdk8:depstar cljfx-"$VERSION"-jdk8.jar
 clj -A:jdk11:depstar cljfx-"$VERSION"-jdk11.jar
-clj -A:build -m version "$VERSION"
 printf "Clojars Username: "
 read -r username
 stty -echo
