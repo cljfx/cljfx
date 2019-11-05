@@ -38,12 +38,23 @@ more explicit and extensible lifecycle for components.
 Cljfx uses `tools.deps`, so you can add this repo with latest sha as a 
 dependency:
 ```edn
- {cljfx {:git/url "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}}
+ cljfx {:git/url "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}
 ```
-Cljfx is also published on clojars, so you can add `cljfx` as a maven
-dependency, current version is on this badge: [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
+Cljfx is also published on Clojars, so you can add `cljfx` as a maven
+dependency, current version is on this badge: 
 
-Minimum required version of clojure is 1.10, minimum JDK version is 11.
+[![Cljfx on Clojars](https://clojars.org/cljfx/cljfx/latest-version.svg)](https://clojars.org/cljfx/cljfx)
+
+Minimum required version of clojure is 1.10.
+
+When depending on git coordinates, minimum required Java version is 11. When using maven 
+dependency, both Java 8 (assumes it has JavaFX provided in JRE) and Java 11 (via openjfx 
+dependency) are supported. You don't need to configure anything in this regard: correct 
+classifiers are picked up automatically. 
+
+Please note that JavaFX 8 is outdated and has problems some people consider severe: it 
+does not support HiDPI scaling on Linux, and sometimes crashes JVM on macOS Mojave. You 
+should prefer JDK 11.
 
 ## Overview
 

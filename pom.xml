@@ -5,45 +5,79 @@
   <artifactId>cljfx</artifactId>
   <version>1.5.1</version>
   <name>cljfx</name>
+  <properties>
+    <cljfx.version>1.5.1</cljfx.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>clojure</artifactId>
       <version>1.10.1</version>
     </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-controls</artifactId>
-      <version>13</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-base</artifactId>
-      <version>13</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-graphics</artifactId>
-      <version>13</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-media</artifactId>
-      <version>13</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-web</artifactId>
-      <version>13</version>
-    </dependency>
   </dependencies>
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-  </build>
   <repositories>
     <repository>
       <id>clojars</id>
       <url>https://repo.clojars.org/</url>
     </repository>
   </repositories>
+  <scm>
+    <url>https://github.com/cljfx/cljfx</url>
+    <tag>1.5.1</tag>
+  </scm>
+  <profiles>
+    <profile>
+      <id>jdk8</id>
+      <activation>
+        <jdk>[1.8,11)</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>cljfx</groupId>
+          <artifactId>cljfx</artifactId>
+          <version>${cljfx.version}</version>
+          <classifier>jdk8</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>jdk11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>cljfx</groupId>
+          <artifactId>cljfx</artifactId>
+          <version>${cljfx.version}</version>
+          <classifier>jdk11</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-controls</artifactId>
+          <version>13</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-base</artifactId>
+          <version>13</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-graphics</artifactId>
+          <version>13</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-media</artifactId>
+          <version>13</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-web</artifactId>
+          <version>13</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>

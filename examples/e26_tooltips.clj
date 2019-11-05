@@ -13,7 +13,8 @@
 (defn- circle-view [{:keys [radius]}]
   {:fx/type fx.ext.node/with-tooltip-props
    :props {:tooltip {:fx/type :tooltip
-                     :show-duration [1 :h]
+                     ;; jdk 11 only
+                     ;:show-duration [1 :h]
                      :text (str "My radius is " radius)}}
    :desc {:fx/type :circle
           :radius radius

@@ -1,5 +1,6 @@
 (ns cljfx.platform
   "Part of a public API"
+  (:require [cljfx.jdk.platform :as jdk.platform])
   (:import [javafx.application Platform]))
 
 (defmacro run-later [& body]
@@ -26,8 +27,4 @@
      (run-later ~@body)))
 
 (defn initialize []
-  (try
-    (Platform/startup #(Platform/setImplicitExit false))
-    ::initialized
-    (catch IllegalStateException _
-      ::already-initialized)))
+  (jdk.platform/initialize))
