@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+if [ -z "$1" ]
+then
+    echo "No version supplied"
+    exit 1
+fi
 VERSION=$1
 clj -A:build -m version "$VERSION"
 git commit -am "Release $1"
