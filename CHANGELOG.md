@@ -3,7 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.6.1](https://github.com/cljfx/cljfx/releases/tag/1.6.0) - 2020-01-02
+### [1.6.2](https://github.com/cljfx/cljfx/releases/tag/1.6.2) - 2020-01-22
+- Add `:on-focus-owner-changed` scene prop
+
+### [1.6.1](https://github.com/cljfx/cljfx/releases/tag/1.6.1) - 2020-01-02
 - Add `:on-focused-changed` node prop
 
 ### [1.6.0](https://github.com/cljfx/cljfx/releases/tag/1.6.0) - 2019-11-05

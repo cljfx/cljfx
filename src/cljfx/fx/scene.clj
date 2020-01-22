@@ -32,6 +32,7 @@
     :on-drag-entered [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-drag-exited [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-drag-over [:setter lifecycle/event-handler :coerce coerce/event-handler]
+    :on-focus-owner-changed [:property-change-listener lifecycle/change-listener]
     :on-input-method-text-changed [:setter lifecycle/scalar :coerce coerce/event-handler]
     :on-key-pressed [:setter lifecycle/event-handler :coerce coerce/event-handler]
     :on-key-released [:setter lifecycle/event-handler :coerce coerce/event-handler]
