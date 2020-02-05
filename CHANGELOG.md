@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.6.3](https://github.com/cljfx/cljfx/releases/tag/1.6.3) - 2020-02-05
+- Improve error message for non-existing effects
+
 ### [1.6.2](https://github.com/cljfx/cljfx/releases/tag/1.6.2) - 2020-01-22
 - Add `:on-focus-owner-changed` scene prop
 
