@@ -931,7 +931,8 @@ To try them out:
    git clone https://github.com/cljfx/cljfx.git
    cd cljfx 
    ```
-2. Launch repl with `:examples` alias and require examples:
+2. Ensure you have java 11 installed.
+3. Launch repl with `:examples` alias and require examples:
    ```shell
    clj -A:examples
    # Clojure 1.10
@@ -957,6 +958,11 @@ shape is internal too.
 
 Keywords with `fx` namespace in component descriptions are reserved: new
 ones may be introduced.
+
+## Getting help
+
+Feel free to ask questions [on Slack](https://clojurians.slack.com/messages/cljfx/)
+or create an issue. Have a look at [previously asked questions](https://github.com/cljfx/cljfx/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aquestion).
 
 ## Food for thought
 
