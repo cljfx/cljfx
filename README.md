@@ -256,6 +256,14 @@ description.
 See walk-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
 as an example of how to iterate on cljfx app in REPL.
 
+### Styling
+
+Iterating on styling is usually cumbersome: styles are defined in 
+external files, they are not reloaded on change, they are opaque: you 
+can't refer from the code to values defined in CSS. Cljfx has a 
+complementary library that aims to help with all those problems: 
+[cljfx/css](https://github.com/cljfx/css).
+
 ### Special keys
 
 Sometimes components accept specially treated keys. Main uses are:
