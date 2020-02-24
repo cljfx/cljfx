@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.6.4](https://github.com/cljfx/cljfx/releases/tag/1.6.4) - 2020-02-24
+- Include node props in camera props
+
 ### [1.6.3](https://github.com/cljfx/cljfx/releases/tag/1.6.3) - 2020-02-05
 - Improve error message for non-existing effects
 
