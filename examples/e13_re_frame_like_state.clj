@@ -1,5 +1,6 @@
 (ns e13-re-frame-like-state
-  (:require [cljfx.api :as fx]))
+  (:require [cljfx.api :as fx]
+            [clojure.core.cache :as cache]))
 
 (def *state
   (atom
@@ -27,7 +28,8 @@
                         4 {:id 4
                            :name "Sulfur"}
                         5 {:id 5
-                           :name "Web"}}})))
+                           :name "Web"}}}
+      cache/lru-cache-factory)))
 
 (defn sub-potion-ids [context]
   (sort (keys (fx/sub context :id->potion))))

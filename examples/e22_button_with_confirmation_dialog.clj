@@ -1,5 +1,6 @@
 (ns e22-button-with-confirmation-dialog
-  (:require [cljfx.api :as fx])
+  (:require [cljfx.api :as fx]
+            [clojure.core.cache :as cache])
   (:import [javafx.scene.control DialogEvent Dialog ButtonBar$ButtonData ButtonType]))
 
 ;; Example of generic component that is a button with confirmation dialog
@@ -11,7 +12,8 @@
 (def *context
   (atom (fx/create-context
           {:showing true
-           :internal {}})))
+           :internal {}}
+          cache/lru-cache-factory)))
 
 ;; Subscriptions of `button-with-confirmation-dialog` component
 

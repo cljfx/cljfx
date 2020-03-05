@@ -21,7 +21,7 @@
   (atom (fx/create-context
           {:db (d/db conn)
            :18+ false}
-          cache/lru-cache-factory)))
+          #(cache/lru-cache-factory % :threshold 4096))))
 
 ;; we listen to db changes and update db in context when detect new txs
 ;; in case of datomic you might use `tx-report-queue` for this

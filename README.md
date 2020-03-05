@@ -456,10 +456,13 @@ Using context in cljfx application requires 2 things:
 
 Minimal app example using contexts:
 ```clj
+;; you will need core.cache dependency if you are going to use contexts!
+(require '[clojure.core.cache :as cache])
+
 ;; Define application state as context
 
 (def *state
-  (atom (fx/create-context {:title "Hello world"})))
+  (atom (fx/create-context {:title "Hello world"} cache/lru-cache-factory)))
 
 ;; Every description function receives context at `:fx/context` key
 
@@ -493,7 +496,9 @@ get re-rendered only when their subscription values change.
 For a bigger example see
 [examples/e15_task_tracker.clj](examples/e15_task_tracker.clj).
 
-Another point of concern for context is cache. By default it will grow
+#### Preventing cache from growing forever
+
+Another point of concern for context is cache size. By default it will grow
 forever, which at certain point might become problematic, and we may
 want to trade some cpu cycles for recalculations to decrease memory
 consumption. There is a perfect library for it:
@@ -502,6 +507,9 @@ supports cache factory (a function taking initial cache map and
 returning cache) as a second argument. What kind of cache
 to use is a question with no easy answer, you probably should try
 different caches and see what is a better fit for your app.
+
+Cljfx has a *runtime* optional dependency on `core.cache`: you need to add
+it yourself if you are going to use contexts.
 
 ### Event handling on steroids
 

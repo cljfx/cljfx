@@ -149,6 +149,11 @@ Possible reasons:
     (recur s2 s1)
     (some #(contains? s2 %) s1)))
 
+(defn ensure-dirty [sub]
+  (case (sub 0)
+    ::dirty sub
+    [::dirty sub]))
+
 (defn- invalidate-cache [cache old-m new-m]
   (let [changed-keys (into #{}
                            (comp (mapcat keys)
@@ -168,7 +173,7 @@ Possible reasons:
                   (intersects? changed-keys (::key-deps v))
                   (-> acc
                       (evict k)
-                      (miss [::dirty k] v))
+                      (miss (ensure-dirty k) v))
 
                   :else
                   acc)))

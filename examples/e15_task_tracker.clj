@@ -1,5 +1,6 @@
 (ns e15-task-tracker
-  (:require [cljfx.api :as fx]))
+  (:require [cljfx.api :as fx]
+            [clojure.core.cache :as cache]))
 
 (def *state
   (atom
@@ -20,7 +21,8 @@
                1 {:id 1
                   :name "Alice"}
                2 {:id 2
-                  :name "Rick"}}})))
+                  :name "Rick"}}}
+      cache/lru-cache-factory)))
 
 ;; subscription functions
 
