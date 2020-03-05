@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.6.5](https://github.com/cljfx/cljfx/releases/tag/1.6.5) - 2020-03-05
+- Fix excessive dirtying of a context cache entries
+
 ### [1.6.4](https://github.com/cljfx/cljfx/releases/tag/1.6.4) - 2020-02-24
 - Include node props in camera props
 
