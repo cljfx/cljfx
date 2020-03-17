@@ -5,7 +5,9 @@
             [cljfx.event-handler :as event-handler]))
 
 (defn fn->lifecycle [fx-type]
-  (when (fn? fx-type) lifecycle/dynamic-fn->dynamic))
+  (when (or (fn? fx-type)
+            (instance? clojure.lang.MultiFn fx-type))
+    lifecycle/dynamic-fn->dynamic))
 
 (defn- fx-type->lifecycle [fx-type]
   (or (fx/keyword->lifecycle fx-type)
