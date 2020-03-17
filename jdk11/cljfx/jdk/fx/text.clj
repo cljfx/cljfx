@@ -11,5 +11,6 @@
     :selection-start [:setter lifecycle/scalar :coerce int :default -1]
     :selection-end [:setter lifecycle/scalar :coerce int :default -1]
     :selection-fill [:setter lifecycle/scalar :coerce coerce/paint :default :white]
+    :tab-size [:setter lifecycle/scalar :coerce int :default 8]
     :caret-position [:setter lifecycle/scalar :coerce int :default -1]
     :caret-bias [:setter lifecycle/scalar :default true]))
