@@ -21,6 +21,7 @@
                         :default :spinner]
       ;; definitions
       :editable [:setter lifecycle/scalar :default false]
+      :on-value-changed [:property-change-listener lifecycle/change-listener]
       :value-factory [:setter lifecycle/dynamic])))
 
 (def lifecycle
