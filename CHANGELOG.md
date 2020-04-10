@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.6.8](https://github.com/cljfx/cljfx/releases/tag/1.6.8) - 2020-04-10
+- Add `:on-value-changed` to Spinner and SpinnerValueFactory props
+
 ### [1.6.7](https://github.com/cljfx/cljfx/releases/tag/1.6.7) - 2020-03-21
 - Add `:on-width-changed` and `:on-height-changed` scene props
 
