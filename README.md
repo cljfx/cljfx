@@ -56,6 +56,17 @@ Please note that JavaFX 8 is outdated and has problems some people consider seve
 does not support HiDPI scaling on Linux, and sometimes crashes JVM on macOS Mojave. You 
 should prefer JDK 11.
 
+### Run examples
+
+Examples in ``examples`` directory lack a ``-main`` function, so preferred way to run them is through repl:
+
+```
+clj -A:examples
+
+# Clojure 1.10.1
+user=> (require 'e33_file_chooser)
+```
+
 ## Overview
 
 ### Hello world
