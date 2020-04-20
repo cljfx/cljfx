@@ -963,7 +963,8 @@ is available [here](https://openjfx.io/javadoc/14/index.html).
 
 If you want to learn more about [React](https://reactjs.org/) programming model cljfx is 
 based on, there is an in-depth guide to it: 
-[React as UI Runtime](https://overreacted.io/react-as-a-ui-runtime/).
+[React as UI Runtime](https://overreacted.io/react-as-a-ui-runtime/). Feel free to skip 
+sections about hooks since cljfx does not have them.
 
 I also gave [a talk about cljfx](https://www.youtube.com/watch?v=xcMNTKFmEgI) — it goes 
 from basic building blocks to how you build reactive applications and provides some 
