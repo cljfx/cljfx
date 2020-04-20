@@ -866,7 +866,7 @@ them — in the element descriptions that it gets:
                 :fx/key (:id i)
                 :item i})})
 ```
-#### Only mutable objects are described with `:fx/type`
+#### `:fx/type` is for mutable objects only
 
 Lifecycles describe how things change, and some things in JavaFX don't
 change. For example, `Insets` class represents an immutable value, so
@@ -919,11 +919,11 @@ usually used through some other API:
 #### No local mutable state
 
 One thing that is easy to do in react/reagent, but actually complects
-things, is local mutable state: every component can have it's own
-mutable state that lives independently from overall app state. This
+things, is local mutable state: every component can have its own
+mutable state that lives independently of overall app state. This
 makes reasoning about state of the app harder: you need to take lots of
 small pieces into account. Another problem is this state is unreliable,
-because it is only here when a component is here. And if it gets
+because it is only here when a component is here. If it gets
 recreated, for example, after closing some panel it resides in and
 reopening it back, this state will be lost. Sometimes we want this
 behavior, sometimes we don't, and it's possible to choose whether this
@@ -956,7 +956,21 @@ To try them out:
    # nil ;; window appears
    ```
 
-## API stability, public and internal code
+## More information
+
+If you want to learn more about [JavaFX](https://openjfx.io/index.html), its documentation
+is available [here](https://openjfx.io/javadoc/14/index.html).
+
+If you want to learn more about [React](https://reactjs.org/) programming model cljfx is 
+based on, there is an in-depth guide to it: 
+[React as UI Runtime](https://overreacted.io/react-as-a-ui-runtime/).
+
+I also gave [a talk about cljfx](https://www.youtube.com/watch?v=xcMNTKFmEgI) — it goes 
+from basic building blocks to how you build reactive applications and provides some 
+context to why I created it. Slides are 
+[here](https://docs.google.com/presentation/d/1576PE2NCbZifGqeg8Ya6RfycrWKVlBNLSW6bPgA527Q/).
+
+## API's stability, public and internal code
 
 Newer versions of cljfx should never introduce breaking changes, so if 
 an update broke something, please file a bug report. Growth of cljfx 
