@@ -351,14 +351,18 @@
    (context/create m cache-factory)))
 
 (defn sub
-  "Subscribe to key or subscription function in this context
+  "Subscribe to a key or subscription function in this context
 
-  Subscribing to key (which may be anything except functions) will return value
-  corresponding to that key in underlying context map
+  Subscribing to a key (which may be anything except functions) will return a value
+  corresponding to that key (via `get`) in underlying context map
 
-  Subscription function is any function that expects context as it's first argument"
-  [context k-or-f & args]
-  (apply context/sub context k-or-f args))
+  Subscription function is any function that expects context as it's first argument
+
+  When called without key or subscription function, returns the underlying context map"
+  ([context]
+   (context/sub context))
+  ([context k-or-f & args]
+   (apply context/sub context k-or-f args)))
 
 (defn swap-context
   "Create new context with context map being (apply f current-map args), reusing existing
