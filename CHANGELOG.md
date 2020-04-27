@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.6.9](https://github.com/cljfx/cljfx/releases/tag/1.6.8) - 2020-04-27
+- Simplify context implementation by using generations instead of dirtying to invalidate
+  cache entries
+
 ### [1.6.8](https://github.com/cljfx/cljfx/releases/tag/1.6.8) - 2020-04-10
 - Add `:on-value-changed` to Spinner and SpinnerValueFactory props
 
