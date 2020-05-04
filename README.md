@@ -915,6 +915,24 @@ usually used through some other API:
   on media player when this prop is changed
 - `:url` prop of WebView will call `load` method on this view's web
   engine
+  
+#### AOT-compilation is complicated
+
+Requiring cljfx starts a JavaFX application thread, which makes sense for repl and running
+application, but problematic for AOT compilation. To turn off this behavior for 
+compilation, you should set `cljfx.skip-javafx-initialization` java property to `true` for 
+your compilation task. This can be done in `lein` or `clj` by specifying the following 
+jvm opts:
+```clj
+:jvm-opts ["-Dcljfx.skip-javafx-initialization=true"] 
+```
+Please note that while this will help in most cases, you still might have compilation 
+related issues if your code imports JavaFX classes from `javafx.scene.control` package: 
+classes defined there require JavaFX runtime to be running by accessing it in 
+[Control](https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.controls/src/main/java/javafx/scene/control/Control.java)'s 
+static initializer. If you need to do that in your application code, you should not skip 
+JavaFX initialization, and instead make your build tool call 
+`(javafx.application.Platform/exit)` when it finished compiling. 
 
 #### No local mutable state
 

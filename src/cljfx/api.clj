@@ -70,9 +70,17 @@
 (defonce
   ^{:doc "Starts JavaFX runtime and sets implicit exit to false if JavaFX wasn't started
 
-  Either `:cljfx.platform/initialized` or `:cljfx.platform/already-initialized`"}
+  This behavior is most useful for REPL, but in other contexts it might be problematic:
+  - for the running app you might need to revert implicit exit to true with
+    `(javafx.application.Platform/setImplicitExit true)`
+  - for AOT-compilation you might need to skip JavaFX initialization completely by
+    setting `cljfx.skip-javafx-initialization` java property to true
+
+  Either `:cljfx.platform/initialized` or `:cljfx.platform/already-initialized` when
+  initialization is not disabled"}
   initialized
-  (platform/initialize))
+  (when-not (Boolean/getBoolean "cljfx.skip-javafx-initialization")
+    (platform/initialize)))
 
 (defmacro on-fx-thread
   "Execute body in implicit do on fx thread
