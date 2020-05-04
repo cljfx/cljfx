@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.0](https://github.com/cljfx/cljfx/releases/tag/1.7.0) - 2020-05-04
+- Add `cljfx.skip-javafx-initialization` java property useful for AOT-compilation
+
 ### [1.6.9](https://github.com/cljfx/cljfx/releases/tag/1.6.9) - 2020-04-27
 - Simplify context implementation by using generations instead of dirtying to invalidate
   cache entries
