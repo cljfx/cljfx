@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.1](https://github.com/cljfx/cljfx/releases/tag/1.7.1) - 2020-05-10
+- Add less buggy version of [cell factory](https://github.com/cljfx/cljfx#factory-props) 
+  description
+
 ### [1.7.0](https://github.com/cljfx/cljfx/releases/tag/1.7.0) - 2020-05-04
 - Add `cljfx.skip-javafx-initialization` java property useful for AOT-compilation
 
