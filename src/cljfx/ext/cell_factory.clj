@@ -9,9 +9,6 @@
 
 (defn- noop [_] {})
 
-(defn- ready? [slot]
-  (and (contains? slot :item) (contains? slot :empty)))
-
 (defn- advance-slot [{:keys [cell props-desc] :as slot} {:keys [props-config opts]}]
   (update slot :props lifecycle/advance-prop-map props-desc props-config cell opts))
 
@@ -24,15 +21,14 @@
       (advance-slot state)))
 
 (defn- set-key-and-advance-slot [state index k v]
-  (update-in state [:slots index] #(let [slot (assoc % k v)]
-                                     (cond-> slot (ready? slot) (describe-slot state)))))
+  (update-in state [:slots index] #(-> % (assoc k v) (describe-slot state))))
 
 (defn- advance-state [state describe opts]
   (let [slot-fn (if (not= describe (:describe state)) describe-slot advance-slot)
         new-state (assoc state :describe describe :opts opts)]
     (update new-state :slots
             (fn [slots]
-              (mapv #(cond-> % (ready? %) (slot-fn new-state)) slots)))))
+              (mapv #(slot-fn % new-state) slots)))))
 
 (def lifecycle
   (reify lifecycle/Lifecycle
@@ -66,6 +62,8 @@
                                (changed [_ _ _ empty]
                                  (vswap! *state set-key-and-advance-slot index :empty empty)))]
                          (vswap! *state update :slots conj {:cell ret
+                                                            :item (.getItem ret)
+                                                            :empty (.isEmpty ret)
                                                             :props {}
                                                             :props-desc {}
                                                             :on-item-changed on-item-changed
