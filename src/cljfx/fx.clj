@@ -165,6 +165,10 @@
    :indexed-cell (lazy-load cljfx.fx.indexed-cell/lifecycle)
    :list-cell (lazy-load cljfx.fx.list-cell/lifecycle)
    :combo-box-list-cell (lazy-load cljfx.fx.combo-box-list-cell/lifecycle)
+   :text-field-list-cell (lazy-load cljfx.fx.text-field-list-cell/lifecycle)
+   :table-cell (lazy-load cljfx.fx.table-cell/lifecycle)
+   :tree-cell (lazy-load cljfx.fx.tree-cell/lifecycle)
+   :tree-table-cell (lazy-load cljfx.fx.tree-table-cell/lifecycle)
    ;; dialogs
    :alert (lazy-load cljfx.fx.alert/lifecycle)
    :choice-dialog (lazy-load cljfx.fx.choice-dialog/lifecycle)

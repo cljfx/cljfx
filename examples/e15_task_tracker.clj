@@ -77,7 +77,8 @@
                  :text "Assignee:"}
                 {:fx/type :combo-box
                  :button-cell (fn [user] {:text (:name user)})
-                 :cell-factory (fn [user] {:text (:name user)})
+                 :cell-factory {:fx/cell-type :list-cell
+                                :describe (fn [user] {:text (:name user)})}
                  :value user
                  :on-value-changed {:event/type ::assign-user :task-id task-id}
                  :items (fx/sub context sub-all-users)}]}))

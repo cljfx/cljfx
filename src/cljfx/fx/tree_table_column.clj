@@ -4,7 +4,8 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.table-column-base :as fx.table-column-base]
-            [cljfx.fx.tree-table-cell :as fx.tree-table-cell])
+            [cljfx.fx.tree-table-cell :as fx.tree-table-cell]
+            [cljfx.ext.cell-factory :as ext.cell-factory])
   (:import [javafx.scene.control TreeTableColumn TreeTableColumn$SortType
                                  TreeTableColumn$CellDataFeatures]
            [javafx.util Callback]))
@@ -40,8 +41,9 @@
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "table-column"]
       ;; definitions
-      :cell-factory [:setter (lifecycle/detached-prop-map
-                               (:props fx.tree-table-cell/lifecycle))
+      :cell-factory [:setter (lifecycle/if-desc map?
+                               ext.cell-factory/lifecycle
+                               (lifecycle/detached-prop-map fx.tree-table-cell/props))
                      :coerce cell-factory
                      :default TreeTableColumn/DEFAULT_CELL_FACTORY]
       :cell-value-factory [:setter lifecycle/scalar

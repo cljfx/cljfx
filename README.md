@@ -340,12 +340,20 @@ construct a value from some input:
   index and returning any component description for this prop (see
   example in [examples/e06_pagination.clj](examples/e06_pagination.clj))
 - various versions of `:cell-factory` in controls designed to display
-  multiples of items (table views, list views etc.). You can use
-  functions that receive items and return descriptions for these props,
-  but they are a bit different: created cells have their own lifecycle
-  for performance reasons, and that imposes a restriction that you can't
-  specify `:fx/type` in returned cell descriptions. There are various
-  usage examples available in
+  multiples of items (table views, list views etc.) can be described 
+  using the following form:
+  ```clj
+  {:fx/cell-type :list-cell
+   :describe (fn [item] {:text (my.ns/item-as-text item)})} 
+  ```
+  The lifecycle of cells is a bit different than lifecycle of other 
+  components: JavaFX pools a minimal amount of cells needed to be shown
+  at the same time and updates them on scrolling. This is great for 
+  performance, but it imposes a restriction: cell type is "static". 
+  That's why cljfx uses `:fx/cell-type` that *has* to be a keyword (like 
+  `:list-cell` or `:table-cell`) and a separate `:describe` function 
+  that receives an item and returns a prop map for that cell type. 
+  There are various usage examples available in
   [examples/e16_cell_factories.clj](examples/e16_cell_factories.clj)
 
 ### Subscriptions and contexts

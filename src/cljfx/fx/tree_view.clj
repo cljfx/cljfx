@@ -6,7 +6,8 @@
             [cljfx.fx.tree-cell :as fx.tree-cell]
             [cljfx.fx.control :as fx.control]
             [cljfx.ext.selection-model :as ext.selection-model]
-            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
+            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model]
+            [cljfx.ext.cell-factory :as ext.cell-factory])
   (:import [javafx.scene.control TreeView MultipleSelectionModel]
            [javafx.scene AccessibleRole]
            [javafx.util Callback]))
@@ -33,7 +34,9 @@
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
                         :default :tree-view]
       ;; definitions
-      :cell-factory [:setter (lifecycle/detached-prop-map fx.tree-cell/props)
+      :cell-factory [:setter (lifecycle/if-desc map?
+                               ext.cell-factory/lifecycle
+                               (lifecycle/detached-prop-map fx.tree-cell/props))
                      :coerce cell-factory]
       :editable [:setter lifecycle/scalar :default false]
       :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]

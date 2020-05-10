@@ -3,10 +3,11 @@
 
 (def list-view
   {:fx/type :list-view
-   :cell-factory (fn [i]
-                   (let [color (format "#%03x" i)]
-                     {:style {:-fx-background-color color}
-                      :text color}))
+   :cell-factory {:fx/cell-type :list-cell
+                  :describe (fn [i]
+                              (let [color (format "#%03x" i)]
+                                {:style {:-fx-background-color color}
+                                 :text color}))}
    :items (range 16r1000)})
 
 (def table-view
@@ -14,19 +15,22 @@
    :columns [{:fx/type :table-column
               :text "pr-str"
               :cell-value-factory identity
-              :cell-factory (fn [x]
-                              {:text (pr-str x)})}
+              :cell-factory {:fx/cell-type :table-cell
+                             :describe (fn [x]
+                                         {:text (pr-str x)})}}
              {:fx/type :table-column
               :text "bg color"
               :cell-value-factory identity
-              :cell-factory (fn [i]
-                              {:style {:-fx-background-color i}})}]
+              :cell-factory {:fx/cell-type :table-cell
+                             :describe (fn [i]
+                                         {:style {:-fx-background-color i}})}}]
    :items [:red :green :blue "#ccc4" "#ccc4"]})
 
 (def combo-box
   {:fx/type :combo-box
    :button-cell (fn [user] {:text (:name user)})
-   :cell-factory (fn [user] {:text (:name user)})
+   :cell-factory {:fx/cell-type :list-cell
+                  :describe (fn [user] {:text (:name user)})}
    :items [{:name "Fred"}
            {:name "Rick"}]})
 
@@ -42,14 +46,16 @@
               :text "pr-str"
               :max-width 960/2
               :cell-value-factory identity
-              :cell-factory (fn [x]
-                              {:text (pr-str x)})}
+              :cell-factory {:fx/cell-type :tree-table-cell
+                             :describe (fn [x]
+                                         {:text (pr-str x)})}}
              {:fx/type :tree-table-column
               :text "str"
               :max-width 960/2
               :cell-value-factory identity
-              :cell-factory (fn [x]
-                              {:text (str x)})}]
+              :cell-factory {:fx/cell-type :tree-table-cell
+                             :describe (fn [x]
+                                         {:text (str x)})}}]
    :root (->tree-item
            {:set #{:a :b :c}
             :scalars ["string" false 1 1M 1/2 1.0 'symbol :keyword]
@@ -60,8 +66,9 @@
 
 (def tree-view
   {:fx/type :tree-view
-   :cell-factory (fn [x]
-                   {:text (str x)})
+   :cell-factory {:fx/cell-type :tree-cell
+                  :describe (fn [x]
+                              {:text (str x)})}
    :root (->tree-item table-view)})
 
 (fx/on-fx-thread
