@@ -4,6 +4,11 @@
             [cljfx.mutator :as mutator]
             [cljfx.prop :as prop]))
 
+;; A simple web browser
+;; ====================
+;;
+;; This example requires one additional property from web-view in order to understand when a link on a web page has been
+;; clicked. See the README.md and e21-extension-lifecycle for some additional examples of this.
 
 (def web-view-with-ext-props
   (cljfx.api/make-ext-with-props
@@ -11,10 +16,10 @@
                                              #(.locationProperty (.getEngine %)))
                                            cljfx.lifecycle/change-listener)}))
 ;; A well known URL
-(def home-url "http://www.google.com")
+(def home-url "https://www.google.com")
 
 ;; The strategy here is to have a partial-url associated with the text field so that typing into the text field
-;; does not get a URL until the return button is pressed. The resulting url is checked to see if the (usually ommited)
+;; does not act as a URL until the return button is pressed. The resulting url is checked to see if the (usually omitted)
 ;; http:// is prepended, if not - it adds it then loads the web-view vis the :url keyword.
 
 (def *state (atom {::partial-url home-url
@@ -32,13 +37,14 @@
                :on-text-changed {:event/type ::url-change}
                :on-action       {:event/type ::url-complete}}]})
 
+;; The web-pane function returns the extended web-view that has the additional property :on-location-changed installed.
 (defn web-pane [{:keys [state]}]
   {:fx/type web-view-with-ext-props
    :desc    {:fx/type     :web-view
              :pref-height 1000
              :pref-width  1500
              :url         (::current-url state)}
-   :props   {:on-location-changed (fn [url] (prn url))}})
+   :props   {:on-location-changed {:event/type ::url-change}}})
 
   (defn body-pane [{:keys [state]}]
     {:fx/type  :v-box
@@ -66,7 +72,7 @@
     (case (:event/type event)
       ::home (reset! *state {::partial-url home-url
                              ::current-url home-url})
-      ::url-change (swap! *state assoc ::partial-url (:fx/event event))
+      ::url-change (do (prn (:fx/event event)) (swap! *state assoc ::partial-url (:fx/event event)))
       ::url-complete (swap! *state assoc ::current-url (-> @*state ::partial-url normalise))))
 
   (def renderer
