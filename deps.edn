@@ -1,0 +1,33 @@
+{:deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.openjfx/javafx-controls {:mvn/version "14"}
+        org.openjfx/javafx-base {:mvn/version "14"}
+        org.openjfx/javafx-graphics {:mvn/version "14"}
+        org.openjfx/javafx-media {:mvn/version "14"}
+        org.openjfx/javafx-web {:mvn/version "14"}}
+ :paths ["src" "jdk11"]
+ :aliases {:examples {:extra-paths ["examples"]
+                      :extra-deps {org.jsoup/jsoup {:mvn/version "1.11.3"}
+                                   clj-http {:mvn/version "3.9.1"}
+                                   com.atlassian.commonmark/commonmark {:mvn/version "0.12.1"}
+                                   de.codecentric.centerdevice/javafxsvg {:mvn/version "1.3.0"}
+                                   datascript {:mvn/version "0.18.6"}
+                                   org.clojure/core.cache {:mvn/version "0.7.1"}}}
+           :build {:extra-paths ["build"]
+                   :extra-deps {org.clojure/data.xml {:mvn/version "0.2.0-alpha6"}
+                                com.cemerick/pomegranate {:mvn/version "1.1.0"}}}
+           :base {:paths ["src"]}
+           :jdk8 {:paths ["jdk8"]}
+           :jdk11 {:paths ["jdk11"]}
+           :cache {:extra-deps {org.clojure/core.cache {:mvn/version "0.7.1"}}}
+           :dev {:extra-paths ["dev"]}
+           :wayland {:jvm-opts ["-Djdk.gtk.version=2"]}
+           :test {:extra-paths ["test"]
+                  :extra-deps {metosin/testit {:mvn/version "0.2.0"}}}
+           :headless {:jvm-opts ["-Dtestfx.robot=glass" "-Dglass.platform=Monocle" "-Dmonocle.platform=Headless" "-Dprism.order=sw"]
+                      :extra-deps {org.testfx/openjfx-monocle {:mvn/version "jdk-12.0.1+2"}}}
+           :runner {:extra-deps {com.cognitect/test-runner
+                                 {:git/url "https://github.com/cognitect-labs/test-runner"
+                                  :sha "3cb0a9daf1cb746259dc8309b218f9211ad3b33b"}}
+                    :main-opts ["-m" "cognitect.test-runner" "-d" "test"]}
+           :depstar {:extra-deps {seancorfield/depstar {:mvn/version "0.2.1"}}
+                     :main-opts ["-m" "hf.depstar.jar"]}}}
