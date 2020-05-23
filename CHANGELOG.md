@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.3](https://github.com/cljfx/cljfx/releases/tag/1.7.3) - 2020-05-23
+- Fix `:event-filter`/`:event-handler` prop lifecycles
+
 ### [1.7.2](https://github.com/cljfx/cljfx/releases/tag/1.7.2) - 2020-05-10
 - Add `nil` item support in cell factories
   
