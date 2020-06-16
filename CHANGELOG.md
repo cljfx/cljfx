@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.4](https://github.com/cljfx/cljfx/releases/tag/1.7.4) - 2020-06-16
+- Fix composite macros behavior in turkish locale
+
 ### [1.7.3](https://github.com/cljfx/cljfx/releases/tag/1.7.3) - 2020-05-23
 - Fix `:event-filter`/`:event-handler` prop lifecycles
 

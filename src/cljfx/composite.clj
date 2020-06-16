@@ -7,7 +7,8 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
             [cljfx.prop :as prop]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import [java.util Locale]))
 
 (defn- desc->props-desc [desc]
   (dissoc desc :fx/type))
@@ -95,30 +96,36 @@
      `lifecycle/advance advance-composite-component
      `lifecycle/delete delete-composite-component}))
 
+(defn- capitalize [^String s]
+  (if (< (count s) 2)
+    (.toUpperCase s Locale/ROOT)
+    (str (.toUpperCase (subs s 0 1) Locale/ROOT)
+         (.toLowerCase (subs s 1) Locale/ROOT))))
+
 (defmacro setter [type-expr kw]
   (let [instance-sym (with-meta (gensym "instance") {:tag type-expr})
         value-sym (gensym "value")
-        setter-expr (symbol (apply str ".set" (map str/capitalize (-> kw
-                                                                      name
-                                                                      (str/split #"-")))))
+        setter-expr (symbol (apply str ".set" (map capitalize (-> kw
+                                                                  name
+                                                                  (str/split #"-")))))
         fn-name (symbol (str "set-" (name kw)))]
     `(fn ~fn-name [~instance-sym ~value-sym]
        (~setter-expr ~instance-sym ~value-sym))))
 
 (defmacro observable-list [type-expr kw]
   (let [instance-sym (with-meta (gensym "instance") {:tag type-expr})
-        getter-expr (symbol (apply str ".get" (map str/capitalize (-> kw
-                                                                      name
-                                                                      (str/split #"-")))))
+        getter-expr (symbol (apply str ".get" (map capitalize (-> kw
+                                                                  name
+                                                                  (str/split #"-")))))
         fn-name (symbol (str "get-" (name kw)))]
     `(fn ~fn-name [~instance-sym]
        (~getter-expr ~instance-sym))))
 
 (defmacro observable-map [type-expr kw]
   (let [instance-sym (with-meta (gensym "instance") {:tag type-expr})
-        getter-expr (symbol (apply str ".get" (map str/capitalize (-> kw
-                                                                      name
-                                                                      (str/split #"-")))))
+        getter-expr (symbol (apply str ".get" (map capitalize (-> kw
+                                                                  name
+                                                                  (str/split #"-")))))
         fn-name (symbol (str "get-" (name kw)))]
     `(fn ~fn-name [~instance-sym]
        (~getter-expr ~instance-sym))))
@@ -129,7 +136,7 @@
         prop-parts (conj (str/split property-name #"-") "property")
         prop-expr (symbol (str "."
                                (first prop-parts)
-                               (apply str (map str/capitalize (rest prop-parts)))))
+                               (apply str (map capitalize (rest prop-parts)))))
         fn-name (symbol (str/join "-" prop-parts))]
     [prop-parts prop-expr fn-name]
     `(fn ~fn-name [~instance-sym]
