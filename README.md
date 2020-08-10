@@ -393,7 +393,7 @@ black-box wrapper around application state map, with an api
 function `fx/sub` to look inside wrapped state. `fx/sub` usage has 2
 flavors:
 1. Keys: anything except function, will return corresponding value from
-   wrapped map.
+   wrapped map. Multiple keys can be passed to subscribe to nested values.
 2. Subscription functions: any function that receives context as first
    argument. `fx/sub`-scribing to such functions will lead to a call to
    this function, and it in turn may subscribe to other keys and
