@@ -359,10 +359,10 @@
    (context/create m cache-factory)))
 
 (defn sub
-  "Subscribe to a key or subscription function in this context
+  "Subscribe to a series of keys or subscription function in this context
 
-  Subscribing to a key (which may be anything except functions) will return a value
-  corresponding to that key (via `get`) in underlying context map
+  Subscribing to a series of keys (which may be anything except functions) will
+  return a value corresponding to those keys (via `get-in`) in underlying context map
 
   Subscription function is any function that expects context as it's first argument
 
