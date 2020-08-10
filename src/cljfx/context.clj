@@ -103,8 +103,8 @@ Possible reasons:
     ::context
     (assoc deps k v)))
 
-(defn- key-sub [ctx k]
-  (get (sub ctx) k))
+(defn- keys-sub [ctx & ks]
+  (get-in (sub ctx) (vec ks)))
 
 (defn sub
   ([context]
@@ -115,15 +115,9 @@ Possible reasons:
        (reset! *deps ::context))
      m))
   ([context k & args]
-   (let [sub-id (cond
-                  (fn? k)
+   (let [sub-id (if (fn? k)
                   (apply vector k args)
-
-                  (seq args)
-                  (throw (ex-info "Subscribing to keys does not allow additional args"
-                                  {:k k :args args}))
-                  :else
-                  [key-sub k])
+                  (apply vector keys-sub k args))
          {::keys [*cache *deps generation]} context
          cache @*cache
          existing-entry (lookup cache sub-id)
