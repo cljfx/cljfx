@@ -1,10 +1,12 @@
 (ns e04-state-with-context
-  (:require [cljfx.api :as fx]))
+  (:require [cljfx.api :as fx]
+            [clojure.core.cache :as cache]))
 
 (def *state
   (atom (fx/create-context
           {:first-name "Vlad"
-           :last-name "Protsenko"})))
+           :last-name "Protsenko"}
+          cache/lru-cache-factory)))
 
 (defn text-input [{:keys [fx/context label-text key]}]
   {:fx/type :v-box

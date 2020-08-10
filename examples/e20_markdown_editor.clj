@@ -1,6 +1,7 @@
 (ns e20-markdown-editor
   (:require [cljfx.api :as fx]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [clojure.core.cache :as cache])
   (:import [de.codecentric.centerdevice.javafxsvg SvgImageLoaderFactory]
            [de.codecentric.centerdevice.javafxsvg.dimension PrimitiveDimensionProvider]
            [java.awt Desktop]
@@ -13,7 +14,8 @@
 
 (def *context
   (atom
-    (fx/create-context {:typed-text (slurp "README.md")})))
+    (fx/create-context {:typed-text (slurp "README.md")}
+                       #(cache/lru-cache-factory % :threshold 4096))))
 
 (defn commonmark->clj [^Node node]
   (let [tag (->> node

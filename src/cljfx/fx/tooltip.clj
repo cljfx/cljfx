@@ -4,6 +4,7 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.popup-control :as fx.popup-control]
+            [cljfx.jdk.fx.tooltip :as jdk.fx.tooltip]
             [cljfx.mutator :as mutator])
   (:import [javafx.scene.control Tooltip ContentDisplay OverrunStyle]
            [javafx.scene.text TextAlignment]))
@@ -24,6 +25,7 @@
 (def props
   (merge
     fx.popup-control/props
+    jdk.fx.tooltip/props
     (composite/props Tooltip
       ;; overrides
       :style-class [:list lifecycle/scalar :coerce coerce/style-class :default "tooltip"]
@@ -34,11 +36,8 @@
       :font [:setter lifecycle/scalar :coerce coerce/font :default :default]
       :graphic [:setter lifecycle/dynamic]
       :graphic-text-gap [:setter lifecycle/scalar :coerce double :default 4.0]
-      :hide-delay [:setter lifecycle/scalar :coerce coerce/duration :default [200 :ms]]
       ;; deprecated, prefer [[cljfx.ext.node/with-tooltip-props]] instead
       :install-to [install-mutator lifecycle/dynamic]
-      :show-delay [:setter lifecycle/scalar :coerce coerce/duration :default [1 :s]]
-      :show-duration [:setter lifecycle/scalar :coerce coerce/duration :default [5 :s]]
       :text [:setter lifecycle/scalar :default ""]
       :text-alignment [:setter lifecycle/scalar :coerce (coerce/enum TextAlignment)
                        :default :left]

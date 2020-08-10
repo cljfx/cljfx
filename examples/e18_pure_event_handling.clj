@@ -2,7 +2,8 @@
   (:require [clj-http.client :as http]
             [cljfx.api :as fx]
             [e18-pure-event-handling.events :as events]
-            [e18-pure-event-handling.views :as views]))
+            [e18-pure-event-handling.views :as views]
+            [clojure.core.cache :as cache]))
 
 ;; This is an example of simplistic web browser built on top of JavaFX: it can display
 ;; text, some images and html as a tree of nodes. Events, subscriptions and views are all
@@ -13,7 +14,8 @@
     (fx/create-context
       {:typed-url ""
        :request-id->response {}
-       :history []})))
+       :history []}
+      cache/lru-cache-factory)))
 
 ;; Example of a custom effect that performs http request in the background, and notifies
 ;; application with result as a new event. Since events are just maps, performing http

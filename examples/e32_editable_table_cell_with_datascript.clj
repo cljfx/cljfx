@@ -21,7 +21,7 @@
   (atom (fx/create-context
           {:db (d/db conn)
            :18+ false}
-          cache/lru-cache-factory)))
+          #(cache/lru-cache-factory % :threshold 4096))))
 
 ;; we listen to db changes and update db in context when detect new txs
 ;; in case of datomic you might use `tx-report-queue` for this
@@ -101,11 +101,13 @@
              {:fx/type :table-column
               :text "name"
               :cell-value-factory identity
-              :cell-factory name-cell-factory}
+              :cell-factory {:fx/cell-type :table-cell
+                             :describe name-cell-factory}}
              {:fx/type :table-column
               :text "age"
               :cell-value-factory identity
-              :cell-factory age-cell-factory}]
+              :cell-factory {:fx/cell-type :table-cell
+                             :describe age-cell-factory}}]
    :items (fx/sub context user-ids-query)})
 
 (defn- root-view [{:keys [fx/context]}]

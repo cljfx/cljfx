@@ -37,8 +37,9 @@
 
 (defn- html [{:keys [tree]}]
   {:fx/type :tree-view
-   :cell-factory (fn [{:keys [tag attrs]}]
-                   {:text (str [tag attrs])})
+   :cell-factory {:fx/cell-type :tree-cell
+                  :describe (fn [{:keys [tag attrs]}]
+                              {:text (str [tag attrs])})}
    :root (->tree-item tree)})
 
 (defn- result [{:keys [fx/context]}]

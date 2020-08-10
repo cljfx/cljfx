@@ -1,6 +1,7 @@
 ; Author: Ambrose Bonnaire-Sergeant
 (ns e30-devtools-via-event-filters
-  (:require [cljfx.api :as fx])
+  (:require [cljfx.api :as fx]
+            [clojure.core.cache :as cache])
   (:import [javafx.scene.input MouseEvent]
            [javafx.scene Node]
            [javafx.event Event]))
@@ -19,7 +20,8 @@
 
 (def *context
   (atom (fx/create-context
-          {:current-node nil})))
+          {:current-node nil}
+          cache/lru-cache-factory)))
 
 ; [(U nil Node) Event CSSClass -> (U nil node)]
 (defn devtools-highlight-filter

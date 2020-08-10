@@ -3,6 +3,56 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.4](https://github.com/cljfx/cljfx/releases/tag/1.7.4) - 2020-06-16
+- Fix composite macros behavior in turkish locale
+
+### [1.7.3](https://github.com/cljfx/cljfx/releases/tag/1.7.3) - 2020-05-23
+- Fix `:event-filter`/`:event-handler` prop lifecycles
+
+### [1.7.2](https://github.com/cljfx/cljfx/releases/tag/1.7.2) - 2020-05-10
+- Add `nil` item support in cell factories
+  
+### [1.7.1](https://github.com/cljfx/cljfx/releases/tag/1.7.1) - 2020-05-10
+- Add less buggy version of [cell factory](https://github.com/cljfx/cljfx#factory-props) 
+  description
+
+### [1.7.0](https://github.com/cljfx/cljfx/releases/tag/1.7.0) - 2020-05-04
+- Add `cljfx.skip-javafx-initialization` java property useful for AOT-compilation
+
+### [1.6.9](https://github.com/cljfx/cljfx/releases/tag/1.6.9) - 2020-04-27
+- Simplify context implementation by using generations instead of dirtying to invalidate
+  cache entries
+
+### [1.6.8](https://github.com/cljfx/cljfx/releases/tag/1.6.8) - 2020-04-10
+- Add `:on-value-changed` to Spinner and SpinnerValueFactory props
+
+### [1.6.7](https://github.com/cljfx/cljfx/releases/tag/1.6.7) - 2020-03-21
+- Add `:on-width-changed` and `:on-height-changed` scene props
+
+### [1.6.6](https://github.com/cljfx/cljfx/releases/tag/1.6.6) - 2020-03-17
+- Use JavaFX 14 on JDK 11+
+
+### [1.6.5](https://github.com/cljfx/cljfx/releases/tag/1.6.5) - 2020-03-05
+- Fix excessive dirtying of a context cache entries
+
+### [1.6.4](https://github.com/cljfx/cljfx/releases/tag/1.6.4) - 2020-02-24
+- Include node props in camera props
+
+### [1.6.3](https://github.com/cljfx/cljfx/releases/tag/1.6.3) - 2020-02-05
+- Improve error message for non-existing effects
+
+### [1.6.2](https://github.com/cljfx/cljfx/releases/tag/1.6.2) - 2020-01-22
+- Add `:on-focus-owner-changed` scene prop
+
+### [1.6.1](https://github.com/cljfx/cljfx/releases/tag/1.6.1) - 2020-01-02
+- Add `:on-focused-changed` node prop
+
+### [1.6.0](https://github.com/cljfx/cljfx/releases/tag/1.6.0) - 2019-11-05
+- Add Java 8 support
+
+### [1.5.1](https://github.com/cljfx/cljfx/releases/tag/1.5.1) - 2019-10-25
+- Support sequentials in style maps: `{:-fx-padding '(10 :px)}` → `-fx-padding: 10px`
+
 ### [1.5.0](https://github.com/cljfx/cljfx/releases/tag/1.5.0) - 2019-10-17
 - Added `fx/ext-set-env` and `fx/ext-get-env` to set and get values in 
   component tree's environment

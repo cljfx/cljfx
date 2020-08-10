@@ -39,8 +39,9 @@
                       (seq selection)
                       (assoc :selected-item (-> selection sort first))))
    :desc {:fx/type :list-view
-          :cell-factory (fn [path]
-                          {:text path})
+          :cell-factory {:fx/cell-type :list-cell
+                         :describe (fn [path]
+                                     {:text path})}
           :items items}})
 
 (defn- let-refs [refs desc]
@@ -111,14 +112,16 @@
    :desc {:fx/type :table-view
           :columns [{:fx/type :table-column
                      :text "path"
-                     :cell-factory identity
-                     :cell-value-factory (fn [path]
-                                           {:text path})}
+                     :cell-value-factory identity
+                     :cell-factory {:fx/cell-type :table-cell
+                                    :describe (fn [path]
+                                                {:text path})}}
                     {:fx/type :table-column
                      :text "elements"
-                     :cell-factory identity
-                     :cell-value-factory (fn [path]
-                                           {:text (str (count (path->value path)))})}]
+                     :cell-value-factory identity
+                     :cell-factory {:fx/cell-type :table-cell
+                                    :describe (fn [path]
+                                                {:text (str (count (path->value path)))})}}]
           :items (keys path->value)}})
 
 ;; Situation with tree-view is complicated by the fact that it's selection model is

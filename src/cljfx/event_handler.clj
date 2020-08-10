@@ -24,8 +24,13 @@
     ([event]
      (dispatch-sync! event dispatch-sync!))
     ([event dispatch!]
-     (doseq [[fx-effect value] (f event)]
-       ((effect-id->consumer fx-effect) value dispatch!)))))
+     (doseq [[fx-effect value] (f event)
+             :let [consumer (effect-id->consumer fx-effect)]]
+       (if consumer
+         (consumer value dispatch!)
+         (throw (ex-info (str "Effect " fx-effect " does not exist")
+                         {:effect fx-effect
+                          :existing-effects (keys effect-id->consumer)})))))))
 
 (defn- process-event [_ f e dispatch-async! *maybe-promise]
   (f e dispatch-async!)

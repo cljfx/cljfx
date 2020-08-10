@@ -70,9 +70,17 @@
 (defonce
   ^{:doc "Starts JavaFX runtime and sets implicit exit to false if JavaFX wasn't started
 
-  Either `:cljfx.platform/initialized` or `:cljfx.platform/already-initialized`"}
+  This behavior is most useful for REPL, but in other contexts it might be problematic:
+  - for the running app you might need to revert implicit exit to true with
+    `(javafx.application.Platform/setImplicitExit true)`
+  - for AOT-compilation you might need to skip JavaFX initialization completely by
+    setting `cljfx.skip-javafx-initialization` java property to true
+
+  Either `:cljfx.platform/initialized` or `:cljfx.platform/already-initialized` when
+  initialization is not disabled"}
   initialized
-  (platform/initialize))
+  (when-not (Boolean/getBoolean "cljfx.skip-javafx-initialization")
+    (platform/initialize)))
 
 (defmacro on-fx-thread
   "Execute body in implicit do on fx thread
@@ -351,14 +359,18 @@
    (context/create m cache-factory)))
 
 (defn sub
-  "Subscribe to key or subscription function in this context
+  "Subscribe to a key or subscription function in this context
 
-  Subscribing to key (which may be anything except functions) will return value
-  corresponding to that key in underlying context map
+  Subscribing to a key (which may be anything except functions) will return a value
+  corresponding to that key (via `get`) in underlying context map
 
-  Subscription function is any function that expects context as it's first argument"
-  [context k-or-f & args]
-  (apply context/sub context k-or-f args))
+  Subscription function is any function that expects context as it's first argument
+
+  When called without key or subscription function, returns the underlying context map"
+  ([context]
+   (context/sub context))
+  ([context k-or-f & args]
+   (apply context/sub context k-or-f args)))
 
 (defn swap-context
   "Create new context with context map being (apply f current-map args), reusing existing

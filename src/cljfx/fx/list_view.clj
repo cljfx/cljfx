@@ -5,6 +5,7 @@
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control]
             [cljfx.fx.text-field-list-cell :as fx.text-field-list-cell]
+            [cljfx.ext.cell-factory :as ext.cell-factory]
             [cljfx.ext.selection-model :as ext.selection-model]
             [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
   (:import [javafx.scene.control ListView SelectionModel]
@@ -34,7 +35,9 @@
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)
                         :default :list-view]
       ;; definitions
-      :cell-factory [:setter (lifecycle/detached-prop-map fx.text-field-list-cell/props)
+      :cell-factory [:setter (lifecycle/if-desc map?
+                               ext.cell-factory/lifecycle
+                               (lifecycle/detached-prop-map fx.text-field-list-cell/props))
                      :coerce cell-factory]
       :editable [:setter lifecycle/scalar :default false]
       :fixed-cell-size [:setter lifecycle/scalar :coerce double :default -1.0]

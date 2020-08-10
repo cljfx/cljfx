@@ -38,12 +38,23 @@ more explicit and extensible lifecycle for components.
 Cljfx uses `tools.deps`, so you can add this repo with latest sha as a 
 dependency:
 ```edn
- {cljfx {:git/url "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}}
+ cljfx {:git/url "https://github.com/cljfx/cljfx" :sha "<insert-sha-here>"}
 ```
-Cljfx is also published on clojars, so you can add `cljfx` as a maven
-dependency, current version is on this badge: [![Clojars Project](https://img.shields.io/clojars/v/cljfx.svg?logo=clojure&logoColor=white)](https://clojars.org/cljfx)
+Cljfx is also published on Clojars, so you can add `cljfx` as a maven
+dependency, current version is on this badge: 
 
-Minimum required version of clojure is 1.10, minimum JDK version is 11.
+[![Cljfx on Clojars](https://clojars.org/cljfx/cljfx/latest-version.svg)](https://clojars.org/cljfx/cljfx)
+
+Minimum required version of clojure is 1.10.
+
+When depending on git coordinates, minimum required Java version is 11. When using maven 
+dependency, both Java 8 (assumes it has JavaFX provided in JRE) and Java 11 (via openjfx 
+dependency) are supported. You don't need to configure anything in this regard: correct 
+classifiers are picked up automatically. 
+
+Please note that JavaFX 8 is outdated and has problems some people consider severe: it 
+does not support HiDPI scaling on Linux, and sometimes crashes JVM on macOS Mojave. You 
+should prefer JDK 11.
 
 ## Overview
 
@@ -245,6 +256,14 @@ description.
 See walk-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
 as an example of how to iterate on cljfx app in REPL.
 
+### Styling
+
+Iterating on styling is usually cumbersome: styles are defined in 
+external files, they are not reloaded on change, they are opaque: you 
+can't refer from the code to values defined in CSS. Cljfx has a 
+complementary library that aims to help with all those problems: 
+[cljfx/css](https://github.com/cljfx/css).
+
 ### Special keys
 
 Sometimes components accept specially treated keys. Main uses are:
@@ -321,12 +340,20 @@ construct a value from some input:
   index and returning any component description for this prop (see
   example in [examples/e06_pagination.clj](examples/e06_pagination.clj))
 - various versions of `:cell-factory` in controls designed to display
-  multiples of items (table views, list views etc.). You can use
-  functions that receive items and return descriptions for these props,
-  but they are a bit different: created cells have their own lifecycle
-  for performance reasons, and that imposes a restriction that you can't
-  specify `:fx/type` in returned cell descriptions. There are various
-  usage examples available in
+  multiples of items (table views, list views etc.) can be described 
+  using the following form:
+  ```clj
+  {:fx/cell-type :list-cell
+   :describe (fn [item] {:text (my.ns/item-as-text item)})} 
+  ```
+  The lifecycle of cells is a bit different than lifecycle of other 
+  components: JavaFX pools a minimal amount of cells needed to be shown
+  at the same time and updates them on scrolling. This is great for 
+  performance, but it imposes a restriction: cell type is "static". 
+  That's why cljfx uses `:fx/cell-type` that *has* to be a keyword (like 
+  `:list-cell` or `:table-cell`) and a separate `:describe` function 
+  that receives an item and returns a prop map for that cell type. 
+  There are various usage examples available in
   [examples/e16_cell_factories.clj](examples/e16_cell_factories.clj)
 
 ### Subscriptions and contexts
@@ -437,10 +464,13 @@ Using context in cljfx application requires 2 things:
 
 Minimal app example using contexts:
 ```clj
+;; you will need core.cache dependency if you are going to use contexts!
+(require '[clojure.core.cache :as cache])
+
 ;; Define application state as context
 
 (def *state
-  (atom (fx/create-context {:title "Hello world"})))
+  (atom (fx/create-context {:title "Hello world"} cache/lru-cache-factory)))
 
 ;; Every description function receives context at `:fx/context` key
 
@@ -474,7 +504,9 @@ get re-rendered only when their subscription values change.
 For a bigger example see
 [examples/e15_task_tracker.clj](examples/e15_task_tracker.clj).
 
-Another point of concern for context is cache. By default it will grow
+#### Preventing cache from growing forever
+
+Another point of concern for context is cache size. By default it will grow
 forever, which at certain point might become problematic, and we may
 want to trade some cpu cycles for recalculations to decrease memory
 consumption. There is a perfect library for it:
@@ -483,6 +515,9 @@ supports cache factory (a function taking initial cache map and
 returning cache) as a second argument. What kind of cache
 to use is a question with no easy answer, you probably should try
 different caches and see what is a better fit for your app.
+
+Cljfx has a *runtime* optional dependency on `core.cache`: you need to add
+it yourself if you are going to use contexts.
 
 ### Event handling on steroids
 
@@ -839,7 +874,7 @@ them — in the element descriptions that it gets:
                 :fx/key (:id i)
                 :item i})})
 ```
-#### Only mutable objects are described with `:fx/type`
+#### `:fx/type` is for mutable objects only
 
 Lifecycles describe how things change, and some things in JavaFX don't
 change. For example, `Insets` class represents an immutable value, so
@@ -888,15 +923,33 @@ usually used through some other API:
   on media player when this prop is changed
 - `:url` prop of WebView will call `load` method on this view's web
   engine
+  
+#### AOT-compilation is complicated
+
+Requiring cljfx starts a JavaFX application thread, which makes sense for repl and running
+application, but problematic for AOT compilation. To turn off this behavior for 
+compilation, you should set `cljfx.skip-javafx-initialization` java property to `true` for 
+your compilation task. This can be done in `lein` or `clj` by specifying the following 
+jvm opts:
+```clj
+:jvm-opts ["-Dcljfx.skip-javafx-initialization=true"] 
+```
+Please note that while this will help in most cases, you still might have compilation 
+related issues if your code imports JavaFX classes from `javafx.scene.control` package: 
+classes defined there require JavaFX runtime to be running by accessing it in 
+[Control](https://github.com/javafxports/openjdk-jfx/blob/develop/modules/javafx.controls/src/main/java/javafx/scene/control/Control.java)'s 
+static initializer. If you need to do that in your application code, you should not skip 
+JavaFX initialization, and instead make your build tool call 
+`(javafx.application.Platform/exit)` when it finished compiling. 
 
 #### No local mutable state
 
 One thing that is easy to do in react/reagent, but actually complects
-things, is local mutable state: every component can have it's own
-mutable state that lives independently from overall app state. This
+things, is local mutable state: every component can have its own
+mutable state that lives independently of overall app state. This
 makes reasoning about state of the app harder: you need to take lots of
 small pieces into account. Another problem is this state is unreliable,
-because it is only here when a component is here. And if it gets
+because it is only here when a component is here. If it gets
 recreated, for example, after closing some panel it resides in and
 reopening it back, this state will be lost. Sometimes we want this
 behavior, sometimes we don't, and it's possible to choose whether this
@@ -920,7 +973,8 @@ To try them out:
    git clone https://github.com/cljfx/cljfx.git
    cd cljfx 
    ```
-2. Launch repl with `:examples` alias and require examples:
+2. Ensure you have java 11 installed.
+3. Launch repl with `:examples` alias and require examples:
    ```shell
    clj -A:examples
    # Clojure 1.10
@@ -928,7 +982,22 @@ To try them out:
    # nil ;; window appears
    ```
 
-## API stability, public and internal code
+## More information
+
+If you want to learn more about [JavaFX](https://openjfx.io/index.html), its documentation
+is available [here](https://openjfx.io/javadoc/14/index.html).
+
+If you want to learn more about [React](https://reactjs.org/) programming model cljfx is 
+based on, there is an in-depth guide to it: 
+[React as UI Runtime](https://overreacted.io/react-as-a-ui-runtime/). Feel free to skip 
+sections about hooks since cljfx does not have them.
+
+I also gave [a talk about cljfx](https://www.youtube.com/watch?v=xcMNTKFmEgI) — it goes 
+from basic building blocks to how you build reactive applications and provides some 
+context to why I created it. Slides are 
+[here](https://docs.google.com/presentation/d/1576PE2NCbZifGqeg8Ya6RfycrWKVlBNLSW6bPgA527Q/).
+
+## API's stability, public and internal code
 
 Newer versions of cljfx should never introduce breaking changes, so if 
 an update broke something, please file a bug report. Growth of cljfx 
@@ -946,6 +1015,11 @@ shape is internal too.
 
 Keywords with `fx` namespace in component descriptions are reserved: new
 ones may be introduced.
+
+## Getting help
+
+Feel free to ask questions [on Slack](https://clojurians.slack.com/messages/cljfx/)
+or create an issue. Have a look at [previously asked questions](https://github.com/cljfx/cljfx/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Aquestion).
 
 ## Food for thought
 

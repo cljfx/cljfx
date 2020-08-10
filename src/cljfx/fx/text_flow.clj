@@ -3,6 +3,7 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
+            [cljfx.jdk.fx.text-flow :as jdk.fx.text-flow]
             [cljfx.fx.pane :as fx.pane])
   (:import [javafx.scene.text TextFlow TextAlignment]
            [javafx.scene AccessibleRole]))
@@ -12,6 +13,7 @@
 (def props
   (merge
     fx.pane/props
+    jdk.fx.text-flow/props
     (composite/props TextFlow
       ;; overrides
       :accessible-role [:setter lifecycle/scalar :coerce (coerce/enum AccessibleRole)

@@ -4,7 +4,8 @@
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
             [cljfx.fx.combo-box-base :as fx.combo-box-base]
-            [cljfx.fx.text-field-list-cell :as fx.text-field-list-cell])
+            [cljfx.fx.text-field-list-cell :as fx.text-field-list-cell]
+            [cljfx.ext.cell-factory :as ext.cell-factory])
   (:import [javafx.scene.control ComboBox ListCell]
            [javafx.scene AccessibleRole]
            [javafx.util Callback]))
@@ -37,7 +38,9 @@
       ;; definitions
       :button-cell [:setter (lifecycle/detached-prop-map fx.text-field-list-cell/props)
                     :coerce list-cell]
-      :cell-factory [:setter (lifecycle/detached-prop-map fx.text-field-list-cell/props)
+      :cell-factory [:setter (lifecycle/if-desc map?
+                               ext.cell-factory/lifecycle
+                               (lifecycle/detached-prop-map fx.text-field-list-cell/props))
                      :coerce cell-factory]
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter
                   :default :default]

@@ -206,3 +206,12 @@
             "Updating context with independent change does not trigger recalculation"
             (context/sub context-3 inc-db) => 3
             @*inc-db-call-counter => 2)]))
+
+(deftest ctx-asserts-on-extra-subs-after-return
+  (let [ctx (context/create {:a 100 :b 5 :c 20} identity)
+        inc-sub (fn inc-sub [ctx k]
+                  (inc (context/sub ctx k)))
+        range-sub (fn range-sub [ctx]
+                    (map #(context/sub ctx inc-sub %) [:a :b :c]))]
+    (fact
+      (doall (context/sub ctx range-sub)) =throws=> any?)))

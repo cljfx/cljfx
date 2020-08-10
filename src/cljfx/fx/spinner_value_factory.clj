@@ -11,4 +11,5 @@
   (composite/props SpinnerValueFactory
     :converter [:setter lifecycle/scalar :coerce coerce/string-converter]
     :value [:setter lifecycle/scalar]
+    :on-value-changed [:property-change-listener lifecycle/change-listener]
     :wrap-around [:setter lifecycle/scalar :default false]))
