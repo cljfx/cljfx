@@ -47,7 +47,7 @@
 
 (defmethod event-handler ::go-back [{:keys [fx/context]}]
   (let [new-active-request-id (peek (pop (fx/sub context :history)))
-        url (:url (fx/sub context subs/response-by-request-id new-active-request-id))]
+        url (fx/sub context :request-id->response new-active-request-id :url)]
     {:context (fx/swap-context context #(-> %
                                             (update :history pop)
                                             (assoc :typed-url url)))}))

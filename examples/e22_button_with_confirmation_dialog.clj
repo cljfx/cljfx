@@ -17,11 +17,8 @@
 
 ;; Subscriptions of `button-with-confirmation-dialog` component
 
-(defn confirmation-state-sub [context state-id]
-  (get (fx/sub context :internal) state-id))
-
 (defn confirmation-showing-sub [context state-id]
-  (:showing (fx/sub context confirmation-state-sub state-id) false))
+  (boolean (fx/sub context :internal state-id :showing)))
 
 ;; Events of `button-with-confirmation-dialog` component
 

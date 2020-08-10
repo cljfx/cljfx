@@ -38,10 +38,10 @@
   (sort (keys (fx/sub context :id->ingredient))))
 
 (defn sub-id->potion [context id]
-  (get (fx/sub context :id->potion) id))
+  (fx/sub context :id->potion id))
 
 (defn sub-id->ingredient [context id]
-  (get (fx/sub context :id->ingredient) id))
+  (fx/sub context :id->ingredient id))
 
 (defmulti event-handler :event/type)
 

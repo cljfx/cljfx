@@ -40,10 +40,10 @@
   (count (fx/sub context sub-task-state->task-ids task-state)))
 
 (defn sub-task-by-id [context i]
-  (get (fx/sub context :tasks) i))
+  (fx/sub context :tasks i))
 
 (defn sub-user-by-id [context i]
-  (get (fx/sub context :users) i))
+  (fx/sub context :users i))
 
 (defn sub-all-users [context]
   (->> (fx/sub context :users)
