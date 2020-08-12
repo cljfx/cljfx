@@ -5,7 +5,7 @@ documented in this file.
 
 ### [1.7.5](https://github.com/cljfx/cljfx/releases/tag/1.7.5) - 2020-08-12
 
-Deprecate `fx/sub` in favor of `fx/sub-val` and `fx/sub-ctx` (thanks @fdeitylink
+Deprecate `fx/sub` in favor of `fx/sub-val` and `fx/sub-ctx` (thanks [@fdeitylink](https://github.com/fdeitylink)
 for kick-starting this process!). I never liked how complected the semantics of 
 `fx/sub` were: it's either root key in a map (which imposes a restriction on 
 context value to be a map) or function coupled to cljfx (since it has to know 
