@@ -103,47 +103,39 @@ Possible reasons:
     ::context
     (assoc deps k v)))
 
-(defn- key-sub [ctx k]
-  (get (sub ctx) k))
+(defn sub-ctx [context f & args]
+  (let [sub-id (apply vector f args)
+        {::keys [*cache *deps generation]} context
+        cache @*cache
+        existing-entry (lookup cache sub-id)
+        entry (cond
+                (nil? existing-entry)
+                (let [e (calc-cache-entry context sub-id)]
+                  (swap! *cache miss sub-id e)
+                  e)
 
-(defn sub
-  ([context]
-   (let [{::keys [m *cache *deps generation]} context
-         cache @*cache]
-     (when *deps
-       (assert-not-leaked generation cache (::parent-sub-id context))
-       (reset! *deps ::context))
-     m))
-  ([context k & args]
-   (let [sub-id (cond
-                  (fn? k)
-                  (apply vector k args)
+                (= generation (::generation existing-entry))
+                (do (swap! *cache hit sub-id)
+                    existing-entry)
 
-                  (seq args)
-                  (throw (ex-info "Subscribing to keys does not allow additional args"
-                                  {:k k :args args}))
-                  :else
-                  [key-sub k])
-         {::keys [*cache *deps generation]} context
-         cache @*cache
-         existing-entry (lookup cache sub-id)
-         entry (cond
-                 (nil? existing-entry)
-                 (let [e (calc-cache-entry context sub-id)]
-                   (swap! *cache miss sub-id e)
-                   e)
+                :else
+                (sub-from-dirty context *cache existing-entry sub-id))
+        ret (::value entry)]
+    (when *deps
+      (assert-not-leaked generation cache (::parent-sub-id context))
+      (swap! *deps add-dep sub-id ret))
+    ret))
 
-                 (= generation (::generation existing-entry))
-                 (do (swap! *cache hit sub-id)
-                     existing-entry)
+(defn- sub-val-sub [context f args]
+  (let [{::keys [m *cache *deps generation]} context
+        cache @*cache]
+    (when *deps
+      (assert-not-leaked generation cache (::parent-sub-id context))
+      (reset! *deps ::context))
+    (apply f m args)))
 
-                 :else
-                 (sub-from-dirty context *cache existing-entry sub-id))
-         ret (::value entry)]
-     (when *deps
-       (assert-not-leaked generation cache (::parent-sub-id context))
-       (swap! *deps add-dep sub-id ret))
-     ret)))
+(defn sub-val [context f & args]
+  (sub-ctx context sub-val-sub f args))
 
 (defn reset [context new-m]
   (let [{::keys [*cache *deps generation]} context
@@ -166,9 +158,16 @@ Possible reasons:
 (defn clear-cache! [context]
   (swap! (::*cache context) #(reduce evict % (keys %))))
 
+(defn ^:deprecated sub
+  ([context] (sub-val context identity))
+  ([context k & args]
+   (cond
+     (fn? k) (apply sub-ctx context k args)
+     (seq args) (throw (ex-info "Subscribing to keys does not allow additional args"
+                                {:k k :args args}))
+     :else (sub-val context get k))))
+
 (defn ^:deprecated ensure-dirty
   "Accidentally public remains of the old context implementation, do not use"
   [sub-id]
-  (case (sub-id 0)
-    ::dirty sub-id
-    [::dirty sub-id]))
+  (case (sub-id 0) ::dirty sub-id [::dirty sub-id]))

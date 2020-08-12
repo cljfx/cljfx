@@ -18,9 +18,9 @@
 ;; Views
 
 (defn button-text [context]
-  (let [clicked (or (fx/sub context ::clicked) 0)]
+  (let [clicked (or (fx/sub-val context ::clicked) 0)]
     (if (< 2 clicked)
-      [clicked (fx/sub context ::clicked-neg)]
+      [clicked (fx/sub-val context ::clicked-neg)]
       clicked)))
 
 (defn view [{:keys [fx/context] :as m}]
@@ -36,7 +36,7 @@
                     :text (str "Reset")
                     :on-action {:event/type ::reset}}
                    {:fx/type :button
-                    :text (str "Clicked: " (fx/sub context button-text))
+                    :text (str "Clicked: " (fx/sub-ctx context button-text))
                     :on-action {:event/type ::clicked}}]}}})
 
 ;; Main app

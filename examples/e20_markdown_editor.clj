@@ -47,7 +47,7 @@
 (defn node-sub [context]
   (-> (Parser/builder)
       .build
-      (.parse (fx/sub context :typed-text))
+      (.parse (fx/sub-val context :typed-text))
       commonmark->clj))
 
 (defmulti handle-event :event/type)
@@ -236,14 +236,14 @@
 (defn note-input [{:keys [fx/context]}]
   {:fx/type :text-area
    :style-class "input"
-   :text (fx/sub context :typed-text)
+   :text (fx/sub-val context :typed-text)
    :on-text-changed {:event/type ::type-text :fx/sync true}})
 
 (defn note-preview [{:keys [fx/context]}]
   {:fx/type :scroll-pane
    :fit-to-width true
    :content {:fx/type md-view
-             :node (fx/sub context node-sub)}})
+             :node (fx/sub-ctx context node-sub)}})
 
 (def app
   (fx/create-app *context

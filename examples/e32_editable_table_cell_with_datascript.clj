@@ -31,21 +31,21 @@
 ;; subscriptions
 
 (defn- query-sub [ctx q & inputs]
-  (apply d/q q (fx/sub ctx :db) inputs))
+  (apply d/q q (fx/sub-val ctx :db) inputs))
 
 (defn- all-user-ids-sub [ctx]
-  (fx/sub ctx query-sub '[:find [?e ...]
-                          :where [?e :user/name]]))
+  (fx/sub-ctx ctx query-sub '[:find [?e ...]
+                              :where [?e :user/name]]))
 
 (defn- grown-up-user-ids-sub [ctx]
-  (fx/sub ctx query-sub '[:find [?e ...]
-                          :where
-                          [?e :user/name]
-                          [?e :user/age ?a]
-                          [(<= 18 ?a)]]))
+  (fx/sub-ctx ctx query-sub '[:find [?e ...]
+                              :where
+                              [?e :user/name]
+                              [?e :user/age ?a]
+                              [(<= 18 ?a)]]))
 
 (defn- value-sub [ctx id attr]
-  (fx/sub ctx query-sub '[:find ?v . :in $ ?e ?a :where [?e ?a ?v]] id attr))
+  (fx/sub-ctx ctx query-sub '[:find ?v . :in $ ?e ?a :where [?e ?a ?v]] id attr))
 
 ;; views
 
@@ -56,8 +56,8 @@
 ;; to render editable or normal version of a cell.
 
 (defn- editable-cell [{:keys [fx/context id attr value-converter]}]
-  (let [edit (fx/sub context :edit)
-        value (fx/sub context value-sub id attr)]
+  (let [edit (fx/sub-val context :edit)
+        value (fx/sub-ctx context value-sub id attr)]
     (if (= edit [id attr])
       {:fx/type :text-field
        :on-key-pressed {:event/type ::key-pressed}
@@ -88,7 +88,7 @@
 
 (defn- age-filter [{:keys [fx/context]}]
   {:fx/type :check-box
-   :selected (fx/sub context :18+)
+   :selected (fx/sub-val context :18+)
    :on-selected-changed {:event/type ::set-18+}
    :text "adults (18+)"})
 
@@ -108,10 +108,10 @@
               :cell-value-factory identity
               :cell-factory {:fx/cell-type :table-cell
                              :describe age-cell-factory}}]
-   :items (fx/sub context user-ids-query)})
+   :items (fx/sub-ctx context user-ids-query)})
 
 (defn- root-view [{:keys [fx/context]}]
-  (let [grown-ups (fx/sub context :18+)]
+  (let [grown-ups (fx/sub-val context :18+)]
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene

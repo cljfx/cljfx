@@ -27,26 +27,26 @@
 ;; subscription functions
 
 (defn sub-make-task-state->task-ids [context]
-  (->> (fx/sub context :tasks)
+  (->> (fx/sub-val context :tasks)
        vals
        (group-by :state)
        (map (juxt key #(->> % val (map :id) (sort-by -))))
        (into {})))
 
 (defn sub-task-state->task-ids [context task-state]
-  (get (fx/sub context sub-make-task-state->task-ids) task-state))
+  (get (fx/sub-ctx context sub-make-task-state->task-ids) task-state))
 
 (defn sub-task-count [context task-state]
-  (count (fx/sub context sub-task-state->task-ids task-state)))
+  (count (fx/sub-ctx context sub-task-state->task-ids task-state)))
 
 (defn sub-task-by-id [context i]
-  (get (fx/sub context :tasks) i))
+  (fx/sub-val context get-in [:tasks i]))
 
 (defn sub-user-by-id [context i]
-  (get (fx/sub context :users) i))
+  (fx/sub-val context get-in [:users i]))
 
 (defn sub-all-users [context]
-  (->> (fx/sub context :users)
+  (->> (fx/sub-val context :users)
        vals
        (sort-by :id)))
 
@@ -66,10 +66,10 @@
 
 (defn column-task-count [{:keys [fx/context task-state]}]
   {:fx/type :label
-   :text (str (fx/sub context sub-task-count task-state))})
+   :text (str (fx/sub-ctx context sub-task-count task-state))})
 
 (defn assignee-view [{:keys [fx/context task-id id]}]
-  (let [user (fx/sub context sub-user-by-id id)]
+  (let [user (fx/sub-ctx context sub-user-by-id id)]
     {:fx/type :h-box
      :alignment :center
      :spacing 5
@@ -81,10 +81,10 @@
                                 :describe (fn [user] {:text (:name user)})}
                  :value user
                  :on-value-changed {:event/type ::assign-user :task-id task-id}
-                 :items (fx/sub context sub-all-users)}]}))
+                 :items (fx/sub-ctx context sub-all-users)}]}))
 
 (defn task-state-view [{:keys [fx/context id]}]
-  (let [task (fx/sub context sub-task-by-id id)]
+  (let [task (fx/sub-ctx context sub-task-by-id id)]
     {:fx/type :h-box
      :alignment :center
      :spacing 5
@@ -96,7 +96,7 @@
                  :items [:todo :in-progress :done]}]}))
 
 (defn task-view [{:keys [fx/context id]}]
-  (let [task (fx/sub context sub-task-by-id id)]
+  (let [task (fx/sub-ctx context sub-task-by-id id)]
     {:fx/type :v-box
      :style {:-fx-background-color "#eee"
              :-fx-background-radius 2
@@ -120,7 +120,7 @@
 (defn column-tasks [{:keys [fx/context task-state]}]
   {:fx/type :v-box
    :spacing 10
-   :children (for [task-id (fx/sub context sub-task-state->task-ids task-state)]
+   :children (for [task-id (fx/sub-ctx context sub-task-state->task-ids task-state)]
                {:fx/type task-view
                 :fx/key task-id
                 :id task-id})})

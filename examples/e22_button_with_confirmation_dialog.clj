@@ -15,14 +15,6 @@
            :internal {}}
           cache/lru-cache-factory)))
 
-;; Subscriptions of `button-with-confirmation-dialog` component
-
-(defn confirmation-state-sub [context state-id]
-  (get (fx/sub context :internal) state-id))
-
-(defn confirmation-showing-sub [context state-id]
-  (:showing (fx/sub context confirmation-state-sub state-id) false))
-
 ;; Events of `button-with-confirmation-dialog` component
 
 (defmulti handle-event :event/type)
@@ -59,7 +51,7 @@
                                                dialog-pane]}]
   {:fx/type fx/ext-let-refs
    :refs {::dialog {:fx/type :dialog
-                    :showing (fx/sub context confirmation-showing-sub state-id)
+                    :showing (fx/sub-val context get-in [:internal state-id :showing] false)
                     :on-hidden {:event/type ::on-confirmation-dialog-hidden
                                 :state-id state-id
                                 :on-confirmed on-confirmed}
@@ -73,7 +65,7 @@
 
 (defn root-view [{:keys [fx/context]}]
   {:fx/type :stage
-   :showing (fx/sub context :showing)
+   :showing (fx/sub-val context :showing)
    :scene {:fx/type :scene
            :root {:fx/type :v-box
                   :padding 50

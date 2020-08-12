@@ -33,7 +33,7 @@
                                          {:fx/type :button
                                           :on-action {:event/type ::reset-dissoc}
                                           :text (str "Reset via dissoc")}]}
-                             (let [clicked (fx/sub context ::clicked)]
+                             (let [clicked (fx/sub-val context ::clicked)]
                                {:fx/type :button
                                 :on-action {:event/type ::clicked
                                             :clicked clicked}

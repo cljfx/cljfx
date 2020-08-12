@@ -13,8 +13,8 @@
   {:context (fx/swap-context context assoc :typed-url event)})
 
 (defmethod event-handler ::key-press-url [{:keys [fx/context ^KeyEvent fx/event]}]
-  (let [current-url (:url (fx/sub context subs/current-response))
-        url (fx/sub context :typed-url)]
+  (let [current-url (:url (fx/sub-ctx context subs/current-response))
+        url (fx/sub-val context :typed-url)]
     (when (and (= KeyCode/ENTER (.getCode event))
                (not= url current-url))
       {:dispatch {:event/type ::open-url :url url}})))
@@ -46,8 +46,8 @@
                                 (= :failure result) (assoc :exception exception)))})
 
 (defmethod event-handler ::go-back [{:keys [fx/context]}]
-  (let [new-active-request-id (peek (pop (fx/sub context :history)))
-        url (:url (fx/sub context subs/response-by-request-id new-active-request-id))]
+  (let [new-active-request-id (peek (pop (fx/sub-val context :history)))
+        url (:url (fx/sub-ctx context subs/response-by-request-id new-active-request-id))]
     {:context (fx/swap-context context #(-> %
                                             (update :history pop)
                                             (assoc :typed-url url)))}))

@@ -77,11 +77,11 @@
             ;; the UI
             :children
             [{:fx/type :label
-              :text (str "Current node: " (some-> (fx/sub context :current-node)
+              :text (str "Current node: " (some-> (fx/sub-val context :current-node)
                                                   class
                                                   .getSimpleName))}
              {:fx/type :label
-              :text (str "Has CSS classes: " (some-> ^Node (fx/sub context :current-node)
+              :text (str "Has CSS classes: " (some-> ^Node (fx/sub-val context :current-node)
                                                      .getStyleClass
                                                      vec))}
              ; mouse over these nodes to highlight them

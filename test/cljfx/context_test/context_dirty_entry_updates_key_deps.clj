@@ -16,7 +16,7 @@
                                  #(or (when (seq %) (pop %)) []))
                 ; clean up state
                 (fx/swap-context update ::clicked
-                                 dissoc (peek (fx/sub context ::ids))))})
+                                 dissoc (peek (fx/sub-val context ::ids))))})
 
 (defmethod handler ::clicked
   [{:keys [fx/context id] :as m}]
@@ -25,7 +25,7 @@
 ;; Views
 
 (defn buttons [{:keys [fx/context]}]
-  (let [clicked (fx/sub context ::clicked)]
+  (let [clicked (fx/sub-val context ::clicked)]
     {:fx/type :scroll-pane
      :fit-to-width true
      :fit-to-height true
@@ -36,13 +36,13 @@
                          :text (str "x" (get clicked id 0))
                          :on-action {:event/type ::clicked
                                      :id id}})
-                      (fx/sub context ::ids))}}))
+                      (fx/sub-val context ::ids))}}))
 
 (defn sum-buttons [context]
-  (reduce #(let [clicked (fx/sub context ::clicked)]
+  (reduce #(let [clicked (fx/sub-val context ::clicked)]
              (+ %1 (get clicked %2 0)))
           0
-          (fx/sub context ::ids)))
+          (fx/sub-val context ::ids)))
 
 (defn view [{:keys [fx/context] :as m}]
   {:fx/type :stage
@@ -61,7 +61,7 @@
                                 :on-action {:event/type ::more-buttons}
                                 :text (str "More buttons")}]}
                    {:fx/type :label
-                    :text (str "Sum: " (fx/sub context sum-buttons))}
+                    :text (str "Sum: " (fx/sub-ctx context sum-buttons))}
                    {:fx/type buttons}]}}})
 
 ;; Main app

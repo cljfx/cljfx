@@ -12,7 +12,7 @@
    :children [{:fx/type :progress-indicator}]})
 
 (defn- exception [{:keys [fx/context]}]
-  (let [{:keys [url exception]} (fx/sub context subs/current-response)]
+  (let [{:keys [url exception]} (fx/sub-ctx context subs/current-response)]
     {:fx/type :v-box
      :alignment :center
      :children [{:fx/type :label
@@ -43,9 +43,9 @@
    :root (->tree-item tree)})
 
 (defn- result [{:keys [fx/context]}]
-  (let [request-id (fx/sub context subs/current-request-id)
-        content-type (fx/sub context subs/context-type request-id)
-        ^bytes body (fx/sub context subs/body request-id)]
+  (let [request-id (fx/sub-ctx context subs/current-request-id)
+        content-type (fx/sub-ctx context subs/context-type request-id)
+        ^bytes body (fx/sub-ctx context subs/body request-id)]
     (case content-type
       "text/html"
       {:fx/type html
@@ -74,7 +74,7 @@
                  :text (str content-type ": " (String. body))}})))
 
 (defn current-page [{:keys [fx/context]}]
-  (case (:result (fx/sub context subs/current-response))
+  (case (:result (fx/sub-ctx context subs/current-response))
     :pending {:fx/type loading}
     :success {:fx/type result}
     :failure {:fx/type exception}
@@ -85,11 +85,11 @@
    :spacing 10
    :children [{:fx/type :button
                :text "Back"
-               :disable (fx/sub context subs/history-empty?)
+               :disable (fx/sub-ctx context subs/history-empty?)
                :on-action {:event/type ::events/go-back}}
               {:fx/type :text-field
                :h-box/hgrow :always
-               :text (fx/sub context :typed-url)
+               :text (fx/sub-val context :typed-url)
                :on-text-changed {:event/type ::events/type-url :fx/sync true}
                :on-key-pressed {:event/type ::events/key-press-url}}]})
 

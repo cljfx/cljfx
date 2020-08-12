@@ -32,16 +32,10 @@
       cache/lru-cache-factory)))
 
 (defn sub-potion-ids [context]
-  (sort (keys (fx/sub context :id->potion))))
+  (sort (keys (fx/sub-val context :id->potion))))
 
 (defn sub-ingredient-ids [context]
-  (sort (keys (fx/sub context :id->ingredient))))
-
-(defn sub-id->potion [context id]
-  (get (fx/sub context :id->potion) id))
-
-(defn sub-id->ingredient [context id]
-  (get (fx/sub context :id->ingredient) id))
+  (sort (keys (fx/sub-val context :id->ingredient))))
 
 (defmulti event-handler :event/type)
 
@@ -69,7 +63,7 @@
                    "711C16.172,4.759,16.172,4.317,15.898,4.045z")}]})
 
 (defn sub-ingredient-id->potion-ids-map [context]
-  (->> (fx/sub context :id->potion)
+  (->> (fx/sub-val context :id->potion)
        vals
        (mapcat (fn [potion]
                  (map (fn [ingredient-id]
@@ -81,7 +75,7 @@
        (into {})))
 
 (defn sub-ingredient-id->potion-ids [context id]
-  (get (fx/sub context sub-ingredient-id->potion-ids-map) id))
+  (get (fx/sub-ctx context sub-ingredient-id->potion-ids-map) id))
 
 (defn section-title [{:keys [text]}]
   {:fx/type :label
@@ -116,13 +110,13 @@
 
 (defn ingredient-badge [{:keys [fx/context id potion-id]}]
   {:fx/type badge
-   :text (:name (fx/sub context sub-id->ingredient id))
+   :text (fx/sub-val context get-in [:id->ingredient id :name])
    :on-remove {:event/type ::remove-ingredient
                :potion-id potion-id
                :ingredient-id id}})
 
 (defn potion-view [{:keys [fx/context id]}]
-  (let [potion (fx/sub context sub-id->potion id)]
+  (let [potion (fx/sub-val context get-in [:id->potion id])]
     {:fx/type :v-box
      :children [{:fx/type item-title
                  :text (:name potion)}
@@ -144,23 +138,22 @@
                :text "Potions"}
               {:fx/type :v-box
                :spacing 5
-               :children (for [id (fx/sub context sub-potion-ids)]
+               :children (for [id (fx/sub-ctx context sub-potion-ids)]
                            {:fx/type potion-view
                             :id id})}]})
 
 (defn potion-badge [{:keys [fx/context id ingredient-id]}]
   {:fx/type badge
-   :text (:name (fx/sub context sub-id->potion id))
+   :text (fx/sub-val context get-in [:id->potion id :name])
    :on-remove {:event/type ::remove-ingredient
                :potion-id id
                :ingredient-id ingredient-id}})
 
 (defn ingredient-view [{:keys [fx/context id]}]
-  (let [ingredient (fx/sub context sub-id->ingredient id)
-        potion-ids (fx/sub context sub-ingredient-id->potion-ids id)]
+  (let [potion-ids (fx/sub-ctx context sub-ingredient-id->potion-ids id)]
     {:fx/type :v-box
      :children [{:fx/type item-title
-                 :text (:name ingredient)}
+                 :text (fx/sub-val context get-in [:id->ingredient id :name])}
                 {:fx/type :h-box
                  :spacing 2
                  :children (if (empty? potion-ids)
@@ -182,7 +175,7 @@
                :text "Ingredients"}
               {:fx/type :v-box
                :spacing 5
-               :children (for [id (fx/sub context sub-ingredient-ids)]
+               :children (for [id (fx/sub-ctx context sub-ingredient-ids)]
                            {:fx/type ingredient-view
                             :id id})}]})
 

@@ -3,6 +3,67 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.5](https://github.com/cljfx/cljfx/releases/tag/1.7.5) - 2020-08-12
+
+Deprecate `fx/sub` in favor of `fx/sub-val` and `fx/sub-ctx` (thanks @fdeitylink
+for kick-starting this process!). I never liked how complected the semantics of 
+`fx/sub` were: it's either root key in a map (which imposes a restriction on 
+context value to be a map) or function coupled to cljfx (since it has to know 
+about context). This is why I split `fx/sub` responsibilities into 2 different 
+functions:
+- `fx/sub-val` that subscribes any function to a value wrapped in a context;
+- `fx/sub-ctx` that subscribes function to a context itself (hence coupling to 
+  cljfx), that is then subscribes to other functions.
+
+See updated [Subscriptions and contexts](https://github.com/cljfx/cljfx#subscriptions-and-contexts) 
+readme section.
+
+Here is how you should migrate your code to benefit from removed complexity:
+1. Replace key subscriptions with `fx/sub-val`:
+    ```clj
+   ;; when subscribing to keywords:
+   (fx/sub ctx :users)
+   ;; becomes
+   (fx/sub-val ctx :users)
+   
+   ;; when subscribing to non-invokable keys:
+   (fx/sub ctx "users")
+   ;; becomes
+   (fx/sub-val ctx get "users")
+    ```
+   The added benefit of `fx/sub-val` is ability to provide defaults or look 
+   deeper in the map, since now you can use any function to extract value from 
+   context:
+   ```clj
+   ;; added benefit: defaults
+   (or (fx/sub ctx :users) [])
+   ;; becomes
+   (fx/sub-val ctx :users [])
+   
+   ;; added benefit: deep lookup
+   (:name (fx/sub ctx user-by-id id))
+   ;; becomes
+   (fx/sub-val ctx get-in [:users id :name])
+   ```
+2. Replace root subscriptions with `fx/sub-val`:
+   ```clj
+   (fx/sub ctx)
+   ;; becomes
+   (fx/sub-val ctx identity)
+   ```
+3. Replace function subscriptions with `fx/sub-ctx`:
+   ```clj
+   (fx/sub ctx user-by-id 1)
+   ;; becomes
+   (fx/sub-ctx ctx user-by-id 1)
+   ```
+   The added benefit of `fx/sub-ctx` is that it allows subscribing to functions 
+   that are not `fn?` (e.g. multi-methods).
+
+Note that for preserving compatibility `fx/sub` is not going to be removed: it 
+will remain in cljfx forever. Deprecation status means this is no longer the 
+recommended approach to using contexts.   
+
 ### [1.7.4](https://github.com/cljfx/cljfx/releases/tag/1.7.4) - 2020-06-16
 - Fix composite macros behavior in turkish locale
 

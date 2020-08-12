@@ -14,11 +14,11 @@
                :text label-text}
               {:fx/type :text-field
                :on-text-changed #(swap! *state fx/swap-context assoc key %)
-               :text (fx/sub context key)}]})
+               :text (fx/sub-val context get key)}]})
 
 (defn root [{:keys [fx/context]}]
-  (let [first-name (fx/sub context :first-name)
-        last-name (fx/sub context :last-name)]
+  (let [first-name (fx/sub-val context :first-name)
+        last-name (fx/sub-val context :last-name)]
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene

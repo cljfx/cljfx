@@ -337,40 +337,48 @@
   (renderer/unmount *ref renderer))
 
 (defn create-context
-  "Create a memoizing context for a map
+  "Create a memoizing context for a value
 
-  Context should be treated as a black box with `sub` being an interface to access
-  context's content. Accessing content is possible via keys or subscription functions
+  Context should be treated as a black box with [[sub-val]]/[[sub-ctx]] as an interface
+  to access context's content.
 
-  Key is any value except functions that will be `get` from context map
+  [[sub-val]] subscribes to a function that receives current value in the context,
+  should be fast like [[get]].
+  [[sub-ctx]] subscribes to a function that receives context to subscribe to other
+  functions, can be slow like [[sort]]
 
-  Subscription function is a function that expects context as first argument.
-  Returned value will be memoized in this context, resulting in cache lookups for
-  subsequent `sub` calls on that function with same arguments.
+  Values returned by `sub-*` will be memoized in this context, resulting in cache lookups
+  for subsequent `sub-*` calls on corresponding functions with same arguments.
 
   Cache will be reused on contexts derived by `swap-context` and `reset-context`
-  to minimize recalculations. To make it efficient, all calls to `sub` by subscription
-  functions are tracked, thus calling `sub` from subscription function on received context
-  is not allowed after said function returns. For example, all lazy sequences that may
-  call `sub` during computing of elements have to be realized."
+  to minimize recalculations. To make it efficient, all calls to `sub-*` by subscription
+  functions are tracked, thus calling `sub-*` from subscription function is not allowed
+  after that function returns. For example, all lazy sequences that may
+  call `sub-*` during computing of their elements have to be realized."
   ([m]
    (create-context m identity))
   ([m cache-factory]
    (context/create m cache-factory)))
 
-(defn sub
-  "Subscribe to a key or subscription function in this context
+(defn sub-val
+  "Subscribe to a function that receives value in this context
 
-  Subscribing to a key (which may be anything except functions) will return a value
-  corresponding to that key (via `get`) in underlying context map
+  This creates a direct subscription that will be recalculated whenever the context
+  changes.
 
-  Subscription function is any function that expects context as it's first argument
+  Should be fast as [[get]]"
+  [context f & args]
+  (apply context/sub-val context f args))
 
-  When called without key or subscription function, returns the underlying context map"
-  ([context]
-   (context/sub context))
-  ([context k-or-f & args]
-   (apply context/sub context k-or-f args)))
+(defn sub-ctx
+  "Subscribe to a function that receives the context
+
+  This is used for creating indirect subscriptions by calling [[sub-ctx]]/[[sub-val]]
+  inside the function that will be recalculated only when those subscriptions change.
+
+  Can be slow as [[sort]]"
+  [context f & args]
+  (apply context/sub-ctx context f args))
 
 (defn swap-context
   "Create new context with context map being (apply f current-map args), reusing existing
@@ -514,3 +522,19 @@
     (mount-renderer *context renderer)
     {:renderer renderer
      :handler handler}))
+
+(defn ^:deprecated sub
+  "Subscribe to a key or subscription function in this context
+
+  Subscribing to a key (which may be anything except functions) will return a value
+  corresponding to that key (via `get`) in underlying context value
+
+  Subscription function is any function that expects context as it's first argument
+
+  When called without key or subscription function, returns the underlying context map
+
+  Deprecated: use [[sub-val]] for direct or [[sub-ctx]] for indirect subscriptions"
+  ([context]
+   (context/sub context))
+  ([context k-or-f & args]
+   (apply context/sub context k-or-f args)))
