@@ -17,7 +17,7 @@
     (instance? Callback x)
     x
 
-    (fn? x)
+    (ifn? x)
     (reify Callback
       (call [_ param]
         (let [^TreeTableColumn$CellDataFeatures features param]
