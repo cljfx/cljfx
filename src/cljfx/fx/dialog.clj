@@ -15,7 +15,7 @@
     (instance? Callback x)
     x
 
-    (fn? x)
+    (ifn? x)
     (reify Callback
       (call [_ p]
         (x p)))

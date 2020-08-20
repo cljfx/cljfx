@@ -14,10 +14,10 @@
 (defn table-cell-value-factory [x]
   (cond
     (instance? Callback x) x
-    (fn? x) (reify Callback
-              (call [_ param]
-                (let [^TableColumn$CellDataFeatures features param]
-                  (coerce/constant-observable-value (x (.getValue features))))))
+    (ifn? x) (reify Callback
+               (call [_ param]
+                 (let [^TableColumn$CellDataFeatures features param]
+                   (coerce/constant-observable-value (x (.getValue features))))))
     :else (coerce/fail Callback x)))
 
 (defn cell-factory [x]

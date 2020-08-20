@@ -3,6 +3,14 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.6](https://github.com/cljfx/cljfx/releases/tag/1.7.6) - 2020-08-20
+
+Allow following props to be `ifn?` instead of `fn?`:
+
+- `:result-converter` in `:dialog`;
+- `:cell-value-factory` in `:table-column`;
+- `:cell-value-factory` in `:tree-table-column`.
+
 ### [1.7.5](https://github.com/cljfx/cljfx/releases/tag/1.7.5) - 2020-08-12
 
 Deprecate `fx/sub` in favor of `fx/sub-val` and `fx/sub-ctx` (thanks @fdeitylink
