@@ -1,4 +1,5 @@
 {:deps {org.clojure/clojure {:mvn/version "1.10.1"}
+        org.clojure/tools.namespace {:mvn/version "1.0.0"}
         org.openjfx/javafx-controls {:mvn/version "14"}
         org.openjfx/javafx-base {:mvn/version "14"}
         org.openjfx/javafx-graphics {:mvn/version "14"}
