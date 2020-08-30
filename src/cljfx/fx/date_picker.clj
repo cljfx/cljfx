@@ -3,7 +3,8 @@
   (:require [cljfx.composite :as composite]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.coerce :as coerce]
-            [cljfx.fx.combo-box-base :as fx.combo-box-base])
+            [cljfx.fx.combo-box-base :as fx.combo-box-base]
+            [cljfx.ext.cell-factory :as ext.cell-factory])
   (:import [javafx.scene.control DatePicker]
            [java.time.chrono Chronology IsoChronology HijrahChronology JapaneseChronology
                              MinguoChronology ThaiBuddhistChronology]
@@ -36,7 +37,10 @@
       :chronology [:setter lifecycle/scalar :coerce chronology :default :iso]
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter
                   :default :local-date]
-      :day-cell-factory [:setter lifecycle/scalar :coerce coerce/cell-factory]
+      :day-cell-factory [:setter (lifecycle/if-desc map?
+                                   ext.cell-factory/lifecycle
+                                   lifecycle/scalar)
+                         :coerce coerce/cell-factory]
       :show-week-numbers [:setter lifecycle/scalar :default false])))
 
 (def lifecycle

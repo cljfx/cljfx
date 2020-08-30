@@ -71,6 +71,13 @@
                               {:text (str x)})}
    :root (->tree-item table-view)})
 
+(def date-picker
+  {:fx/type :date-picker
+   :day-cell-factory {:fx/cell-type :date-cell
+                      :describe (fn [^java.time.LocalDate x]
+                                  ;; Christmas theme ^_^
+                                  {:text-fill (if (even? (.getDayOfYear x)) :red :green)})}})
+
 (fx/on-fx-thread
   (fx/create-component
     {:fx/type :stage
@@ -89,7 +96,7 @@
                             :closable false
                             :content list-view}
                            {:fx/type :tab
-                            :text "Combo box"
+                            :text "Combo Box"
                             :closable false
                             :content combo-box}
                            {:fx/type :tab
@@ -99,4 +106,8 @@
                            {:fx/type :tab
                             :text "Tree View"
                             :closable false
-                            :content tree-view}]}}}))
+                            :content tree-view}
+                           {:fx/type :tab
+                            :text "Date Picker"
+                            :closable false
+                            :content date-picker}]}}}))
