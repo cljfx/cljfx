@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.7](https://github.com/cljfx/cljfx/releases/tag/1.7.7) - 2020-08-30
+
+- Add missing `:date-cell` fx type (thanks [@ertugrulcetin](https://github.com/ertugrulcetin));
+- Bring `:date-picker`'s `:day-cell-factory` up to par with other cell factories. 
+
 ### [1.7.6](https://github.com/cljfx/cljfx/releases/tag/1.7.6) - 2020-08-20
 
 Allow following props to be `ifn?` instead of `fn?`:
