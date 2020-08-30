@@ -19,8 +19,7 @@
                                        (= (take 2 forms) '(def lifecycle))))
                                 top-forms))))
          (map (fn [form]
-                (let [ns*           (second (first form))
-                      ns-str        (name ns*)
+                (let [ns-str        (-> form first second name)
                       fx-kw         (-> ns-str (str/split #"\.") last keyword)
                       lifecycle-sym (symbol (str ns-str "/lifecycle"))]
                   [fx-kw (lazy-load lifecycle-sym)])))
