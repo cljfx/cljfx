@@ -162,6 +162,7 @@
    :tree-view (lazy-load cljfx.fx.tree-view/lifecycle)
    ;; cells
    :cell (lazy-load cljfx.fx.cell/lifecycle)
+   :date-cell (lazy-load cljfx.fx.date-cell/lifecycle)
    :indexed-cell (lazy-load cljfx.fx.indexed-cell/lifecycle)
    :list-cell (lazy-load cljfx.fx.list-cell/lifecycle)
    :combo-box-list-cell (lazy-load cljfx.fx.combo-box-list-cell/lifecycle)
