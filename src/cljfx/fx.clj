@@ -14,10 +14,9 @@
          (#(ns-find/find-sources-in-dir % ns-find/clj))
          (map #(read-string (str "(" (slurp (.getAbsolutePath ^File %)) ")")))
          (filter (fn [top-forms]
-                   (seq (filter (fn [forms]
-                                  (and (list? forms)
-                                       (= (take 2 forms) '(def lifecycle))))
-                                top-forms))))
+                   (some (fn [forms]
+                           (and (list? forms)
+                                (= (take 2 forms) '(def lifecycle)))) top-forms)))
          (map (fn [form]
                 (let [ns-str        (-> form first second name)
                       fx-kw         (-> ns-str (str/split #"\.") last keyword)
