@@ -3,6 +3,12 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.8](https://github.com/cljfx/cljfx/releases/tag/1.7.7) - 2020-09-05
+
+- add proper `:row-factory` support for `:table-view` and `:tree-table-view` 
+  (see updated [e16_cell_factories.clj](examples/e16_cell_factories.clj) 
+  example).
+
 ### [1.7.7](https://github.com/cljfx/cljfx/releases/tag/1.7.7) - 2020-08-30
 
 - Add missing `:date-cell` fx type (thanks [@ertugrulcetin](https://github.com/ertugrulcetin)!);
