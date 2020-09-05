@@ -12,6 +12,9 @@
 
 (def table-view
   {:fx/type :table-view
+   :row-factory {:fx/cell-type :table-row
+                 :describe (fn [x]
+                             {:style {:-fx-border-color x}})}
    :columns [{:fx/type :table-column
               :text "pr-str"
               :cell-value-factory identity
@@ -42,6 +45,16 @@
 
 (def tree-table-view
   {:fx/type :tree-table-view
+   :row-factory {:fx/cell-type :tree-table-row
+                 :describe (fn [x]
+                             {:style {:-fx-background-color (cond
+                                                              (number? x) "#99f"
+                                                              (string? x) "#cfa"
+                                                              (map? x) "fda"
+                                                              (set? x) :pink
+                                                              (coll? x) "#faa"
+                                                              (keyword? x) "eaf"
+                                                              :else "#adf")}})}
    :columns [{:fx/type :tree-table-column
               :text "pr-str"
               :max-width 960/2

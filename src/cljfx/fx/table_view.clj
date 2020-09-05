@@ -5,7 +5,8 @@
             [cljfx.coerce :as coerce]
             [cljfx.fx.control :as fx.control]
             [cljfx.ext.selection-model :as ext.selection-model]
-            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model])
+            [cljfx.ext.multiple-selection-model :as ext.multiple-selection-model]
+            [cljfx.ext.cell-factory :as ext.cell-factory])
   (:import [javafx.scene.control TableView]
            [javafx.util Callback]
            [javafx.scene AccessibleRole]))
@@ -50,7 +51,9 @@
       :on-scroll-to-column [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :on-sort [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :placeholder [:setter lifecycle/dynamic]
-      :row-factory [:setter lifecycle/scalar]
+      :row-factory [:setter (lifecycle/if-desc map?
+                              ext.cell-factory/lifecycle
+                              lifecycle/scalar)]
       ;; deprecated, use [[cljfx.ext.table-view/with-selection-props]] instead
       :on-selected-item-changed (ext.selection-model/on-selected-item-changed-prop
                                   get-selection-model)
