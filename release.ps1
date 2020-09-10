@@ -16,4 +16,6 @@ clj -A:base:depstar cljfx-"$version".jar
 clj -A:jdk8:depstar cljfx-"$version"-jdk8.jar
 clj -A:jdk11:depstar cljfx-"$version"-jdk11.jar
 clj -A:build -m deploy (Read-Host -Prompt "Username") (Read-Host -Prompt "Token" -AsSecureString | ConvertFrom-SecureString -AsPlainText) cljfx-"$version".jar cljfx-"$version"-jdk8.jar cljfx-"$version"-jdk11.jar
-rm cljfx-"$version".jar cljfx-"$version"-jdk8.jar cljfx-"$version"-jdk11.jar
+rm cljfx-"$version".jar
+rm cljfx-"$version"-jdk8.jar
+rm cljfx-"$version"-jdk11.jar
