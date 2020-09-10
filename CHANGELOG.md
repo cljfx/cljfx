@@ -3,9 +3,12 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.7.8](https://github.com/cljfx/cljfx/releases/tag/1.7.7) - 2020-09-05
+### [1.7.9](https://github.com/cljfx/cljfx/releases/tag/1.7.9) - 2020-09-10
+- Add `:pseudo-classes` node prop ([example](examples/e36_pseudo_classes.clj)).
 
-- add proper `:row-factory` support for `:table-view` and `:tree-table-view` 
+### [1.7.8](https://github.com/cljfx/cljfx/releases/tag/1.7.8) - 2020-09-05
+
+- Add proper `:row-factory` support for `:table-view` and `:tree-table-view` 
   (see updated [e16_cell_factories.clj](examples/e16_cell_factories.clj) 
   example).
 

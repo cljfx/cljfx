@@ -3,6 +3,7 @@
 
   All Mutator implementations should be treated as Mutator protocol implementations
   only, their internals are subject to change"
+  (:require [clojure.set :as set])
   (:import [java.util Collection]
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.collections ObservableList ObservableMap ListChangeListener]
@@ -83,6 +84,20 @@
                      (set-all! instance (coerce new-value))))
        `retract! (fn [_ instance _ _]
                    (set-all! instance {}))})))
+
+(defn set-difference [add! remove!]
+  (with-meta
+    [::set-difference add! remove!]
+    {`assign! (fn [_ instance coerce value]
+                (run! #(add! instance (coerce %)) value))
+     `replace! (fn [_ instance coerce old-value new-value]
+                 (when-not (= old-value new-value)
+                   (let [removed (set/difference old-value new-value)
+                         added (set/difference new-value old-value)]
+                     (run! #(remove! instance (coerce %)) removed)
+                     (run! #(add! instance (coerce %)) added))))
+     `retract! (fn [_ instance coerce value]
+                 (run! #(remove! instance (coerce %)) value))}))
 
 (def forbidden
   (with-meta

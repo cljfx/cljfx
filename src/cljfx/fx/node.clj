@@ -8,9 +8,16 @@
   (:import [javafx.event Event EventHandler]
            [javafx.scene Node AccessibleRole CacheHint DepthTest]
            [javafx.scene.effect BlendMode]
-           [javafx.geometry NodeOrientation]))
+           [javafx.geometry NodeOrientation]
+           [javafx.css PseudoClass]))
 
 (set! *warn-on-reflection* true)
+
+(defn- pseudo-class [x]
+  (cond
+    (instance? PseudoClass x) x
+    (keyword? x) (PseudoClass/getPseudoClass (name x))
+    :else (coerce/fail PseudoClass x)))
 
 (def props
   (merge
@@ -89,6 +96,11 @@
       :on-zoom-started [:setter lifecycle/event-handler :coerce coerce/event-handler]
       :opacity [:setter lifecycle/scalar :coerce double :default 1]
       :pick-on-bounds [:setter lifecycle/scalar :default false]
+      :pseudo-classes [(mutator/set-difference
+                         #(.pseudoClassStateChanged ^Node %1 %2 true)
+                         #(.pseudoClassStateChanged ^Node %1 %2 false))
+                       lifecycle/scalar
+                       :coerce pseudo-class]
       :rotate [:setter lifecycle/scalar :coerce double :default 0]
       :rotation-axis [:setter lifecycle/scalar :coerce coerce/point-3d :default :z-axis]
       :scale-x [:setter lifecycle/scalar :coerce double :default 1]
