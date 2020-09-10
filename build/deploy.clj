@@ -3,10 +3,6 @@
             [clojure.java.io :as io]
             [clojure.data.xml :as xml]))
 
-(def default-repo-settings {"clojars" {:url "https://clojars.org/repo"
-                                       :username (System/getenv "CLOJARS_USERNAME")
-                                       :password (System/getenv "CLOJARS_PASSWORD")}})
-
 (def artifact-id-tag :xmlns.http%3A%2F%2Fmaven.apache.org%2FPOM%2F4.0.0/artifactId)
 (def group-id-tag :xmlns.http%3A%2F%2Fmaven.apache.org%2FPOM%2F4.0.0/groupId)
 (def version-tag :xmlns.http%3A%2F%2Fmaven.apache.org%2FPOM%2F4.0.0/version)
@@ -40,37 +36,20 @@
                                    (= tag version-tag))
                            {(keyword (name tag)) (first (:content m))})))
                  (apply merge))]
-    {:coordinates [(symbol (str (:groupId tmp) "/" (:artifactId tmp))) (:version tmp)]}))
+    [(symbol (str (:groupId tmp) "/" (:artifactId tmp))) (:version tmp)]))
 
 (defn artifacts [version files]
   (into {} (for [f files]
              [[:extension (extension f)
                :classifier (classifier version f)] f])))
 
-(defn all-artifacts [version files]
-  (artifacts version (into ["pom.xml"] files)))
-
-(defmulti deploy :installer)
-
-(defmethod deploy "deploy" [{:keys [artifact-map coordinates repository]
-                             :or {repository default-repo-settings}}]
-  (println "Deploying" (str (first coordinates) "-" (second coordinates)) "to clojars as"
-           (-> repository vals first :username))
-  (aether/deploy :artifact-map artifact-map
-                 :repository repository
-                 :coordinates coordinates))
-
-(defmethod deploy "install" [{:keys [artifact-map coordinates]}]
-  (println "Installing" (str (first coordinates) "-" (second coordinates)) "to your local `.m2`")
-  (aether/install :artifact-map artifact-map
-                  :transfer-listener :stdout
-                  :coordinates coordinates)
-  (println "done."))
-
-(defn -main [deploy-or-install & files]
+(defn -main [username token & files]
   (let [coordinates (coordinates-from-pom (slurp "pom.xml"))]
-    (->> {:installer deploy-or-install
-          :artifact-map (all-artifacts (second (:coordinates coordinates)) files)}
-         (merge coordinates)
-         deploy)))
+    (println "Deploying" coordinates "to clojars as" username)
+    (aether/deploy
+      :coordinates coordinates
+      :artifact-map (artifacts (second coordinates) (cons "pom.xml" files))
+      :repository {"clojars" {:url "https://clojars.org/repo"
+                              :username username
+                              :password token}})))
 
