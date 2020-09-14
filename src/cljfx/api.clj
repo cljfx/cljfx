@@ -483,6 +483,8 @@
     [[wrap-effects]]
   - `:async-agent-options` (optional, default `{}`) - agent options as described in
     [[wrap-async]]
+  - `:enable-async-event-handler` (optional, default `true`) - whether
+    to enable the [[wrap-async]] event handler middleware
   - `:renderer-middleware` (optional, default `identity`) - additional renderer
     middleware, such as [[wrap-many]]
   - `:renderer-error-handler` (optional, prints Exception stack traces and re-throws
@@ -496,11 +498,13 @@
                       co-effects
                       effects
                       async-agent-options
+                      enable-async-event-handler
                       renderer-middleware
                       renderer-error-handler]
                :or {co-effects {}
                     effects {}
                     async-agent-options {}
+                    enable-async-event-handler true
                     renderer-middleware identity
                     renderer-error-handler renderer/default-error-handler}}]
   (let [handler (-> event-handler
@@ -508,8 +512,9 @@
                       (defaults/fill-co-effects co-effects *context))
                     (event-handler/wrap-effects
                       (defaults/fill-effects effects *context))
-                    (event-handler/wrap-async
-                      (defaults/fill-async-handler-options async-agent-options)))
+                    (cond-> enable-async-event-handler
+                      (event-handler/wrap-async
+                        (defaults/fill-async-handler-options async-agent-options))))
         renderer (create-renderer
                    :error-handler renderer-error-handler
                    :middleware (comp
