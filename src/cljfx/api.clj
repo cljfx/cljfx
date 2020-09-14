@@ -441,7 +441,7 @@
   "Effect function that dispatches another event when this effect is triggered"
   event-handler/dispatch-effect)
 
-(defn wrap-async
+(defn ^:deprecated wrap-async
   "Event handler wrapper that redirects all actual event handling to background thread
 
   Returned handler uses agent underneath, so using this wrapper will require call to
@@ -456,7 +456,18 @@
 
   `agent-options` is map that is passed to [[clojure.core/agent]], has default
   `:error-handler` that will print stack traces of thrown Throwables. Additional option
-  `:fx/executor` may be used to specify executor"
+  `:fx/executor` may be used to specify executor.
+
+  Deprecated: This middleware only partially solves the problem of
+  blocking the UI thread. Since event processing still occurs
+  sequentially on the agent, a long-running event handler would still
+  block other events from being handled, leading to an unresponsive UI
+  yet again. Another drawback is the increased complexity introduced
+  by having to carefully manage `:fx/sync` flags (and the fact that
+  they don't even help in all cases, e.g. `startDragAndDrop`). The
+  recommended solution is to handle potentially blocking effects
+  asynchronously (e.g. via an agent) and to notify the UI about their
+  completion by dispatching events."
   [f & {:as agent-options}]
   (event-handler/wrap-async
     f

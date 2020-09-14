@@ -45,8 +45,7 @@
       (fx/wrap-effects
         {:context (fx/make-reset-effect *state)
          :dispatch fx/dispatch-effect
-         :http http-effect})
-      (fx/wrap-async)))
+         :http http-effect})))
 
 (def renderer
   (fx/create-renderer
@@ -59,7 +58,6 @@
 
 (event-handler
   {:event/type ::events/open-url
-   :fx/sync true
    :url "https://github.com/cljfx/cljfx/"})
 
 (fx/mount-renderer *state renderer)

@@ -13,7 +13,7 @@
   (let [window (.getWindow (.getScene ^Node (.getTarget event)))
         chooser (doto (FileChooser.)
                   (.setTitle "Open File"))]
-    (when-let [file @(fx/on-fx-thread (.showOpenDialog chooser window))]
+    (when-let [file (.showOpenDialog chooser window)]
       {:state {:file file :content (slurp file)}})))
 
 (defn root-view [{:keys [file content]}]
@@ -46,7 +46,6 @@
            (-> handle
                (fx/wrap-co-effects {:state (fx/make-deref-co-effect *state)})
                (fx/wrap-effects {:state (fx/make-reset-effect *state)
-                                 :dispatch fx/dispatch-effect})
-               (fx/wrap-async))}))
+                                 :dispatch fx/dispatch-effect}))}))
 
 (fx/mount-renderer *state renderer)

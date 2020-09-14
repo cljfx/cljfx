@@ -67,7 +67,6 @@
                                      :text text}))
     :opts {:fx.opt/map-event-handler (-> handle
                                          (fx/wrap-effects
-                                           {:text (fx/make-reset-effect *text)})
-                                         (fx/wrap-async))}))
+                                           {:text (fx/make-reset-effect *text)}))}))
 
 (fx/mount-renderer *text renderer)

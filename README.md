@@ -600,13 +600,16 @@ example event handler and see how we can make it pure:
          (fx/wrap-effects {:state (fn [state _] (reset! *state state))})))
    ```
    In addition to value provided by wrapped handler, side-effecting 
-   function receives a function they can call to dispatch new events. 
-   While it's useless for resetting state, it can be useful in
-   other circumstances. One is you can create a `:dispatch` effect that
-   dispatches another events, and another is you can describe 
-   asynchronous operations such as http requests as just data. Examples
-   of both can be found at [examples/e18_pure_event_handling.clj](examples/e18_pure_event_handling.clj).
-   This approach allows to specify side effects in a few places, and 
+   function receives a function they can call to dispatch new events.
+   While it's useless for resetting state, it can be useful in other
+   circumstances. One is you can create a `:dispatch` effect that
+   dispatches other events, and another is you can describe
+   asynchronous operations such as http requests as just data. Since
+   effect handlers are run on the UI thread, you should delegate the
+   execution of potentially blocking effects to a different thread
+   using this approach. Examples of both can be found at
+   [examples/e18_pure_event_handling.clj](examples/e18_pure_event_handling.clj).
+   This approach allows to specify side effects in a few places, and
    then have easily testable handlers:
    ```clj
    (handle {:event/type ::add-todo
@@ -615,29 +618,7 @@ example event handler and see how we can make it pure:
    => {:state {:todos [{:text "Buy milk", :done false}]}}
    ;; data in, data out, no mocks necessary! 
    ```
-3. Async handling: `wrap-async`
 
-   Finally, you can wrap your handler with `fx/wrap-async` to offload 
-   event handling to background thread:
-   ```clj
-   (def actual-handler
-     (-> handle
-         (fx/wrap-co-effects {:state #(deref *state)})
-         (fx/wrap-effects {:state (fn [state _] (reset! *state state))})
-         (fx/wrap-async)))
-   ```
-   Note that it uses agents underneath, so you will need to call 
-   `clojure.core/shutdown-agents` on exit. Another thing to keep in mind
-   is that there are couple of cases where you want event handling to 
-   be synchronous: 
-   - when syncing typed text in input fields with app state by using 
-     `:text` and `:on-text-changed` props to avoid text reverts when 
-     typing too fast;
-   - when dispatching events on startup that prepare some views to avoid
-     showing empty screens.
-   
-   In these cases you can put `:fx/sync true` to event map: that will 
-   block call to event handler until this event is processed.
 
 ### How does it actually work
 
