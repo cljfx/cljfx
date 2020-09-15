@@ -42,7 +42,7 @@
   - context:
     - [[create-context]] - wrap map in a black box that memoizes function subscriptions to
       it
-    - [[sub]] - extract value from a context and memoize it using key or function
+    - [[sub-ctx]] and [[sub-val]] - extract value from a context and memoize it
     - [[swap-context]] - create new context using function that reuses existing cache
     - [[reset-context]] - derive new context that reuses existing cache
     - [[unbind-context]] - debug utility that releases context from dependency tracking
@@ -54,10 +54,12 @@
       updating app state, performing http requests etc.) with pure functions
     - [[make-reset-effect]] - helper function that creates effect that resets atom
     - [[dispatch-effect]] - effect that allows dispatching another events
-    - [[wrap-async]] - wrap event handler to perform event processing in background
   - combining it all together:
     - [[create-app]] - convenient function that combines all cljfx concepts to create
-      applications with pure views, subscriptions and event handlers"
+      applications with pure views, subscriptions and event handlers
+  - deprecated:
+    - [[sub]] - extract value from a context and memoize it using key or function
+    - [[wrap-async]] - wrap event handler to perform event processing in background"
   (:require [cljfx.component :as component]
             [cljfx.context :as context]
             [cljfx.defaults :as defaults]
@@ -441,27 +443,6 @@
   "Effect function that dispatches another event when this effect is triggered"
   event-handler/dispatch-effect)
 
-(defn wrap-async
-  "Event handler wrapper that redirects all actual event handling to background thread
-
-  Returned handler uses agent underneath, so using this wrapper will require call to
-  [[clojure.core/shutdown-agents]] to gracefully stop JVM
-
-  Setting `:fx/sync` to true in event will make calling this handler block until event is
-  processed. This may be useful for text changed listeners in inputs that synchronise
-  typed text with displayed text.
-
-  `f` is a function that will be called with 2 args: event and event dispatcher fn that
-  can be used to enqueue more events for asynchronous handling
-
-  `agent-options` is map that is passed to [[clojure.core/agent]], has default
-  `:error-handler` that will print stack traces of thrown Throwables. Additional option
-  `:fx/executor` may be used to specify executor"
-  [f & {:as agent-options}]
-  (event-handler/wrap-async
-    f
-    (defaults/fill-async-handler-options agent-options)))
-
 (defn create-app
   "Convenient starting point for apps with pure views, subscriptions and events
 
@@ -538,3 +519,35 @@
    (context/sub context))
   ([context k-or-f & args]
    (apply context/sub context k-or-f args)))
+
+(defn ^:deprecated wrap-async
+  "Event handler wrapper that redirects all actual event handling to background thread
+
+  Returned handler uses agent underneath, so using this wrapper will require call to
+  [[clojure.core/shutdown-agents]] to gracefully stop JVM
+
+  Setting `:fx/sync` to true in event will make calling this handler block until event is
+  processed. This may be useful for text changed listeners in inputs that synchronise
+  typed text with displayed text.
+
+  `f` is a function that will be called with 2 args: event and event dispatcher fn that
+  can be used to enqueue more events for asynchronous handling
+
+  `agent-options` is map that is passed to [[clojure.core/agent]], has default
+  `:error-handler` that will print stack traces of thrown Throwables. Additional option
+  `:fx/executor` may be used to specify executor.
+
+  Deprecated: This middleware only partially solves the problem of
+  blocking the UI thread. Since event processing still occurs
+  sequentially on the agent, a long-running event handler would still
+  block other events from being handled, leading to an unresponsive UI
+  yet again. Another drawback is the increased complexity introduced
+  by having to carefully manage `:fx/sync` flags (and the fact that
+  they don't even help in all cases, e.g. `startDragAndDrop`). The
+  recommended solution is to handle potentially blocking effects
+  asynchronously (e.g. via an agent) and to notify the UI about their
+  completion by dispatching events."
+  [f & {:as agent-options}]
+  (event-handler/wrap-async
+    f
+    (defaults/fill-async-handler-options agent-options)))
