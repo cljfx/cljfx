@@ -3,6 +3,22 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.10](https://github.com/cljfx/cljfx/releases/tag/1.7.10) - 2020-09-15
+
+Deprecate `fx/wrap-async`. This middleware only partially solved the problem of
+blocking the UI thread. Since event processing still occurs sequentially on the 
+agent thread, a long-running event handler would still block other events from 
+being handled, leading to an unresponsive UI yet again. Another drawback is the 
+increased complexity introduced by having to carefully manage `:fx/sync` flags 
+(and the fact that they don't even help in all cases, e.g. `startDragAndDrop`). 
+The recommended solution is to handle potentially blocking effects 
+asynchronously (e.g. via an agent or a future) and to notify the UI about 
+their completion by dispatching events.
+
+Note that for preserving compatibility `fx/wrap-async` is not going to be 
+removed: it will remain in cljfx forever. Deprecation status means this is no 
+longer the recommended approach for event handling.  
+
 ### [1.7.9](https://github.com/cljfx/cljfx/releases/tag/1.7.9) - 2020-09-10
 - Add `:pseudo-classes` node prop ([example](examples/e36_pseudo_classes.clj)).
 
