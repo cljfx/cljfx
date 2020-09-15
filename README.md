@@ -532,13 +532,11 @@ applications, there is still a room for improvement:
   with an atom: mutable place
 - almost every event handler still mutates app state, which also makes 
   them coupled
-- events are handled on JavaFX application thread, which may lead to 
-  responsiveness issues
 
-Cljfx borrows solutions to all these problems from re-frame, providing
-map event handler wrappers that allow having co-effects (pure inputs), 
-effects (pure outputs), and async handling. Lets walk through this 
-example event handler and see how we can make it pure:
+Cljfx borrows solutions to these problems from re-frame, providing
+map event handler wrappers that allow having co-effects (pure inputs) and 
+effects (pure outputs). Lets walk through this example event handler and see 
+how we can make it pure:
 
 ```clj
 (def *state
@@ -582,7 +580,7 @@ example event handler and see how we can make it pure:
    return data that describes how to perform these side-effecting 
    operations. `fx/wrap-effects` uses that data to perform side effects.
    You describe effects as a map from arbitrary keys to side-effecting
-   function. Wrapped handler in turn should return a seqable of 
+   function. A wrapped handler in turn should return a seqable of 
    2-element vectors. First element is a key used to find side-effecting
    function, and second is an argument to it:
    ```clj

@@ -65,8 +65,7 @@
     :middleware (fx/wrap-map-desc (fn [text]
                                     {:fx/type root-view
                                      :text text}))
-    :opts {:fx.opt/map-event-handler (-> handle
-                                         (fx/wrap-effects
-                                           {:text (fx/make-reset-effect *text)}))}))
+    :opts {:fx.opt/map-event-handler (fx/wrap-effects handle
+                                       {:text (fx/make-reset-effect *text)})}))
 
 (fx/mount-renderer *text renderer)
