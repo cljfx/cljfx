@@ -192,7 +192,7 @@ Consider this example:
   {:fx/type :h-box
    :children [{:fx/type :check-box
                :selected done
-               :on-selected-changed #(swap! *state assoc-in [:by-id id :done] %)
+               :on-selected-changed #(swap! *state assoc-in [:by-id id :done] %)}
               {:fx/type :label
                :style {:-fx-text-fill (if done :grey :black)}
                :text text}]})
