@@ -1,15 +1,16 @@
 (ns e37-web-view-local-content
-  (:require '[cljfx.api :as fx]
-            '[cljfx.prop :as fx.prop]
-            '[cljfx.mutator :as fx.mutator]
-            '[cljfx.lifecycle :as fx.lifecycle]))
+  (:require [cljfx.api :as fx]
+            [cljfx.prop :as fx.prop]
+            [cljfx.mutator :as fx.mutator]
+            [cljfx.lifecycle :as fx.lifecycle])
+  (:import [javafx.scene.web WebView]))
 
 ;; Short snippet demonstrating how to display local content in a WebView
 
 (def ext-with-html
   (fx/make-ext-with-props
     {:html (fx.prop/make
-             (fx.mutator/setter #(.loadContent (.getEngine ^javafx.scene.web.WebView %1) %2))
+             (fx.mutator/setter #(.loadContent (.getEngine ^WebView %1) %2))
              fx.lifecycle/scalar)}))
 
 (fx/on-fx-thread
