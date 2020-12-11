@@ -6,6 +6,7 @@
   (:import [javafx.scene.web WebView]))
 
 ;; Short snippet demonstrating how to display local content in a WebView
+;; with a custom prop
 
 (def ext-with-html
   (fx/make-ext-with-props

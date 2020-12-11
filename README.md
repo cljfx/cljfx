@@ -776,8 +776,10 @@ prefix in their names.
    Using this function you can create extension lifecycles that handle whatever
    additional props you need. These props will be applied after props of
    original lifecycle. There are some predefined lifecycles providing extra
-   props for controlling default selection models in TabPane, ListView,
-   TableView, TreeView and TreeTableView, see [examples/e27_selection_models.clj](examples/e27_selection_models.clj).
+   props:
+   - for controlling default selection models in TabPane, ListView,
+   TableView, TreeView and TreeTableView, see [examples/e27_selection_models.clj](examples/e27_selection_models.clj);
+   - for extra WebView knobs, see [examples/e39_web_view_extensions.clj](examples/e39_web_view_extensions.clj).
 
 Examples of included extension lifecycles are available at
 [examples/e21_extension_lifecycles.clj](examples/e21_extension_lifecycles.clj).

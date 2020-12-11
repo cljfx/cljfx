@@ -32,6 +32,7 @@
       :pref-height [:setter lifecycle/scalar :coerce double :default 600.0]
       :pref-width [:setter lifecycle/scalar :coerce double :default 800.0]
       :zoom [:setter lifecycle/scalar :coerce double :default 1.0]
+      ;; deprecated, use [[cljfx.ext.web-view/with-engine-props]] instead
       :url [(mutator/setter #(.load (.getEngine ^WebView %1) %2)) lifecycle/scalar])))
 
 (def lifecycle
