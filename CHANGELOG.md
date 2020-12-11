@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.11](https://github.com/cljfx/cljfx/releases/tag/1.7.11) - 2020-12-11
+- Add WebView extension that provides WebEngine-related extra props 
+  ([example](examples/e39_web_view_extensions.clj));
+
 ### [1.7.10](https://github.com/cljfx/cljfx/releases/tag/1.7.10) - 2020-09-15
 
 Deprecate `fx/wrap-async`. This middleware only partially solved the problem of
