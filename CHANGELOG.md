@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.12](https://github.com/cljfx/cljfx/releases/tag/1.7.12) - 2021-01-01
+- Bump javafx dep;
+- Fix dynamic updates to combo-box items. 
+
 ### [1.7.11](https://github.com/cljfx/cljfx/releases/tag/1.7.11) - 2020-12-11
 - Add WebView extension that provides WebEngine-related extra props 
   ([example](examples/e39_web_view_extensions.clj));
