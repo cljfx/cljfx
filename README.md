@@ -971,7 +971,7 @@ To try them out:
 ## More information
 
 If you want to learn more about [JavaFX](https://openjfx.io/index.html), its documentation
-is available [here](https://openjfx.io/javadoc/14/index.html).
+is available [here](https://openjfx.io/javadoc/15/index.html).
 
 If you want to learn more about [React](https://reactjs.org/) programming model cljfx is 
 based on, there is an in-depth guide to it: 
