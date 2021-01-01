@@ -8,7 +8,9 @@
             [cljfx.ext.cell-factory :as ext.cell-factory])
   (:import [javafx.scene.control ComboBox ListCell]
            [javafx.scene AccessibleRole]
-           [javafx.util Callback]))
+           [javafx.util Callback]
+           [javafx.collections ObservableList FXCollections]
+           [java.util Collection]))
 
 (set! *warn-on-reflection* true)
 
@@ -25,6 +27,12 @@
     (instance? ListCell x) x
     (fn? x) (fx.text-field-list-cell/create x)
     :else (coerce/fail ListCell x)))
+
+(defn- observable-list [x]
+  (cond
+    (instance? ObservableList x) x
+    (instance? Collection x) (FXCollections/observableArrayList ^Collection x)
+    :else (coerce/fail ObservableList x)))
 
 (def props
   (merge
@@ -44,7 +52,7 @@
                      :coerce cell-factory]
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter
                   :default :default]
-      :items [:setter lifecycle/scalar :coerce coerce/observable-list]
+      :items [:setter lifecycle/scalar :coerce observable-list]
       :placeholder [:setter lifecycle/dynamic]
       :visible-row-count [:setter lifecycle/scalar :coerce int :default 10])))
 

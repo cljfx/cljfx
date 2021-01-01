@@ -518,9 +518,3 @@
   (case x
     :use-computed-size -1.0
     (double x)))
-
-(defn observable-list [x]
-  (cond
-    (instance? ObservableList x) x
-    (instance? Collection x) (FXCollections/observableArrayList ^Collection x)
-    :else (fail ObservableList x)))
