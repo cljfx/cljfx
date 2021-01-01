@@ -1,7 +1,7 @@
 (ns cljfx.coerce
   "Part of a public API"
   (:require [clojure.string :as str])
-  (:import [java.util List Locale Collection]
+  (:import [java.util List Locale]
            [javafx.event EventHandler]
            [javafx.scene Cursor]
            [javafx.scene.image Image]
@@ -29,7 +29,7 @@
            [javafx.beans.value ObservableValue ChangeListener]
            [javafx.beans Observable InvalidationListener]
            [java.io InputStream]
-           [javafx.collections ListChangeListener ObservableList FXCollections]))
+           [javafx.collections ListChangeListener]))
 
 (set! *warn-on-reflection* true)
 
