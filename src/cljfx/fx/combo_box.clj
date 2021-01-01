@@ -44,7 +44,7 @@
                      :coerce cell-factory]
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter
                   :default :default]
-      :items [:list lifecycle/scalar]
+      :items [:setter lifecycle/scalar :coerce coerce/observable-list]
       :placeholder [:setter lifecycle/dynamic]
       :visible-row-count [:setter lifecycle/scalar :coerce int :default 10])))
 
