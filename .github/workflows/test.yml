@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11.0.2'
-      - uses: DeLaGuardo/setup-clojure@1.0
+      - uses: DeLaGuardo/setup-clojure@3.1
         with: 
           tools-deps: '1.10.1.507'
       - name: Run tests
