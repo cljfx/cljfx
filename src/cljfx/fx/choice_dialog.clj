@@ -17,5 +17,6 @@
 (def lifecycle
   (-> (composite/describe ChoiceDialog
         :ctor []
-        :props props)
+        :props props
+        :prop-order {:showing 1})
       (lifecycle/wrap-on-delete #(.hide ^ChoiceDialog %))))

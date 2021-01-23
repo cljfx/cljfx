@@ -13,5 +13,6 @@
 (def lifecycle
   (-> (composite/describe TextInputDialog
         :ctor []
-        :props props)
+        :props props
+        :prop-order {:showing 1})
       (lifecycle/wrap-on-delete #(.hide ^TextInputDialog %))))

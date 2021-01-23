@@ -22,5 +22,6 @@
 (def lifecycle
   (-> (composite/describe Alert
         :ctor [:alert-type]
-        :props props)
+        :props props
+        :prop-order {:showing 1})
       (lifecycle/wrap-on-delete #(.hide ^Alert %))))
