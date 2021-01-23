@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cljfx</groupId>
   <artifactId>cljfx</artifactId>
-  <version>1.7.12</version>
+  <version>1.7.13</version>
   <name>cljfx</name>
   <properties>
-    <cljfx.version>1.7.12</cljfx.version>
+    <cljfx.version>1.7.13</cljfx.version>
   </properties>
   <dependencies>
     <dependency>
@@ -23,7 +23,7 @@
   </repositories>
   <scm>
     <url>https://github.com/cljfx/cljfx</url>
-    <tag>1.7.12</tag>
+    <tag>1.7.13</tag>
   </scm>
   <profiles>
     <profile>
