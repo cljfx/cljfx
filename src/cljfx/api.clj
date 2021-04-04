@@ -368,9 +368,13 @@
   This creates a direct subscription that will be recalculated whenever the context
   changes.
 
-  Should be fast as [[get]]"
-  [context f & args]
-  (apply context/sub-val context f args))
+  Should be fast as [[get]]
+
+  When called without subscription function, returns the underlying context map"
+  ([context]
+   (context/sub-val context))
+  ([context f & args]
+   (apply context/sub-val context f args)))
 
 (defn sub-ctx
   "Subscribe to a function that receives the context

@@ -134,8 +134,11 @@ Possible reasons:
       (reset! *deps ::context))
     (apply f m args)))
 
-(defn sub-val [context f & args]
-  (sub-ctx context sub-val-sub f args))
+(defn sub-val
+  ([context]
+   (sub-val context identity))
+  ([context f & args]
+   (sub-ctx context sub-val-sub f args)))
 
 (defn reset [context new-m]
   (let [{::keys [*cache *deps generation]} context
@@ -159,7 +162,7 @@ Possible reasons:
   (swap! (::*cache context) #(reduce evict % (keys %))))
 
 (defn ^:deprecated sub
-  ([context] (sub-val context identity))
+  ([context] (sub-val context))
   ([context k & args]
    (cond
      (fn? k) (apply sub-ctx context k args)
