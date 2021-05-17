@@ -331,6 +331,26 @@ Sometimes components accept specially treated keys. Main uses are:
 
    For a more complete example of available pane keys, see
    [examples/e07_extra_props.clj](examples/e07_extra_props.clj)
+3. Managing existing instances with full description support.
+   On occasion, you may want to manage an externally created JavaFX object as if it were
+   created by cljfx. This is particularly useful when using JavaFX
+   preloaders (see the JavaFX ["Sharing the Stage"](https://docs.oracle.com/javafx/2/deployment/preloaders.htm#BABBBBBJ)
+   tutorial).
+   ```clojure
+   ;; created by the preloader, for example
+   (def externally-created-stage ...)
+   (fx/create-component
+     {:fx/type :stage
+      ;; share the same stage as the preloader
+      :fx/manage-instance externally-created-stage
+      ;; add new props like normal -- old props will be "inherited"
+      ;; from external instance.
+      :width 500
+      :height 600})
+   ```
+
+   See [examples/e41_manage_instance.clj](examples/e41_manage_instance.clj)
+   for a runnable example.
 
 ### Factory props
 
@@ -698,6 +718,8 @@ prefix in their names.
         :create #(Duration/valueOf "10ms")}))
    => #object[javafx.util.Duration 0x2f5eb358 "10.0 ms"]
    ```
+
+   See `:fx/manage-instance` for using descriptions with existing instances.
    
 2. `fx/ext-on-instance-lifecycle`
 
