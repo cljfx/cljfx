@@ -7,11 +7,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Cache Clojure deps
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: ${{ runner.os }}-clojure-${{ hashFiles('pom.xml') }}-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure-${{ hashFiles('pom.xml') }}-
+            ${{ runner.os }}-clojure-
       - uses: actions/setup-java@v1
         with:
           java-version: '11.0.2'
-      - uses: DeLaGuardo/setup-clojure@3.1
+      - uses: DeLaGuardo/setup-clojure@3.3
         with: 
-          tools-deps: '1.10.1.507'
+          cli: '1.10.1.763'
+          lein: '2.9.6'
       - name: Run tests
-        run: clojure -A:test:runner:headless
+        run: clojure -M:test:runner:headless
+      - name: Compile splash screen example
+        run: |
+          cd example-projects/splash
+          lein uberjar
