@@ -15,44 +15,46 @@
     {:state state
      :grab-history grab-history}))
 
-(defn mk-props [pks {:keys [state] :as state-m}]
-  (let [mk-prop (fn [pkw]
-                  (prop/make
-                    (reify mutator/Mutator
-                      (assign! [_ instance coerce value]
-                        (swap! state
-                               #(-> %
-                                    (update :history conj
-                                            {:op :assign!
-                                             :prop pkw
-                                             :instance instance
-                                             :coerced-value (coerce value)
-                                             :value value}))))
-                      (replace! [_ instance coerce old-value new-value]
-                        (swap! state
-                               #(-> %
-                                    (update :history conj
-                                            {:op :replace!
-                                             :prop pkw
-                                             :instance instance
-                                             :coerced-new-value (coerce new-value)
-                                             :old-value old-value
-                                             :new-value new-value}))))
-                      (retract! [_ instance coerce value]
-                        (swap! state
-                               #(-> %
-                                    (update :history conj
-                                            {:op :retract!
-                                             :prop pkw
-                                             :instance instance
-                                             :coerced-value (coerce value)
-                                             :value value})))))
-                    lifecycle/scalar
-                    :coerce pr-str))
-        props-config (into {}
-                           (map (juxt identity mk-prop))
-                           pks)]
-    (assoc state-m :props-config props-config)))
+(defn mk-props
+  ([pks] (mk-props pks (mk-state {})))
+  ([pks {:keys [state] :as state-m}]
+   (let [mk-prop (fn [pkw]
+                   (prop/make
+                     (reify mutator/Mutator
+                       (assign! [_ instance coerce value]
+                         (swap! state
+                                #(-> %
+                                     (update :history conj
+                                             {:op :assign!
+                                              :prop pkw
+                                              :instance instance
+                                              :coerced-value (coerce value)
+                                              :value value}))))
+                       (replace! [_ instance coerce old-value new-value]
+                         (swap! state
+                                #(-> %
+                                     (update :history conj
+                                             {:op :replace!
+                                              :prop pkw
+                                              :instance instance
+                                              :coerced-new-value (coerce new-value)
+                                              :old-value old-value
+                                              :new-value new-value}))))
+                       (retract! [_ instance coerce value]
+                         (swap! state
+                                #(-> %
+                                     (update :history conj
+                                             {:op :retract!
+                                              :prop pkw
+                                              :instance instance
+                                              :coerced-value (coerce value)
+                                              :value value})))))
+                     lifecycle/scalar
+                     :coerce pr-str))
+         props-config (into {}
+                            (map (juxt identity mk-prop))
+                            pks)]
+     (assoc state-m :props-config props-config))))
 
 (defn mk-logging-lifecycle [{:keys [state] :as state-m}]
   (let [logging-lifecycle

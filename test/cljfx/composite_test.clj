@@ -9,8 +9,7 @@
             [cljfx.prop :as prop]))
 
 (deftest composite-lifecycle-test
-  (let [state-m (mk-state {})
-        {:keys [props-config grab-history state]} (mk-props [:a :b :c] state-m)
+  (let [{:keys [props-config grab-history state]} (mk-props [:a :b :c])
         prop-order {:a 0, :b 1, :c 2}
         lifecycle (composite/lifecycle
                     {:ctor (fn [& args]
