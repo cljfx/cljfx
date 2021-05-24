@@ -107,5 +107,4 @@
         _ (fact (grab-history)
                 => [])
         _ (fact (component/instance component)
-                => nil)
-        ]))
+                => nil)]))

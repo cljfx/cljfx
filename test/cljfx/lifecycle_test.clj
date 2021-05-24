@@ -131,8 +131,7 @@
         _ (fact (grab-history)
                 => [{:op :delete, :component :advance1, :opts {::foo 5}}])
         _ (fact (component/instance component)
-                => :delete)
-        ]))
+                => :delete)]))
 
 (deftest make-ext-with-props-test
   (let [{:keys [state] :as state-m} (mk-state {:props {}})
@@ -210,8 +209,7 @@
         _ (fact (grab-history)
                 => [{:op :delete, :component :advance1, :opts {::foo 4}}])
         _ (fact (component/instance component)
-                => :delete)
-        ]))
+                => :delete)]))
 
 
 (deftest wrap-context-desc-test
@@ -249,8 +247,7 @@
         _ (fact (grab-history)
                 => [{:op :delete, :component :advance, :opts {::foo 3}}])
         _ (fact (component/instance component)
-                => :delete)
-        ]))
+                => :delete)]))
 
 (deftest context-fn->dynamic-test
   (let [{:keys [state grab-history logging-lifecycle]} (mk-logging-lifecycle (mk-state {}))
@@ -317,8 +314,7 @@
                 => [{:op :delete
                      :component :advance
                      :opts {:fx/context context4
-                            :fx.opt/type->lifecycle type->lifecycle}}])
-        ]))
+                            :fx.opt/type->lifecycle type->lifecycle}}])]))
 
 (deftest wrap-on-instance-lifecycle-test
   (let [{:keys [state grab-history logging-lifecycle]} (mk-logging-lifecycle (mk-state {}))
@@ -423,8 +419,7 @@
                 => [{:op :create, :desc nil, :opts {::foo 2}}
                     {:op :advance, :component :create, :desc nil, :opts {::foo 2}}
                     {:op :delete, :component :advance, :opts {::foo 2}}
-                    {:op :on-deleted, :instance :advance}])
-        ]))
+                    {:op :on-deleted, :instance :advance}])]))
 
 (deftest instance-factory-test
   (let [{:keys [state grab-history]} (mk-state {})
@@ -477,5 +472,4 @@
         _ (fact (grab-history)
                 => [])
         _ (fact (component/instance component)
-                => nil)
-        ]))
+                => nil)]))
