@@ -106,11 +106,7 @@
                     component
                     nil)
         _ (fact (grab-history)
-                => [;;FIXME
-                    ;{:op :set-prop, :prop :a, :v nil}
-                    ;{:op :set-prop, :prop :b, :v nil}
-                    ;{:op :set-prop, :prop :c, :v nil}
-                    ])
+                => [])
         _ (fact (component/instance component)
                 => nil)
         ]))

@@ -78,14 +78,9 @@
                     {::foo 2})
         _ (fact (sort-by-from :prop 1 (grab-history))
                 => [{:op :advance, :component :create, :desc {:d 4, :e 5}, :opts {::foo 2}}
-                    ;; FIXME retract props on old instance
-                    ;{:op :retract!, :prop :a, :instance :create, :coerced-value "1", :value 1}
-                    ;{:op :retract!, :prop :b, :instance :create, :coerced-value "2", :value 2}
-                    ;{:op :retract!, :prop :c, :instance :create, :coerced-value "3", :value 3}
                     {:op :assign!, :prop :a, :instance :advance, :coerced-value "1", :value 1}
                     {:op :assign!, :prop :b, :instance :advance, :coerced-value "3", :value 3}
-                    {:op :assign!, :prop :c, :instance :advance, :coerced-value "3", :value 3}
-                    ])
+                    {:op :assign!, :prop :c, :instance :advance, :coerced-value "3", :value 3}])
         _ (fact (component/instance component)
                 => :advance)
 
@@ -122,10 +117,6 @@
                     {::foo 4})
         _ (fact (sort-by-from :prop 1 (grab-history))
                 => [{:op :advance, :component :advance, :desc {:d 2, :e 5}, :opts {::foo 4}}
-                    ;; FIXME retract props on old instance
-                    ;{:op :retract!, :prop :a, :instance :advance, :coerced-value "1", :value 1}
-                    ;{:op :retract!, :prop :b, :instance :advance, :coerced-value "3", :value 3}
-                    ;{:op :retract!, :prop :c, :instance :advance, :coerced-value "3", :value 3}
                     {:op :assign!, :prop :a, :instance :advance1, :coerced-value "1", :value 1}
                     {:op :assign!, :prop :b, :instance :advance1, :coerced-value "3", :value 3}
                     {:op :assign!, :prop :c, :instance :advance1, :coerced-value "3", :value 3}])
@@ -138,12 +129,7 @@
                     component
                     {::foo 5})
         _ (fact (grab-history)
-                => [;; FIXME retract extra props
-                    ;{:op :retract!, :prop :a, :instance :advance1, :coerced-value "1", :value 1}
-                    ;{:op :retract!, :prop :b, :instance :advance1, :coerced-value "3", :value 3}
-                    ;{:op :retract!, :prop :c, :instance :advance1, :coerced-value "3", :value 3}
-                    {:op :delete, :component :advance1, :opts {::foo 5}}
-                    ])
+                => [{:op :delete, :component :advance1, :opts {::foo 5}}])
         _ (fact (component/instance component)
                 => :delete)
         ]))
@@ -183,12 +169,7 @@
                     {::foo 2})
         _ (fact (grab-history)
                 => [{:op :advance, :component :create, :desc 1, :opts {::foo 2}}
-                    ;; FIXME retract props on old instance
-                    ;{:op :retract!, :prop :a, :instance :create, :coerced-value "1", :value 1}
-                    ;{:op :retract!, :prop :b, :instance :create, :coerced-value "2", :value 2}
-                    ;{:op :retract!, :prop :c, :instance :create, :coerced-value "3", :value 3}
-                    {:op :assign!, :prop :a, :instance :advance, :coerced-value "2", :value 2}
-                    ])
+                    {:op :assign!, :prop :a, :instance :advance, :coerced-value "2", :value 2}])
         _ (fact (component/instance component)
                 => :advance)
 
@@ -217,10 +198,7 @@
                     {::foo 4})
         _ (fact (grab-history)
                 => [{:op :advance, :component :advance, :desc 2, :opts {::foo 4}}
-                    ;; FIXME retract props on old instance
-                    ;{:op :retract!, :prop :a, :instance :advance, :coerced-value "2", :value 2}
-                    {:op :assign!, :prop :a, :instance :advance1, :coerced-value "2", :value 2}
-                    ])
+                    {:op :assign!, :prop :a, :instance :advance1, :coerced-value "2", :value 2}])
         _ (fact (component/instance component)
                 => :advance1)
 
@@ -230,9 +208,7 @@
                     component
                     {::foo 4})
         _ (fact (grab-history)
-                => [;; FIXME retract props on old instance
-                    ;{:op :retract!, :prop :a, :instance :advance1, :coerced-value "2", :value 2}
-                    {:op :delete, :component :advance1, :opts {::foo 4}}])
+                => [{:op :delete, :component :advance1, :opts {::foo 4}}])
         _ (fact (component/instance component)
                 => :delete)
         ]))
