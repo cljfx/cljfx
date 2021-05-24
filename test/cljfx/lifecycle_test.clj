@@ -159,6 +159,7 @@
         _ (fact (component/instance component)
                 => :create)
 
+        ;; TODO test create => advance without instance change
         ;; advance :a, retract :b/:c, while changing instance
         component (lifecycle/advance
                     lifecycle
@@ -346,6 +347,7 @@
                 => [{:op :create, :desc {:a 1}, :opts {::foo 2}}
                     {:op :on-created, :instance :create}])
 
+        ;; TODO test create => advance without instance change
         ;; advance :a
         component (lifecycle/advance
                     lifecycle
