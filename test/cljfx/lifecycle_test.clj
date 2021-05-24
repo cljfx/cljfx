@@ -319,6 +319,7 @@
                      :opts {:fx/context context4
                             :fx.opt/type->lifecycle type->lifecycle}}])]))
 
+;; TODO test component/instance throughout
 (deftest wrap-on-instance-lifecycle-test
   (let [{:keys [state grab-history logging-lifecycle]} (mk-logging-lifecycle (mk-state {}))
         lifecycle (lifecycle/wrap-on-instance-lifecycle logging-lifecycle)
