@@ -59,7 +59,7 @@
                      :e 5}
                     {::foo 1})
         _ (fact (sort-by-from :prop 1 (grab-history))
-                => [{:op :create, :desc {:d 4, :e 5}, :opts #:cljfx.lifecycle-test{:foo 1}}
+                => [{:op :create, :desc {:d 4, :e 5}, :opts {::foo 1}}
                     {:op :assign!, :prop :a, :instance :create, :coerced-value "1", :value 1}
                     {:op :assign!, :prop :b, :instance :create, :coerced-value "2", :value 2}
                     {:op :assign!, :prop :c, :instance :create, :coerced-value "3", :value 3}])
