@@ -66,6 +66,7 @@
         _ (fact (component/instance component)
                 => :create)
 
+        ;; TODO test create => advance without instance change
         ;; replace :b, update instance
         component (lifecycle/advance
                     lifecycle
@@ -227,6 +228,7 @@
         _ (fact (component/instance component)
                 => :create)
 
+        ;; TODO test create => advance without instance change
         ;; updated context
         context (context/swap context update :a inc)
         component (lifecycle/advance
