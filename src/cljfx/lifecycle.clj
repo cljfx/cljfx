@@ -470,7 +470,7 @@
 
 (defn- sub-context-fn [desc opts]
   (let [context (:fx/context opts)]
-    (context/sub context call-context-fn desc)))
+    (context/sub-ctx context call-context-fn desc)))
 
 (def context-fn->dynamic
   (with-meta

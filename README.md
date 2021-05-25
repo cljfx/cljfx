@@ -968,6 +968,13 @@ To try them out:
    # nil ;; window appears
    ```
 
+## Full project examples
+
+Full project examples are in the [example-projects](example-projects) directory.
+Consult the example project's README.md for usage.
+
+- [Splash/loading screens and preloaders](example-projects/splash/README.md)
+
 ## More information
 
 If you want to learn more about [JavaFX](https://openjfx.io/index.html), its documentation
