@@ -60,14 +60,14 @@
   (let [logging-lifecycle
         (reify
           lifecycle/Lifecycle
-          (lifecycle/create [_ desc opts]
+          (create [_ desc opts]
             (swap! state #(-> %
                               (update :history conj
                                       {:op :create
                                        :desc desc
                                        :opts opts})))
             :create)
-          (lifecycle/advance [_ component desc opts]
+          (advance [_ component desc opts]
             (let [[{:keys [next-advance-instance]}]
                   (swap-vals! state #(-> %
                                          (dissoc :next-advance-instance)
@@ -77,7 +77,7 @@
                                                   :desc desc
                                                   :opts opts})))]
               (or next-advance-instance :advance)))
-          (lifecycle/delete [_ component opts]
+          (delete [_ component opts]
             (swap! state #(-> %
                               (update :history conj
                                       {:op :delete
