@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.14](https://github.com/cljfx/cljfx/releases/tag/1.7.14) - 2021-06-27
+- Add `:split-pane/resizable-with-parent` prop to split pane items.
+
 ### [1.7.13](https://github.com/cljfx/cljfx/releases/tag/1.7.13) - 2021-01-23
 - Set prop order on dialog subclasses to prevent exceptions caused by JavaFX's 
   order dependency between different setters.  
