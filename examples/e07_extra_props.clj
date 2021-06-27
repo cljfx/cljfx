@@ -166,6 +166,18 @@
               :button-bar/button-data :no
               :text "No"}]})
 
+(def split-pane
+  {:fx/type :split-pane
+   :divider-positions [0.5]
+   :items [{:fx/type :label
+            :split-pane/resizable-with-parent false
+            :padding 50
+            :text "This is label that is NOT resizable with parent"}
+           {:fx/type :label
+            :padding 50
+            :text "This is a label resizable with parent"}]})
+
+
 (fx/on-fx-thread
   (fx/create-component
     {:fx/type :stage
@@ -210,4 +222,8 @@
                            {:fx/type :tab
                             :text "Button Bar"
                             :closable false
-                            :content button-bar}]}}}))
+                            :content button-bar}
+                           {:fx/type :tab
+                            :text "SplitPane"
+                            :closable false
+                            :content split-pane}]}}}))
