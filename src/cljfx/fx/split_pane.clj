@@ -27,7 +27,7 @@
                           {:split-pane/resizable-with-parent (prop/make
                                                                (mutator/setter #(SplitPane/setResizableWithParent %1 %2))
                                                                lifecycle/scalar)})
-                           lifecycle/wrap-many)]
+                        lifecycle/wrap-many)]
       :orientation [:setter lifecycle/scalar :coerce (coerce/enum Orientation)
                     :default :horizontal])))
 
