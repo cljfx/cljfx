@@ -55,27 +55,27 @@
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-controls</artifactId>
-          <version>15.0.1</version>
+          <version>17.0.0.1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-base</artifactId>
-          <version>15.0.1</version>
+          <version>17.0.0.1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-graphics</artifactId>
-          <version>15.0.1</version>
+          <version>17.0.0.1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-media</artifactId>
-          <version>15.0.1</version>
+          <version>17.0.0.1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-web</artifactId>
-          <version>15.0.1</version>
+          <version>17.0.0.1</version>
         </dependency>
       </dependencies>
     </profile>
