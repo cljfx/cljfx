@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.15](https://github.com/cljfx/cljfx/releases/tag/1.7.15) - 2021-09-22
+- Bump JavaFX version to `17.0.0.1`.
+
 ### [1.7.14](https://github.com/cljfx/cljfx/releases/tag/1.7.14) - 2021-06-27
 - Add `:split-pane/resizable-with-parent` prop to split pane items.
 
