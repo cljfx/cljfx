@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.17](https://github.com/cljfx/cljfx/releases/tag/1.7.17) - 2021-11-26
+- add `:on-iconified-changed` and `:on-maximized-changed` stage props.
+
 ### [1.7.16](https://github.com/cljfx/cljfx/releases/tag/1.7.16) - 2021-09-22
 - Silence JavaFX warnings by default. Since JavaFX 16, it shows a warning if
   JavaFX is loaded on classpath and not module path. Officially it's not 

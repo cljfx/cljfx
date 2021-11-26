@@ -19,10 +19,12 @@
       :full-screen-exit-key-combination [:setter lifecycle/scalar
                                          :coerce coerce/key-combination]
       :iconified [:setter lifecycle/scalar :default false]
+      :on-iconified-changed [:property-change-listener lifecycle/change-listener]
       :icons [:list lifecycle/scalar :coerce #(map coerce/image %)]
       :max-height [:setter lifecycle/scalar :coerce double :default Double/MAX_VALUE]
       :max-width [:setter lifecycle/scalar :coerce double :default Double/MAX_VALUE]
       :maximized [:setter lifecycle/scalar :default false]
+      :on-maximized-changed [:property-change-listener lifecycle/change-listener]
       :min-height [:setter lifecycle/scalar :coerce double :default 0.0]
       :min-width [:setter lifecycle/scalar :coerce double :default 0.0]
       :modality [(mutator/setter #(.initModality ^Stage %1 %2))
