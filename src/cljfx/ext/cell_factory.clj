@@ -2,7 +2,8 @@
   (:require [cljfx.lifecycle :as lifecycle]
             [cljfx.component :as component]
             [cljfx.coerce :as coerce]
-            [cljfx.prop :as prop])
+            [cljfx.prop :as prop]
+            [cljfx.fx])
   (:import [javafx.util Callback]
            [javafx.scene.control Cell IndexedCell]
            [javafx.beans.value ChangeListener]))
