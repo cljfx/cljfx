@@ -3,7 +3,7 @@
             [cljfx.component :as component]
             [cljfx.coerce :as coerce]
             [cljfx.prop :as prop]
-            [cljfx.fx])
+            [cljfx.fx :as fx])
   (:import [javafx.util Callback]
            [javafx.scene.control Cell IndexedCell]
            [javafx.beans.value ChangeListener]))
@@ -36,7 +36,7 @@
     (create [_ {:keys [fx/cell-type describe] :or {describe noop}} opts]
       (let [composite (cond
                         (keyword? cell-type)
-                        (cljfx.fx/keyword->lifecycle cell-type)
+                        (fx/keyword->lifecycle cell-type)
 
                         (and (map? cell-type) (:ctor cell-type) (:props cell-type))
                         cell-type
