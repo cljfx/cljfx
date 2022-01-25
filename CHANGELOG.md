@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.19](https://github.com/cljfx/cljfx/releases/tag/1.7.19) - 2022-01-25
+- Bump JavaFX version to `17.0.2`.
+
 ### [1.7.18](https://github.com/cljfx/cljfx/releases/tag/1.7.18) - 2022-01-14
 - add missing require.
 
