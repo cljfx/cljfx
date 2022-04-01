@@ -2,14 +2,14 @@
   (:require [cljfx.api :as fx])
   (:import [javafx.scene.input KeyCode KeyEvent]))
 
-(def *state
-  (atom {:typed-text ""
-         :by-id {0 {:id 0
-                    :text "Buy milk"
-                    :done true}
-                 1 {:id 1
-                    :text "Buy socks"
-                    :done false}}}))
+(def initial-state
+  {:typed-text ""
+   :by-id {0 {:id 0
+              :text "Buy milk"
+              :done true}
+           1 {:id 1
+              :text "Buy socks"
+              :done false}}})
 
 (defn todo-view [{:keys [text id done]}]
   {:fx/type :h-box
@@ -48,19 +48,23 @@
 
 (defn map-event-handler [event]
   (case (:event/type event)
-    ::set-done (swap! *state assoc-in [:by-id (:id event) :done] (:fx/event event))
-    ::type (swap! *state assoc :typed-text (:fx/event event))
-    ::press (when (= KeyCode/ENTER (.getCode ^KeyEvent (:fx/event event)))
-              (swap! *state #(-> %
-                                 (assoc :typed-text "")
-                                 (assoc-in [:by-id (count (:by-id %))]
-                                           {:id (count (:by-id %))
-                                            :text (:typed-text %)
-                                            :done false}))))
-    nil))
+    ::set-done #(assoc-in % [:by-id (:id event) :done] (:fx/event event))
+    ::type #(assoc % :typed-text (:fx/event event))
+    ::press (if (= KeyCode/ENTER (.getCode ^KeyEvent (:fx/event event)))
+              #(-> %
+                   (assoc :typed-text "")
+                   (assoc-in [:by-id (count (:by-id %))]
+                             {:id (count (:by-id %))
+                              :text (:typed-text %)
+                              :done false}))
+              identity)
+    identity))
+
+(def *state
+  (atom initial-state))
 
 (fx/mount-renderer
   *state
   (fx/create-renderer
     :middleware (fx/wrap-map-desc assoc :fx/type root)
-    :opts {:fx.opt/map-event-handler map-event-handler}))
+    :opts {:fx.opt/map-event-handler #(swap! *state (map-event-handler %))}))
