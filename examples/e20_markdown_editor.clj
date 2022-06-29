@@ -14,7 +14,7 @@
 
 (def *context
   (atom
-    (fx/create-context {:typed-text (slurp "README.md")}
+    (fx/create-context {:typed-text (subs (slurp "README.md") 0 2000)}
                        #(cache/lru-cache-factory % :threshold 4096))))
 
 (defn commonmark->clj [^Node node]
@@ -251,6 +251,8 @@
     :desc-fn (fn [_]
                {:fx/type :stage
                 :showing true
+                :width 960
+                :height 540
                 :scene {:fx/type :scene
                         :stylesheets #{"markdown.css"}
                         :root {:fx/type :grid-pane

@@ -41,7 +41,9 @@
 (defn- request-render [*renderer desc]
   (let [[old new] (swap-vals! *renderer request-rendering-with-desc desc)]
     (when-not (:request old)
-      (platform/run-later (perform-render *renderer)))
+      (if (nil? (:component old))
+        (platform/on-fx-thread (perform-render *renderer))
+        (platform/run-later (perform-render *renderer))))
     (:request new)))
 
 (defn- render-component

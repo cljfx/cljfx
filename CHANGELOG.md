@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.20](https://github.com/cljfx/cljfx/releases/tag/1.7.20) - 2022-06-29
+- Don't skip a frame on first render if renderer is used from the FX thread.
+
 ### [1.7.19](https://github.com/cljfx/cljfx/releases/tag/1.7.19) - 2022-01-25
 - Bump JavaFX version to `17.0.2`.
 
