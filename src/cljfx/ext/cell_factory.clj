@@ -6,7 +6,8 @@
             [cljfx.fx :as fx])
   (:import [javafx.util Callback]
            [javafx.scene.control Cell IndexedCell]
-           [javafx.beans.value ChangeListener]))
+           [javafx.beans InvalidationListener]
+           [javafx.beans.value ObservableValue]))
 
 (defn- noop [_] {})
 
@@ -22,7 +23,9 @@
       (advance-slot state)))
 
 (defn- set-key-and-advance-slot [state index k v]
-  (update-in state [:slots index] #(-> % (assoc k v) (describe-slot state))))
+  (update-in state [:slots index] #(if (identical? v (get % k))
+                                     %
+                                     (-> % (assoc k v) (describe-slot state)))))
 
 (defn- advance-state [state describe opts]
   (let [slot-fn (if (not= describe (:describe state)) describe-slot advance-slot)
@@ -54,14 +57,14 @@
                      (if (:deleted state)
                        ret
                        (let [index (count (:slots @*state))
-                             ^ChangeListener on-item-changed
-                             (reify ChangeListener
-                               (changed [_ _ _ item]
-                                 (vswap! *state set-key-and-advance-slot index :item item)))
-                             ^ChangeListener on-empty-changed
-                             (reify ChangeListener
-                               (changed [_ _ _ empty]
-                                 (vswap! *state set-key-and-advance-slot index :empty empty)))]
+                             on-item-changed
+                             (reify InvalidationListener
+                               (invalidated [_ ov]
+                                 (vswap! *state set-key-and-advance-slot index :item (.getValue ^ObservableValue ov))))
+                             on-empty-changed
+                             (reify InvalidationListener
+                               (invalidated [_ ov]
+                                 (vswap! *state set-key-and-advance-slot index :empty (.getValue ^ObservableValue ov))))]
                          (vswap! *state update :slots conj {:cell ret
                                                             :item (.getItem ret)
                                                             :empty (.isEmpty ret)
@@ -86,8 +89,8 @@
       (let [{:keys [slots props-config]} @*state]
         (doseq [slot slots
                 :let [{:keys [props
-                              ^ChangeListener on-item-changed
-                              ^ChangeListener on-empty-changed
+                              ^InvalidationListener on-item-changed
+                              ^InvalidationListener on-empty-changed
                               ^Cell cell]} slot
                       _ (.removeListener (.itemProperty cell) on-item-changed)
                       _ (.removeListener (.emptyProperty cell) on-empty-changed)]
