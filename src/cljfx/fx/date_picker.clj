@@ -44,6 +44,8 @@
       :show-week-numbers [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe DatePicker
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe DatePicker
+      :ctor []
+      :props props)
+    :date-picker))

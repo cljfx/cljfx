@@ -18,6 +18,8 @@
     :color [:setter lifecycle/scalar :coerce coerce/color :default :black]))
 
 (def lifecycle
-  (composite/describe Shadow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Shadow
+      :ctor []
+      :props props)
+    :shadow))

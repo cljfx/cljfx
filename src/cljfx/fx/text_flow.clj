@@ -24,6 +24,8 @@
                        :default :left])))
 
 (def lifecycle
-  (composite/describe TextFlow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TextFlow
+      :ctor []
+      :props props)
+    :text-flow))

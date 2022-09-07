@@ -43,6 +43,8 @@
       :vgap [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe TilePane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TilePane
+      :ctor []
+      :props props)
+    :tile-pane))

@@ -17,6 +17,8 @@
                     :default "progress-bar"])))
 
 (def lifecycle
-  (composite/describe ProgressBar
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ProgressBar
+      :ctor []
+      :props props)
+    :progress-bar))

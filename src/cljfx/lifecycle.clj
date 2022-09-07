@@ -20,6 +20,9 @@
   (advance [this component desc opts] "Advances component")
   (delete [this component opts] "Deletes component"))
 
+(defn annotate [lifecycle id]
+  (vary-meta lifecycle assoc :cljfx/id id))
+
 (defn- desc->lifecycle [desc opts]
   (let [type (:fx/type desc)
         type->lifecycle (:fx.opt/type->lifecycle opts)]
@@ -402,31 +405,32 @@
         (delete (prop/lifecycle (get props-config k)) v opts)))))
 
 (defn make-ext-with-props [lifecycle props-config]
-  (reify Lifecycle
-    (create [_ {child-desc :desc props-desc :props} opts]
-      (let [child (create lifecycle child-desc opts)
-            instance (component/instance child)
-            props-lifecycle (props-on props-config instance)]
-        (with-meta {:child child
-                    :props-lifecycle props-lifecycle
-                    :props (create props-lifecycle props-desc opts)}
-                   {`component/instance #(-> % :child component/instance)})))
-    (advance [_ component {child-desc :desc props-desc :props} opts]
-      (let [{:keys [child props props-lifecycle]} component
-            old-instance (component/instance child)
-            new-child (advance lifecycle child child-desc opts)
-            new-instance (component/instance new-child)
-            with-child (assoc component :child new-child)]
-        (if (identical? old-instance new-instance)
-          (assoc with-child :props (advance props-lifecycle props props-desc opts))
-          (do
-            (delete props-lifecycle props opts)
-            (let [new-props-lifecycle (props-on props-config new-instance)]
-              (assoc with-child :props-lifecycle new-props-lifecycle
-                                :props (create new-props-lifecycle props-desc opts)))))))
-    (delete [_ {:keys [child props props-lifecycle]} opts]
-      (delete props-lifecycle props opts)
-      (delete lifecycle child opts))))
+  (annotate (reify Lifecycle
+              (create [_ {child-desc :desc props-desc :props} opts]
+                (let [child (create lifecycle child-desc opts)
+                      instance (component/instance child)
+                      props-lifecycle (props-on props-config instance)]
+                  (with-meta {:child child
+                              :props-lifecycle props-lifecycle
+                              :props (create props-lifecycle props-desc opts)}
+                             {`component/instance #(-> % :child component/instance)})))
+              (advance [_ component {child-desc :desc props-desc :props} opts]
+                (let [{:keys [child props props-lifecycle]} component
+                      old-instance (component/instance child)
+                      new-child (advance lifecycle child child-desc opts)
+                      new-instance (component/instance new-child)
+                      with-child (assoc component :child new-child)]
+                  (if (identical? old-instance new-instance)
+                    (assoc with-child :props (advance props-lifecycle props props-desc opts))
+                    (do
+                      (delete props-lifecycle props opts)
+                      (let [new-props-lifecycle (props-on props-config new-instance)]
+                        (assoc with-child :props-lifecycle new-props-lifecycle
+                                          :props (create new-props-lifecycle props-desc opts)))))))
+              (delete [_ {:keys [child props props-lifecycle]} opts]
+                (delete props-lifecycle props opts)
+                (delete lifecycle child opts)))
+            'cljfx.api/make-ext-with-props))
 
 (defn wrap-on-delete [lifecycle f]
   (with-meta

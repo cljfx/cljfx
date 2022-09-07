@@ -12,6 +12,8 @@
     :threshold [:setter lifecycle/scalar :coerce double :default 0.3]))
 
 (def lifecycle
-  (composite/describe Bloom
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Bloom
+      :ctor []
+      :props props)
+    :bloom))

@@ -18,6 +18,8 @@
       :editable [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe Cell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Cell
+      :ctor []
+      :props props)
+    :cell))

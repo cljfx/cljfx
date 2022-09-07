@@ -11,6 +11,8 @@
     :user-data [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (composite/describe ToggleGroup
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ToggleGroup
+      :ctor []
+      :props props)
+    :toggle-group))

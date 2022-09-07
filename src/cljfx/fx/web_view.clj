@@ -36,6 +36,8 @@
       :url [(mutator/setter #(.load (.getEngine ^WebView %1) %2)) lifecycle/scalar])))
 
 (def lifecycle
-  (composite/describe WebView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe WebView
+      :ctor []
+      :props props)
+    :web-view))

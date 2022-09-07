@@ -25,6 +25,8 @@
     :user-data [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (composite/describe Tab
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Tab
+      :ctor []
+      :props props)
+    :tab))

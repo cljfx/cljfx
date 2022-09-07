@@ -19,6 +19,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe Rectangle
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Rectangle
+      :ctor []
+      :props props)
+    :rectangle))

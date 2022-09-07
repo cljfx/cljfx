@@ -21,6 +21,8 @@
       :mnemonic-parsing [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe SplitMenuButton
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SplitMenuButton
+      :ctor []
+      :props props)
+    :split-menu-button))

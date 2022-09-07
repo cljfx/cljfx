@@ -23,6 +23,8 @@
                  :default :use-computed-size]))
 
 (def lifecycle
-  (composite/describe ColumnConstraints
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ColumnConstraints
+      :ctor []
+      :props props)
+    :column-constraints))

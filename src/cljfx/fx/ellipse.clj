@@ -17,6 +17,8 @@
       :radius-y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe Ellipse
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Ellipse
+      :ctor []
+      :props props)
+    :ellipse))

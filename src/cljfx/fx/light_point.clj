@@ -16,6 +16,8 @@
       :z [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe Light$Point
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Light$Point
+      :ctor []
+      :props props)
+    :light-point))

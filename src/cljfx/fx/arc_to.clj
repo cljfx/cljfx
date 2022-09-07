@@ -20,6 +20,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe ArcTo
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ArcTo
+      :ctor []
+      :props props)
+    :arc-to))

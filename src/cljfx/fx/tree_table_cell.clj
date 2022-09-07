@@ -20,9 +20,11 @@
                         :default :tree-table-cell])))
 
 (def lifecycle
-  (composite/describe TreeTableCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TreeTableCell
+      :ctor []
+      :props props)
+    :tree-table-cell))
 
 ;; proxy-super uses reflection because updateItem is protected
 

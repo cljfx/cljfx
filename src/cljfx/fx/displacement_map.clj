@@ -30,6 +30,8 @@
     :wrap [:setter lifecycle/scalar :default false]))
 
 (def lifecycle
-  (composite/describe DisplacementMap
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe DisplacementMap
+      :ctor []
+      :props props)
+    :displacement-map))

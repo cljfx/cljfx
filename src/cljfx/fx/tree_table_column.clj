@@ -57,6 +57,8 @@
                   :default :ascending])))
 
 (def lifecycle
-  (composite/describe TreeTableColumn
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TreeTableColumn
+      :ctor []
+      :props props)
+    :tree-table-column))

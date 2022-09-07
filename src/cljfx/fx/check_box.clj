@@ -29,6 +29,8 @@
       :on-selected-changed [:property-change-listener lifecycle/change-listener])))
 
 (def lifecycle
-  (composite/describe CheckBox
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe CheckBox
+      :ctor []
+      :props props)
+    :check-box))

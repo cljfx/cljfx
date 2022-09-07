@@ -36,21 +36,23 @@
              :coerce (nilable unary-operator)]))
 
 (def lifecycle
-  (composite/lifecycle
-    {:props props
-     :args [:value-converter :filter]
-     :ctor (fn [^StringConverter value-converter ^UnaryOperator filter]
-             (cond
-               (and value-converter filter)
-               (TextFormatter. value-converter nil filter)
+  (lifecycle/annotate
+    (composite/lifecycle
+      {:props props
+       :args [:value-converter :filter]
+       :ctor (fn [^StringConverter value-converter ^UnaryOperator filter]
+               (cond
+                 (and value-converter filter)
+                 (TextFormatter. value-converter nil filter)
 
-               value-converter
-               (TextFormatter. value-converter)
+                 value-converter
+                 (TextFormatter. value-converter)
 
-               filter
-               (TextFormatter. filter)
+                 filter
+                 (TextFormatter. filter)
 
-               :else
-               (throw (ex-info "Can't construct TextFormatter"
-                               {:value-converter value-converter
-                                :filter filter}))))}))
+                 :else
+                 (throw (ex-info "Can't construct TextFormatter"
+                                 {:value-converter value-converter
+                                  :filter filter}))))})
+    :text-formatter))

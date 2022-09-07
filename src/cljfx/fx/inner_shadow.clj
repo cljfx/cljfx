@@ -21,6 +21,8 @@
     :offset-y [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (composite/describe InnerShadow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe InnerShadow
+      :ctor []
+      :props props)
+    :inner-shadow))

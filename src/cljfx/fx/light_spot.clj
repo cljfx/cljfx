@@ -17,6 +17,8 @@
       :specular-exponent [:setter lifecycle/scalar :coerce double :default 1])))
 
 (def lifecycle
-  (composite/describe Light$Spot
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Light$Spot
+      :ctor []
+      :props props)
+    :light-spot))

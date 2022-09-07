@@ -20,6 +20,8 @@
       :end-y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe Line
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Line
+      :ctor []
+      :props props)
+    :line))

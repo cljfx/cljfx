@@ -15,6 +15,8 @@
     :contrast [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (composite/describe ColorAdjust
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ColorAdjust
+      :ctor []
+      :props props)
+    :color-adjust))

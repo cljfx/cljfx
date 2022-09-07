@@ -55,6 +55,8 @@
       :show-root [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe TreeView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TreeView
+      :ctor []
+      :props props)
+    :tree-view))

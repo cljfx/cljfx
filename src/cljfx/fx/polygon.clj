@@ -14,6 +14,8 @@
       :points [:list lifecycle/scalar :coerce #(map double %)])))
 
 (def lifecycle
-  (composite/describe Polygon
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Polygon
+      :ctor []
+      :props props)
+    :polygon))

@@ -19,6 +19,8 @@
       :z [:setter lifecycle/scalar :coerce double :default 1.0])))
 
 (def lifecycle
-  (composite/describe Scale
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Scale
+      :ctor []
+      :props props)
+    :scale))

@@ -14,6 +14,8 @@
     :y-value [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (composite/describe XYChart$Data
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe XYChart$Data
+      :ctor []
+      :props props)
+    :xy-chart-data))

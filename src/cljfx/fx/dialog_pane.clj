@@ -47,6 +47,8 @@
       :header-text [:setter lifecycle/scalar])))
 
 (def lifecycle
-  (composite/describe DialogPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe DialogPane
+      :ctor []
+      :props props)
+    :dialog-pane))

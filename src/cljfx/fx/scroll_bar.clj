@@ -28,6 +28,8 @@
       :visible-amount [:setter lifecycle/scalar :coerce double :default 15.0])))
 
 (def lifecycle
-  (composite/describe ScrollBar
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ScrollBar
+      :ctor []
+      :props props)
+    :scroll-bar))

@@ -20,6 +20,8 @@
       :hide-on-click [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe CustomMenuItem
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe CustomMenuItem
+      :ctor []
+      :props props)
+    :custom-menu-item))

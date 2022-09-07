@@ -17,6 +17,8 @@
                   :default :non-zero])))
 
 (def lifecycle
-  (composite/describe SVGPath
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SVGPath
+      :ctor []
+      :props props)
+    :svg-path))

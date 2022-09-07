@@ -15,6 +15,8 @@
       :tick-unit [:setter lifecycle/scalar :coerce double :default 5.0])))
 
 (def lifecycle
-  (composite/describe NumberAxis
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe NumberAxis
+      :ctor []
+      :props props)
+    :number-axis))

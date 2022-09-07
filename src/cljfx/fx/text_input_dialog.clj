@@ -15,4 +15,5 @@
         :ctor []
         :props props
         :prop-order {:showing 1})
-      (lifecycle/wrap-on-delete #(.hide ^TextInputDialog %))))
+      (lifecycle/wrap-on-delete #(.hide ^TextInputDialog %))
+      (lifecycle/annotate :text-input-dialog)))

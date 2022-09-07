@@ -172,7 +172,9 @@
     with another instance, not changes it's content)
   - `:on-deleted` (optional) - function that will receive instance of a component
     described by `:desc` when it's deleted"
-  (lifecycle/wrap-on-instance-lifecycle lifecycle/dynamic))
+  (-> lifecycle/dynamic
+      lifecycle/wrap-on-instance-lifecycle
+      (lifecycle/annotate `ext-on-instance-lifecycle)))
 
 (def ext-let-refs
   "Extension lifecycle that decouples component lifecycles from component tree
@@ -186,7 +188,9 @@
   - `:refs` (required) - map from arbitrary keys to component descriptions
   - `:desc` (required) - component description that will be a part of a component tree,
     has access to components created in `:refs` using [[ext-get-ref]]"
-  (lifecycle/wrap-let-refs lifecycle/dynamic))
+  (-> lifecycle/dynamic
+      lifecycle/wrap-let-refs
+      (lifecycle/annotate `ext-let-refs)))
 
 (def ext-get-ref
   "Extension lifecycle that returns component instance created by [[ext-let-refs]]
@@ -194,7 +198,7 @@
   Supported keys:
   - `:ref` (required) - component identifier used as a key in [[ext-let-ref]]'s `:refs`
     map"
-  (lifecycle/get-ref :ref))
+  (lifecycle/annotate (lifecycle/get-ref :ref) `ext-get-ref))
 
 (def ext-set-env
   "Extension lifecycle that sets environment values for later access with [[ext-get-env]]
@@ -207,7 +211,9 @@
   - `:env` (required) - map from arbitrary keys to arbitrary values
   - `:desc` (required) - component description that will have access to specified values
     using [[ext-get-env]]"
-  (lifecycle/wrap-set-env lifecycle/dynamic))
+  (-> lifecycle/dynamic
+      lifecycle/wrap-set-env
+      (lifecycle/annotate `ext-set-env)))
 
 (def ext-get-env
   "Extension lifecycle that puts values from environment to wrapped component description
@@ -219,7 +225,9 @@
      - map of keys in an environment to keys that will be put into component description
   - `:desc` (required) - component description that will receive additional keys specified
     in `:env`"
-  (lifecycle/wrap-get-env lifecycle/dynamic))
+  (-> lifecycle/dynamic
+      lifecycle/wrap-get-env
+      (lifecycle/annotate `ext-get-env)))
 
 (def ext-many
   "Extension lifecycle that allows to create a vector of components
@@ -228,7 +236,8 @@
   - `:desc` (required) - a coll of component descriptions"
   (-> lifecycle/dynamic
       lifecycle/wrap-many
-      (lifecycle/wrap-map-desc :desc)))
+      (lifecycle/wrap-map-desc :desc)
+      (lifecycle/annotate `ext-many)))
 
 (defn make-ext-with-props
   "Creates extension lifecycle that provides additional props to a component

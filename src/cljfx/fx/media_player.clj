@@ -60,4 +60,5 @@
                 :stop-time [:setter lifecycle/dynamic :coerce coerce/duration
                             :default :indefinite]
                 :volume [:setter lifecycle/scalar :coerce double :default 1]})
-      (lifecycle/wrap-on-delete #(.dispose ^MediaPlayer %))))
+      (lifecycle/wrap-on-delete #(.dispose ^MediaPlayer %))
+      (lifecycle/annotate :media-player)))

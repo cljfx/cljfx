@@ -23,6 +23,8 @@
     :visible [:setter lifecycle/scalar :default true]))
 
 (def lifecycle
-  (composite/describe MenuItem
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MenuItem
+      :ctor []
+      :props props)
+    :menu-item))

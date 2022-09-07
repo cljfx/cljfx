@@ -29,6 +29,8 @@
       :on-value-changed [:property-change-listener lifecycle/change-listener])))
 
 (def lifecycle
-  (composite/describe ChoiceBox
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ChoiceBox
+      :ctor []
+      :props props)
+    :choice-box))

@@ -44,6 +44,8 @@
       :snap-to-pixel [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe Region
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Region
+      :ctor []
+      :props props)
+    :region))

@@ -15,6 +15,8 @@
     :top-input [:setter lifecycle/dynamic]))
 
 (def lifecycle
-  (composite/describe Blend
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Blend
+      :ctor []
+      :props props)
+    :blend))

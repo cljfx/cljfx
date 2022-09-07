@@ -22,6 +22,8 @@
       :visited [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe Hyperlink
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Hyperlink
+      :ctor []
+      :props props)
+    :hyperlink))

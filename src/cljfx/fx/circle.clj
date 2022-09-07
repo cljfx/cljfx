@@ -16,6 +16,8 @@
       :radius [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe Circle
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Circle
+      :ctor []
+      :props props)
+    :circle))

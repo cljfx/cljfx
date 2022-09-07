@@ -24,6 +24,8 @@
     :tex-coords [:list lifecycle/scalar :coerce #(map float %)]))
 
 (def lifecycle
-  (composite/describe TriangleMesh
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TriangleMesh
+      :ctor []
+      :props props)
+    :triangle-mesh))

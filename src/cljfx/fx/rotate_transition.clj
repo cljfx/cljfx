@@ -20,7 +20,9 @@
       :node [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe RotateTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe RotateTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :rotate-transition))

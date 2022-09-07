@@ -33,6 +33,8 @@
                   :default :center])))
 
 (def lifecycle
-  (composite/describe StackPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe StackPane
+      :ctor []
+      :props props)
+    :stack-pane))

@@ -17,6 +17,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe QuadCurveTo
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe QuadCurveTo
+      :ctor []
+      :props props)
+    :quad-curve-to))

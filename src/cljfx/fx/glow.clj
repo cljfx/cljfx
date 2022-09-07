@@ -12,6 +12,8 @@
     :level [:setter lifecycle/scalar :coerce double :default 0.3]))
 
 (def lifecycle
-  (composite/describe Glow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Glow
+      :ctor []
+      :props props)
+    :glow))

@@ -21,6 +21,8 @@
       :type [:setter lifecycle/scalar :coerce (coerce/enum ArcType) :default :open])))
 
 (def lifecycle
-  (composite/describe Arc
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Arc
+      :ctor []
+      :props props)
+    :arc))

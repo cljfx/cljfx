@@ -15,7 +15,9 @@
       :duration [:setter lifecycle/scalar :coerce coerce/duration :default 400])))
 
 (def lifecycle
-  (composite/describe PauseTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PauseTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :pause-transition))

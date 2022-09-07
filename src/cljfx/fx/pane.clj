@@ -14,6 +14,8 @@
       :children [:list lifecycle/dynamics])))
 
 (def lifecycle
-  (composite/describe Pane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Pane
+      :ctor []
+      :props props)
+    :pane))

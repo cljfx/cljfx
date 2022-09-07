@@ -19,6 +19,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe CubicCurveTo
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe CubicCurveTo
+      :ctor []
+      :props props)
+    :cubic-curve-to))

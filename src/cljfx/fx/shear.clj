@@ -17,6 +17,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe Shear
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Shear
+      :ctor []
+      :props props)
+    :shear))

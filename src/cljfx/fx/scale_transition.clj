@@ -25,7 +25,9 @@
       :by-z [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe ScaleTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ScaleTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :scale-transition))

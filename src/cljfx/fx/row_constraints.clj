@@ -19,6 +19,8 @@
     :vgrow [:setter lifecycle/scalar :coerce (coerce/enum Priority)]))
 
 (def lifecycle
-  (composite/describe RowConstraints
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe RowConstraints
+      :ctor []
+      :props props)
+    :row-constraints))

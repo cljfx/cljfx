@@ -14,6 +14,8 @@
       :radius [:setter lifecycle/scalar :coerce double :default 1.0])))
 
 (def lifecycle
-  (composite/describe Sphere
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Sphere
+      :ctor []
+      :props props)
+    :sphere))

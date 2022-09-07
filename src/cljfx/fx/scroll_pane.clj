@@ -63,6 +63,8 @@
       :on-vvalue-changed [:property-change-listener lifecycle/change-listener])))
 
 (def lifecycle
-  (composite/describe ScrollPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ScrollPane
+      :ctor []
+      :props props)
+    :scroll-pane))

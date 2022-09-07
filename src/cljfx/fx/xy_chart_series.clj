@@ -13,6 +13,8 @@
     :node [:setter lifecycle/dynamic]))
 
 (def lifecycle
-  (composite/describe XYChart$Series
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe XYChart$Series
+      :ctor []
+      :props props)
+    :xy-chart-series))

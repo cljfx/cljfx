@@ -26,6 +26,8 @@
       :wrap-text [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe TextArea
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TextArea
+      :ctor []
+      :props props)
+    :text-area))

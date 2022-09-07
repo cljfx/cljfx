@@ -14,6 +14,8 @@
       :mesh [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe MeshView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MeshView
+      :ctor []
+      :props props)
+    :mesh-view))

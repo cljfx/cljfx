@@ -1,7 +1,8 @@
 (ns cljfx.fx.parallel-camera
   "Part of a public API"
   (:require [cljfx.composite :as composite]
-            [cljfx.fx.camera :as fx.camera])
+            [cljfx.fx.camera :as fx.camera]
+            [cljfx.lifecycle :as lifecycle])
   (:import [javafx.scene ParallelCamera]))
 
 (set! *warn-on-reflection* true)
@@ -10,6 +11,8 @@
   fx.camera/props)
 
 (def lifecycle
-  (composite/describe ParallelCamera
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ParallelCamera
+      :ctor []
+      :props props)
+    :parallel-camera))

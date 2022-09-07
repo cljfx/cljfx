@@ -14,6 +14,8 @@
       :x [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe HLineTo
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe HLineTo
+      :ctor []
+      :props props)
+    :h-line-to))

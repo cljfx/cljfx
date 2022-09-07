@@ -16,6 +16,8 @@
       :width [:setter lifecycle/scalar :coerce double :default 2.0])))
 
 (def lifecycle
-  (composite/describe Box
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Box
+      :ctor []
+      :props props)
+    :box))

@@ -35,6 +35,8 @@
       :value-changing [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe Slider
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Slider
+      :ctor []
+      :props props)
+    :slider))

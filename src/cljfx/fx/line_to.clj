@@ -15,6 +15,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe LineTo
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe LineTo
+      :ctor []
+      :props props)
+    :line-to))

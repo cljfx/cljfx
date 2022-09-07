@@ -17,6 +17,8 @@
       :points [:list lifecycle/scalar :coerce #(map double %)])))
 
 (def lifecycle
-  (composite/describe Polyline
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Polyline
+      :ctor []
+      :props props)
+    :polyline))

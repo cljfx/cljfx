@@ -49,4 +49,5 @@
         :ctor []
         :prop-order {:showing 1}
         :props props)
-      (lifecycle/wrap-on-delete #(.hide ^Stage %))))
+      (lifecycle/wrap-on-delete #(.hide ^Stage %))
+      (lifecycle/annotate :stage)))

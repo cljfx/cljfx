@@ -17,6 +17,8 @@
     :surface-scale [:setter lifecycle/scalar :coerce double :default 1.5]))
 
 (def lifecycle
-  (composite/describe Lighting
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Lighting
+      :ctor []
+      :props props)
+    :lighting))

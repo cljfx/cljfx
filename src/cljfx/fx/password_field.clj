@@ -20,6 +20,8 @@
                         :default :password-field])))
 
 (def lifecycle
-  (composite/describe PasswordField
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PasswordField
+      :ctor []
+      :props props)
+    :password-field))

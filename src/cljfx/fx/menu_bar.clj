@@ -23,6 +23,8 @@
 
 
 (def lifecycle
-  (composite/describe MenuBar
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MenuBar
+      :ctor []
+      :props props)
+    :menu-bar))

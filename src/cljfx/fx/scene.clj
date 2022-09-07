@@ -73,6 +73,8 @@
     :user-data [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (composite/describe Scene
-    :ctor [:root]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Scene
+      :ctor [:root]
+      :props props)
+    :scene))

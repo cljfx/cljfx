@@ -19,7 +19,9 @@
       :by-value [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe FadeTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe FadeTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :fade-transition))

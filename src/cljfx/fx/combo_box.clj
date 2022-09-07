@@ -57,6 +57,8 @@
       :visible-row-count [:setter lifecycle/scalar :coerce int :default 10])))
 
 (def lifecycle
-  (composite/describe ComboBox
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ComboBox
+      :ctor []
+      :props props)
+    :combo-box))

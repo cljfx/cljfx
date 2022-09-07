@@ -32,6 +32,8 @@
       :spacing [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe VBox
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe VBox
+      :ctor []
+      :props props)
+    :v-box))

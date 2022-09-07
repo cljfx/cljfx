@@ -20,6 +20,8 @@
                         :default :radio-button])))
 
 (def lifecycle
-  (composite/describe RadioButton
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe RadioButton
+      :ctor []
+      :props props)
+    :radio-button))

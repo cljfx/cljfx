@@ -23,6 +23,8 @@
       :on-shown [:setter lifecycle/event-handler :coerce coerce/event-handler])))
 
 (def lifecycle
-  (composite/describe Menu
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Menu
+      :ctor []
+      :props props)
+    :menu))

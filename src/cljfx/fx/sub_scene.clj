@@ -20,6 +20,8 @@
       :user-agent-stylesheet [:setter lifecycle/scalar])))
 
 (def lifecycle
-  (composite/describe SubScene
-    :ctor [:root :width :height]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SubScene
+      :ctor [:root :width :height]
+      :props props)
+    :sub-scene))

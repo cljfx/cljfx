@@ -25,6 +25,8 @@
       :expanded [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe TitledPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TitledPane
+      :ctor []
+      :props props)
+    :titled-pane))

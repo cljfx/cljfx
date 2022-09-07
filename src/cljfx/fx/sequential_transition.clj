@@ -15,7 +15,9 @@
       :node [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe SequentialTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SequentialTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :sequential-transition))

@@ -16,6 +16,8 @@
 
 
 (def lifecycle
-  (composite/describe HTMLEditor
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe HTMLEditor
+      :ctor []
+      :props props)
+    :html-editor))

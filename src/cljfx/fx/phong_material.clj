@@ -18,6 +18,8 @@
     :specular-power [:setter lifecycle/scalar :coerce double :default 32.0]))
 
 (def lifecycle
-  (composite/describe PhongMaterial
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PhongMaterial
+      :ctor []
+      :props props)
+    :phong-material))

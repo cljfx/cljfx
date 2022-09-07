@@ -14,6 +14,8 @@
       :create-symbols [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe StackedAreaChart
-    :ctor [:x-axis :y-axis]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe StackedAreaChart
+      :ctor [:x-axis :y-axis]
+      :props props)
+    :stacked-area-chart))

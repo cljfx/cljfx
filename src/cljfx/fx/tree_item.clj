@@ -15,6 +15,8 @@
     :value [:setter lifecycle/scalar]))
 
 (def lifecycle
-  (composite/describe TreeItem
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TreeItem
+      :ctor []
+      :props props)
+    :tree-item))

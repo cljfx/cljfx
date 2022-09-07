@@ -38,6 +38,8 @@
                      lifecycle/wrap-many)])))
 
 (def lifecycle
-  (composite/describe AnchorPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe AnchorPane
+      :ctor []
+      :props props)
+    :anchor-pane))

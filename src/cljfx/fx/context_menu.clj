@@ -22,6 +22,8 @@
       :on-action [:setter lifecycle/event-handler :coerce coerce/event-handler])))
 
 (def lifecycle
-  (composite/describe ContextMenu
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ContextMenu
+      :ctor []
+      :props props)
+    :context-menu))

@@ -18,6 +18,8 @@
       :panes [:list lifecycle/dynamics])))
 
 (def lifecycle
-  (composite/describe Accordion
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Accordion
+      :ctor []
+      :props props)
+    :accordion))

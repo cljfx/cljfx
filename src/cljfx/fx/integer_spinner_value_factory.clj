@@ -17,6 +17,8 @@
       :min [:setter lifecycle/scalar :coerce int :default 0])))
 
 (def lifecycle
-  (composite/describe SpinnerValueFactory$IntegerSpinnerValueFactory
-    :ctor [:min :max]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SpinnerValueFactory$IntegerSpinnerValueFactory
+      :ctor [:min :max]
+      :props props)
+    :integer-spinner-value-factory))

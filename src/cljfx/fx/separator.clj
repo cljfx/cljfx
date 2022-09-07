@@ -22,6 +22,8 @@
       :valignment [:setter lifecycle/scalar :coerce (coerce/enum VPos) :default :center])))
 
 (def lifecycle
-  (composite/describe Separator
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Separator
+      :ctor []
+      :props props)
+    :separator))

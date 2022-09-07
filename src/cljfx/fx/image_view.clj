@@ -31,6 +31,8 @@
       :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d])))
 
 (def lifecycle
-  (composite/describe ImageView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ImageView
+      :ctor []
+      :props props)
+    :image-view))

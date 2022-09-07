@@ -17,6 +17,8 @@
                     :default ["cell" "indexed-cell"]])))
 
 (def lifecycle
-  (composite/describe IndexedCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe IndexedCell
+      :ctor []
+      :props props)
+    :indexed-cell))

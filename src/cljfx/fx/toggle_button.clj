@@ -26,6 +26,8 @@
                                lifecycle/dynamic)])))
 
 (def lifecycle
-  (composite/describe ToggleButton
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ToggleButton
+      :ctor []
+      :props props)
+    :toggle-button))

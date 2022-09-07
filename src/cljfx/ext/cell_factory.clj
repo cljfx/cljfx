@@ -50,6 +50,10 @@
                                :props-config (:props composite)
                                :opts opts
                                :slots []})
+            on-item-changed-fn (bound-fn [index ov]
+                                 (vswap! *state set-key-and-advance-slot index :item (.getValue ^ObservableValue ov)))
+            on-empty-changed-fn (bound-fn [index ov]
+                                  (vswap! *state set-key-and-advance-slot index :empty (.getValue ^ObservableValue ov)))
             cb (reify Callback
                  (call [_ _]
                    (let [state @*state
@@ -60,11 +64,11 @@
                              on-item-changed
                              (reify InvalidationListener
                                (invalidated [_ ov]
-                                 (vswap! *state set-key-and-advance-slot index :item (.getValue ^ObservableValue ov))))
+                                 (on-item-changed-fn index ov)))
                              on-empty-changed
                              (reify InvalidationListener
                                (invalidated [_ ov]
-                                 (vswap! *state set-key-and-advance-slot index :empty (.getValue ^ObservableValue ov))))]
+                                 (on-empty-changed-fn index ov)))]
                          (vswap! *state update :slots conj {:cell ret
                                                             :item (.getItem ret)
                                                             :empty (.isEmpty ret)

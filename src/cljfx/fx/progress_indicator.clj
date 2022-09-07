@@ -21,6 +21,8 @@
       :progress [:setter lifecycle/scalar :coerce double :default -1.0])))
 
 (def lifecycle
-  (composite/describe ProgressIndicator
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ProgressIndicator
+      :ctor []
+      :props props)
+    :progress-indicator))

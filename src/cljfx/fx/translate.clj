@@ -16,6 +16,8 @@
       :z [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe Translate
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Translate
+      :ctor []
+      :props props)
+    :translate))

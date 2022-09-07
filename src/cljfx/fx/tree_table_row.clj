@@ -22,6 +22,8 @@
       :disclosure-node [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe TreeTableRow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TreeTableRow
+      :ctor []
+      :props props)
+    :tree-table-row))

@@ -20,6 +20,8 @@
 
 
 (def lifecycle
-  (composite/describe StackedBarChart
-    :ctor [:x-axis :y-axis]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe StackedBarChart
+      :ctor [:x-axis :y-axis]
+      :props props)
+    :stacked-bar-chart))

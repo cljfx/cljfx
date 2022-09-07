@@ -14,6 +14,8 @@
     :height [:setter lifecycle/scalar :coerce double :default 5]))
 
 (def lifecycle
-  (composite/describe BoxBlur
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe BoxBlur
+      :ctor []
+      :props props)
+    :box-blur))

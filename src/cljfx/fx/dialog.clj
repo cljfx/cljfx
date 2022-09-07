@@ -56,4 +56,5 @@
         :ctor []
         :prop-order {:showing 1}
         :props props)
-      (lifecycle/wrap-on-delete #(.hide ^Dialog %))))
+      (lifecycle/wrap-on-delete #(.hide ^Dialog %))
+      (lifecycle/annotate :dialog)))

@@ -19,6 +19,8 @@
       :selected [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe CheckMenuItem
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe CheckMenuItem
+      :ctor []
+      :props props)
+    :check-menu-item))

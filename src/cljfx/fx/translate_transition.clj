@@ -26,7 +26,9 @@
       :to-z [:setter lifecycle/scalar :coerce double :default ##NaN])))
 
 (def lifecycle
-  (composite/describe TranslateTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TranslateTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :translate-transition))

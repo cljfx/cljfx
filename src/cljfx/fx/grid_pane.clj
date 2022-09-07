@@ -93,6 +93,8 @@
       :vgap [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe GridPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe GridPane
+      :ctor []
+      :props props)
+    :grid-pane))

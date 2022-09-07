@@ -34,6 +34,8 @@
       :vgap [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe FlowPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe FlowPane
+      :ctor []
+      :props props)
+    :flow-pane))

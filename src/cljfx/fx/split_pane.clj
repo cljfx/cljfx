@@ -32,6 +32,8 @@
                     :default :horizontal])))
 
 (def lifecycle
-  (composite/describe SplitPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SplitPane
+      :ctor []
+      :props props)
+    :split-pane))

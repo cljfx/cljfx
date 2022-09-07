@@ -20,6 +20,8 @@
                         :default :list-item])))
 
 (def lifecycle
-  (composite/describe ListCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ListCell
+      :ctor []
+      :props props)
+    :list-cell))

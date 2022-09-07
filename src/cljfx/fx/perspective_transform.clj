@@ -19,6 +19,8 @@
     :ury [:setter lifecycle/scalar :coerce double :default 0.0]))
 
 (def lifecycle
-  (composite/describe PerspectiveTransform
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PerspectiveTransform
+      :ctor []
+      :props props)
+    :perspective-transform))

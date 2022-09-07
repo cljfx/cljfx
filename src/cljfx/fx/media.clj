@@ -14,6 +14,8 @@
     :on-error [:setter lifecycle/event-handler :coerce coerce/runnable]))
 
 (def lifecycle
-  (composite/describe Media
-    :ctor [:source]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Media
+      :ctor [:source]
+      :props props)
+    :media))

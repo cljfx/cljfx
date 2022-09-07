@@ -34,6 +34,8 @@
       :top [:setter border-pane-constrained-dynamic])))
 
 (def lifecycle
-  (composite/describe BorderPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe BorderPane
+      :ctor []
+      :props props)
+    :border-pane))

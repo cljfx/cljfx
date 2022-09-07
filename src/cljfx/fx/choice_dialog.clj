@@ -19,4 +19,5 @@
         :ctor []
         :props props
         :prop-order {:showing 1})
-      (lifecycle/wrap-on-delete #(.hide ^ChoiceDialog %))))
+      (lifecycle/wrap-on-delete #(.hide ^ChoiceDialog %))
+      (lifecycle/annotate :choice-dialog)))

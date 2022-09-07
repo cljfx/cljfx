@@ -25,6 +25,8 @@
       :value-factory [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe Spinner
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Spinner
+      :ctor []
+      :props props)
+    :spinner))

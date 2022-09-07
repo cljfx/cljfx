@@ -21,6 +21,8 @@
     :offset-y [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (composite/describe DropShadow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe DropShadow
+      :ctor []
+      :props props)
+    :drop-shadow))

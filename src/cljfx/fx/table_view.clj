@@ -67,6 +67,8 @@
       :table-menu-button-visible [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe TableView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TableView
+      :ctor []
+      :props props)
+    :table-view))

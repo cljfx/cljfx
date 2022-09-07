@@ -23,6 +23,8 @@
       :items [:list lifecycle/scalar :coerce observable-list])))
 
 (def lifecycle
-  (composite/describe SpinnerValueFactory$ListSpinnerValueFactory
-    :ctor [:items]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SpinnerValueFactory$ListSpinnerValueFactory
+      :ctor [:items]
+      :props props)
+    :list-spinner-value-factory))

@@ -18,7 +18,9 @@
       :to-value [:setter lifecycle/scalar :coerce coerce/color])))
 
 (def lifecycle
-  (composite/describe FillTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe FillTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :fill-transition))

@@ -24,4 +24,5 @@
         :ctor [:alert-type]
         :props props
         :prop-order {:showing 1})
-      (lifecycle/wrap-on-delete #(.hide ^Alert %))))
+      (lifecycle/wrap-on-delete #(.hide ^Alert %))
+      (lifecycle/annotate :alert)))

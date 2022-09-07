@@ -13,6 +13,8 @@
     :angle [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (composite/describe MotionBlur
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MotionBlur
+      :ctor []
+      :props props)
+    :motion-blur))

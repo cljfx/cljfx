@@ -40,6 +40,8 @@
                      :coerce page-factory])))
 
 (def lifecycle
-  (composite/describe Pagination
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Pagination
+      :ctor []
+      :props props)
+    :pagination))

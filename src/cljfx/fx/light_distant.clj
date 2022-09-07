@@ -15,6 +15,8 @@
       :elevation [:setter lifecycle/scalar :coerce double :default 45])))
 
 (def lifecycle
-  (composite/describe Light$Distant
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Light$Distant
+      :ctor []
+      :props props)
+    :light-distant))

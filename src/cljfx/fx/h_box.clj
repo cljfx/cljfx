@@ -32,6 +32,8 @@
       :spacing [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe HBox
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe HBox
+      :ctor []
+      :props props)
+    :h-box))

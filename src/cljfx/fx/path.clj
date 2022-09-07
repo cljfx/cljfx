@@ -19,6 +19,8 @@
                   :default :non-zero])))
 
 (def lifecycle
-  (composite/describe Path
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Path
+      :ctor []
+      :props props)
+    :path))

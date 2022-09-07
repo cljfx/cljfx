@@ -20,6 +20,8 @@
                         :default :table-row])))
 
 (def lifecycle
-  (composite/describe TableRow
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TableRow
+      :ctor []
+      :props props)
+    :table-row))

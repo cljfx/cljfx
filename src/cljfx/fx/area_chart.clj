@@ -14,6 +14,8 @@
       :create-symbols [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe AreaChart
-    :ctor [:x-axis :y-axis]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe AreaChart
+      :ctor [:x-axis :y-axis]
+      :props props)
+    :area-chart))

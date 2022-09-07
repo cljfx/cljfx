@@ -19,6 +19,8 @@
       :category-gap [:setter lifecycle/scalar :coerce double :default 10])))
 
 (def lifecycle
-  (composite/describe BarChart
-    :ctor [:x-axis :y-axis]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe BarChart
+      :ctor [:x-axis :y-axis]
+      :props props)
+    :bar-chart))

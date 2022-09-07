@@ -21,6 +21,8 @@
       :label-for [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe Label
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Label
+      :ctor []
+      :props props)
+    :label))

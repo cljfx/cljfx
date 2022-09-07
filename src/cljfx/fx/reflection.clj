@@ -15,6 +15,8 @@
     :bottom-opacity [:setter lifecycle/scalar :coerce double :default 0.0]))
 
 (def lifecycle
-  (composite/describe Reflection
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Reflection
+      :ctor []
+      :props props)
+    :reflection))

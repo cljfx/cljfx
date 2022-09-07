@@ -17,6 +17,8 @@
       :gap-start-and-end [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe CategoryAxis
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe CategoryAxis
+      :ctor []
+      :props props)
+    :category-axis))

@@ -15,6 +15,8 @@
       :vertical-field-of-view [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe PerspectiveCamera
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PerspectiveCamera
+      :ctor []
+      :props props)
+    :perspective-camera))

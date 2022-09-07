@@ -15,6 +15,8 @@
       :radius [:setter lifecycle/scalar :coerce double :default 1.0])))
 
 (def lifecycle
-  (composite/describe Cylinder
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Cylinder
+      :ctor []
+      :props props)
+    :cylinder))

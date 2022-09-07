@@ -26,6 +26,8 @@
       :popup-side [:setter lifecycle/scalar :coerce (coerce/enum Side) :default :bottom])))
 
 (def lifecycle
-  (composite/describe MenuButton
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MenuButton
+      :ctor []
+      :props props)
+    :menu-button))

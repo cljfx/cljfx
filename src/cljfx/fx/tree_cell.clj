@@ -22,9 +22,11 @@
       :disclosure-node [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe TreeCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TreeCell
+      :ctor []
+      :props props)
+    :tree-cell))
 
 ;; proxy-super uses reflection because updateItem is protected
 

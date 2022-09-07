@@ -12,6 +12,8 @@
     :level [:setter lifecycle/scalar :coerce double :default 1.0]))
 
 (def lifecycle
-  (composite/describe SepiaTone
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SepiaTone
+      :ctor []
+      :props props)
+    :sepia-tone))

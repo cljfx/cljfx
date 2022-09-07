@@ -19,6 +19,8 @@
       :pivot-z [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe Rotate
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Rotate
+      :ctor []
+      :props props)
+    :rotate))

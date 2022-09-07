@@ -34,6 +34,8 @@
                                   lifecycle/list-change-listener))))
 
 (def lifecycle
-  (composite/describe TabPane
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TabPane
+      :ctor []
+      :props props)
+    :tab-pane))

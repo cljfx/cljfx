@@ -16,6 +16,8 @@
     :paint [:setter lifecycle/scalar :coerce coerce/paint]))
 
 (def lifecycle
-  (composite/describe ColorInput
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ColorInput
+      :ctor []
+      :props props)
+    :color-input))

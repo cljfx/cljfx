@@ -12,6 +12,8 @@
     :radius [:setter lifecycle/scalar :coerce double :default 10]))
 
 (def lifecycle
-  (composite/describe GaussianBlur
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe GaussianBlur
+      :ctor []
+      :props props)
+    :gaussian-blur))

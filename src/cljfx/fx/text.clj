@@ -40,6 +40,8 @@
                             :default :gray])))
 
 (def lifecycle
-  (composite/describe Text
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Text
+      :ctor []
+      :props props)
+    :text))

@@ -18,7 +18,9 @@
       :orientation [:setter lifecycle/scalar :coerce (coerce/enum PathTransition$OrientationType) :default :none])))
 
 (def lifecycle
-  (composite/describe PathTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PathTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :path-transition))

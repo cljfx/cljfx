@@ -26,6 +26,8 @@
       :default-button [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (composite/describe Button
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Button
+      :ctor []
+      :props props)
+    :button))

@@ -15,6 +15,8 @@
       :y [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe MoveTo
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MoveTo
+      :ctor []
+      :props props)
+    :move-to))

@@ -20,6 +20,8 @@
                         :default :text])))
 
 (def lifecycle
-  (composite/describe DateCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe DateCell
+      :ctor []
+      :props props)
+    :date-cell))

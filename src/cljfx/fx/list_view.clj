@@ -58,6 +58,8 @@
                         :single))))
 
 (def lifecycle
-  (composite/describe ListView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ListView
+      :ctor []
+      :props props)
+    :list-view))

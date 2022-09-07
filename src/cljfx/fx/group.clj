@@ -15,6 +15,8 @@
       :auto-size-children [:setter lifecycle/scalar :default true])))
 
 (def lifecycle
-  (composite/describe Group
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Group
+      :ctor []
+      :props props)
+    :group))

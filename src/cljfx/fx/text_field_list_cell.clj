@@ -19,9 +19,11 @@
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter])))
 
 (def lifecycle
-  (composite/describe TextFieldListCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TextFieldListCell
+      :ctor []
+      :props props)
+    :text-field-list-cell))
 
 ;; proxy-super uses reflection because updateItem is protected
 

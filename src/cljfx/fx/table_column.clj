@@ -51,6 +51,8 @@
                   :default :ascending])))
 
 (def lifecycle
-  (composite/describe TableColumn
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TableColumn
+      :ctor []
+      :props props)
+    :table-column))

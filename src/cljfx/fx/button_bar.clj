@@ -31,6 +31,8 @@
                           lifecycle/wrap-many)])))
 
 (def lifecycle
-  (composite/describe ButtonBar
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ButtonBar
+      :ctor []
+      :props props)
+    :button-bar))

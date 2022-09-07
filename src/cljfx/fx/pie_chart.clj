@@ -18,6 +18,8 @@
       :start-angle [:setter lifecycle/scalar :coerce double :default 0.0])))
 
 (def lifecycle
-  (composite/describe PieChart
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PieChart
+      :ctor []
+      :props props)
+    :pie-chart))

@@ -21,6 +21,8 @@
       :toggle-group [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe RadioMenuItem
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe RadioMenuItem
+      :ctor []
+      :props props)
+    :radio-menu-item))

@@ -25,6 +25,8 @@
       :pref-column-count [:setter lifecycle/scalar :coerce int :default 12])))
 
 (def lifecycle
-  (composite/describe TextField
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe TextField
+      :ctor []
+      :props props)
+    :text-field))

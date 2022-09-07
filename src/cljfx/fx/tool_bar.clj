@@ -25,6 +25,8 @@
                     :default :horizontal])))
 
 (def lifecycle
-  (composite/describe ToolBar
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ToolBar
+      :ctor []
+      :props props)
+    :tool-bar))

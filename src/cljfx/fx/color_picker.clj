@@ -20,6 +20,8 @@
       :custom-colors [:list lifecycle/scalar :coerce #(map coerce/color %)])))
 
 (def lifecycle
-  (composite/describe ColorPicker
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ColorPicker
+      :ctor []
+      :props props)
+    :color-picker))

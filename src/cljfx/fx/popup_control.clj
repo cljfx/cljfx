@@ -41,6 +41,8 @@
       :style-class [:list lifecycle/scalar :coerce coerce/style-class])))
 
 (def lifecycle
-  (composite/describe PopupControl
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PopupControl
+      :ctor []
+      :props props)
+    :popup-control))

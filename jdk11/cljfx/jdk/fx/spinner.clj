@@ -10,4 +10,4 @@
   (composite/props Spinner
     :initial-delay [:setter lifecycle/scalar :coerce coerce/duration :default [300 :ms]]
     :prompt-text [:setter lifecycle/scalar :default ""]
-    :repeat-delay [:setter lifecycle/scalar :default [60 :ms]]))
+    :repeat-delay [:setter lifecycle/scalar :coerce coerce/duration :default [60 :ms]]))

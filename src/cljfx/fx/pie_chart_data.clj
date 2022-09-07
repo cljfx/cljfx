@@ -12,6 +12,8 @@
     :pie-value [:setter lifecycle/scalar :coerce double :default 0]))
 
 (def lifecycle
-  (composite/describe PieChart$Data
-    :ctor [:name :pie-value]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe PieChart$Data
+      :ctor [:name :pie-value]
+      :props props)
+    :pie-chart-data))

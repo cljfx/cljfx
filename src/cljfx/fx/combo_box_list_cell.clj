@@ -20,6 +20,8 @@
       :converter [:setter lifecycle/scalar :coerce coerce/string-converter])))
 
 (def lifecycle
-  (composite/describe ComboBoxListCell
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ComboBoxListCell
+      :ctor []
+      :props props)
+    :combo-box-list-cell))

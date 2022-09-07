@@ -32,7 +32,9 @@
                  (.getHeight canvas)))])))
 
 (def lifecycle
-  (composite/describe Canvas
-    :ctor []
-    :prop-order {:draw 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe Canvas
+      :ctor []
+      :prop-order {:draw 1}
+      :props props)
+    :canvas))

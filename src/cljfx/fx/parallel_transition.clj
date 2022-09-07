@@ -15,7 +15,9 @@
       :node [:setter lifecycle/dynamic])))
 
 (def lifecycle
-  (composite/describe ParallelTransition
-    :ctor []
-    :prop-order {:status 1}
-    :props props))
+  (lifecycle/annotate
+    (composite/describe ParallelTransition
+      :ctor []
+      :prop-order {:status 1}
+      :props props)
+    :parallel-transition))

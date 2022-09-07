@@ -17,6 +17,8 @@
       :min [:setter lifecycle/scalar :coerce double :default 0])))
 
 (def lifecycle
-  (composite/describe SpinnerValueFactory$DoubleSpinnerValueFactory
-    :ctor [:min :max]
-    :props props))
+  (lifecycle/annotate
+    (composite/describe SpinnerValueFactory$DoubleSpinnerValueFactory
+      :ctor [:min :max]
+      :props props)
+    :double-spinner-value-factory))

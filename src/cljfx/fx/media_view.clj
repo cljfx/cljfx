@@ -30,6 +30,8 @@
       :viewport [:setter lifecycle/scalar :coerce coerce/rectangle-2d])))
 
 (def lifecycle
-  (composite/describe MediaView
-    :ctor []
-    :props props))
+  (lifecycle/annotate
+    (composite/describe MediaView
+      :ctor []
+      :props props)
+    :media-view))
