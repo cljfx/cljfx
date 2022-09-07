@@ -70,4 +70,5 @@
          {:selected-indices (selected-indices-prop get-model)
           :selected-items (selected-items-prop get-model items-lifecycle)
           :on-selected-indices-changed (on-selected-indices-changed-prop get-model)
-          :on-selected-items-changed (on-selected-items-changed-prop get-model)}))))
+          :on-selected-items-changed (on-selected-items-changed-prop get-model)})
+       (lifecycle/annotate 'cljfx.api/make-ext-with-props))))
