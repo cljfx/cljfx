@@ -14,8 +14,8 @@
       :content [:list lifecycle/dynamics])))
 
 (def lifecycle
-  (lifecycle/annotate
-    (composite/describe Popup
-      :ctor []
-      :props props)
-    :popup))
+  (-> (composite/describe Popup
+        :ctor []
+        :props props)
+      (lifecycle/wrap-on-delete #(.hide ^Popup %))
+      (lifecycle/annotate :popup)))
