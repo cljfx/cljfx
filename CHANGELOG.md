@@ -3,7 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.7.20](https://github.com/cljfx/cljfx/releases/tag/1.7.21) - 2022-07-15
+### [1.7.22](https://github.com/cljfx/cljfx/releases/tag/1.7.22) - 2022-09-22
+- Hide popup when the component is deleted
+
+### [1.7.21](https://github.com/cljfx/cljfx/releases/tag/1.7.21) - 2022-07-15
 - Use invalidation listeners instead of change listeners in cell factory 
   lifecycle. This allows depending on item metadata for rendering given you 
   also use a custom item mutator that is sensitive to item metadata.
