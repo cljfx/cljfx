@@ -261,7 +261,8 @@ as an example of how to iterate on cljfx app in REPL.
 Check out [cljfx/dev](https://github.com/cljfx/dev) for tools that might help 
 you when developing cljfx applications. These tools include:
 - specs and validation, both for individual cljfx descriptions and running apps;
-- helper reference for existing types and their props.
+- helper reference for existing types and their props;
+- cljfx component stack reporting in exceptions to help with debugging. 
 
 ### Styling
 
