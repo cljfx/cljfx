@@ -256,6 +256,13 @@ description.
 See walk-through in [examples/e12_interactive_development.clj](examples/e12_interactive_development.clj)
 as an example of how to iterate on cljfx app in REPL.
 
+### Dev tools
+
+Check out [cljfx/dev](https://github.com/cljfx/dev) for tools that might help 
+you when developing cljfx applications. These tools include:
+- specs and validation, both for individual cljfx descriptions and running apps;
+- helper reference for existing types and their props.
+
 ### Styling
 
 Iterating on styling is usually cumbersome: styles are defined in 
