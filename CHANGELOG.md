@@ -3,6 +3,12 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.23](https://github.com/cljfx/cljfx/releases/tag/1.7.23) - 2023-05-15
+- Add `:fixed-eye-at-camera-zero` prop to `:perspective-camera` component. Since
+  this value can only be supplied as a constructor arg, it cannot be changed.
+- Bump JavaFX version to `19.0.2.1`
+- Add new components: `:spot-light` and `:directional-light`
+
 ### [1.7.22](https://github.com/cljfx/cljfx/releases/tag/1.7.22) - 2022-09-22
 - Hide popup when the component is deleted
 
