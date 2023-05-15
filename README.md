@@ -1029,7 +1029,6 @@ Internal list of ideas to explore:
 - missing observable maps: Scene's getMnemonics
 - `:row-factory` in tree-view/tree-table-view should be similar to cell 
   factories
-- make exceptions more informative
 - are controlled props possible? (controls, also stage's `:showing`)
 - wrap-factory may use some memoizing and advancing
 - add tests for various lifecycles and re-calculations

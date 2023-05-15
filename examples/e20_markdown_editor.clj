@@ -10,7 +10,8 @@
            [org.commonmark.node Node]
            [org.commonmark.parser Parser]))
 
-(SvgImageLoaderFactory/install (PrimitiveDimensionProvider.))
+;; does not work any more :(
+#_(SvgImageLoaderFactory/install (PrimitiveDimensionProvider.))
 
 (def *context
   (atom

@@ -16,7 +16,7 @@
       (last (.split f "\\.")))))
 
 (defn classifier
-  "The classifier is be located between the version and extension name of the artifact.
+  "The classifier is located between the version and extension name of the artifact.
   See http://maven.apache.org/plugins/maven-deploy-plugin/examples/deploying-with-classifiers.html "
   [version f]
   (let [pattern (re-pattern (format "%s-(\\p{Alnum}*)\\.%s" version (extension f)))
