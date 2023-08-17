@@ -3,6 +3,9 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.7.24](https://github.com/cljfx/cljfx/releases/tag/1.7.24) - 2023-08-17
+- Add `:user-data` prop to `:node` component
+
 ### [1.7.23](https://github.com/cljfx/cljfx/releases/tag/1.7.23) - 2023-05-15
 - Add `:fixed-eye-at-camera-zero` prop to `:perspective-camera` component. Since
   this value can only be supplied as a constructor arg, it cannot be changed.
