@@ -112,4 +112,5 @@
       :translate-x [:setter lifecycle/scalar :coerce double :default 0]
       :translate-y [:setter lifecycle/scalar :coerce double :default 0]
       :translate-z [:setter lifecycle/scalar :coerce double :default 0]
+      :user-data [:setter lifecycle/scalar]
       :visible [:setter lifecycle/scalar :default true])))
