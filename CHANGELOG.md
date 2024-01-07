@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.8.0](https://github.com/cljfx/cljfx/releases/tag/1.8.0) - 2024-01-07
+- Support both JDK 8, 11 and 17, automatically picking the newest dependencies 
+  available
+
 ### [1.7.24](https://github.com/cljfx/cljfx/releases/tag/1.7.24) - 2023-08-17
 - Add `:user-data` prop to `:node` component
 
