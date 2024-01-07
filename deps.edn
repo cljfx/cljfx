@@ -1,9 +1,9 @@
 {:deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        org.openjfx/javafx-controls {:mvn/version "19.0.2.1"}
-        org.openjfx/javafx-base {:mvn/version "19.0.2.1"}
-        org.openjfx/javafx-graphics {:mvn/version "19.0.2.1"}
-        org.openjfx/javafx-media {:mvn/version "19.0.2.1"}
-        org.openjfx/javafx-web {:mvn/version "19.0.2.1"}}
+        org.openjfx/javafx-controls {:mvn/version "20-ea+1"}
+        org.openjfx/javafx-base {:mvn/version "20-ea+1"}
+        org.openjfx/javafx-graphics {:mvn/version "20-ea+1"}
+        org.openjfx/javafx-media {:mvn/version "20-ea+1"}
+        org.openjfx/javafx-web {:mvn/version "20-ea+1"}}
  :paths ["src" "jdk11"]
  :aliases {:examples {:extra-paths ["examples"]
                       :extra-deps {org.jsoup/jsoup {:mvn/version "1.11.3"}
@@ -19,6 +19,12 @@
            :base {:paths ["src"]}
            :jdk8 {:paths ["jdk8"]}
            :jdk11 {:paths ["jdk11"]}
+           :jdk17 {:paths ["jdk11" "src"]
+                   :override-deps {org.openjfx/javafx-controls {:mvn/version "22-ea+16"}
+                                   org.openjfx/javafx-base {:mvn/version "22-ea+16"}
+                                   org.openjfx/javafx-graphics {:mvn/version "22-ea+16"}
+                                   org.openjfx/javafx-media {:mvn/version "22-ea+16"}
+                                   org.openjfx/javafx-web {:mvn/version "22-ea+16"}}}
            :cache {:extra-deps {org.clojure/core.cache {:mvn/version "0.7.1"}}}
            :dev {:extra-paths ["dev"]
                  :extra-deps {cljfx/dev {:local/root "../cljfx-dev"}}}

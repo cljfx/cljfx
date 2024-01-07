@@ -2,6 +2,9 @@
   (:require [clojure.string :as str]
             [clojure.reflect :as reflect]))
 
+{:java (System/getProperty "java.version")
+ :fx (System/getProperty "javafx.runtime.version")}
+
 (defn infer-props [inspected-class]
   (let [instance (try (.newInstance inspected-class)
                       (catch Exception _

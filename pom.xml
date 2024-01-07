@@ -43,7 +43,7 @@
     <profile>
       <id>jdk11</id>
       <activation>
-        <jdk>[11,)</jdk>
+        <jdk>[11,17)</jdk>
       </activation>
       <dependencies>
         <dependency>
@@ -55,27 +55,66 @@
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-controls</artifactId>
-          <version>19.0.2.1</version>
+          <version>20-ea+1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-base</artifactId>
-          <version>19.0.2.1</version>
+          <version>20-ea+1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-graphics</artifactId>
-          <version>19.0.2.1</version>
+          <version>20-ea+1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-media</artifactId>
-          <version>19.0.2.1</version>
+          <version>20-ea+1</version>
         </dependency>
         <dependency>
           <groupId>org.openjfx</groupId>
           <artifactId>javafx-web</artifactId>
-          <version>19.0.2.1</version>
+          <version>20-ea+1</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>jdk17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>cljfx</groupId>
+          <artifactId>cljfx</artifactId>
+          <version>${cljfx.version}</version>
+          <classifier>jdk11</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-controls</artifactId>
+          <version>22-ea+16</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-base</artifactId>
+          <version>22-ea+16</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-graphics</artifactId>
+          <version>22-ea+16</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-media</artifactId>
+          <version>22-ea+16</version>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-web</artifactId>
+          <version>22-ea+16</version>
         </dependency>
       </dependencies>
     </profile>
