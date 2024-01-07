@@ -119,4 +119,10 @@
       </dependencies>
     </profile>
   </profiles>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/license/mit</url>
+    </license>
+  </licenses>
 </project>
