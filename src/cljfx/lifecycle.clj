@@ -8,6 +8,7 @@
   protocol implementations only, their internals are subject to change"
   (:require [cljfx.component :as component]
             [cljfx.coerce :as coerce]
+            [cljfx.platform :as platform]
             [cljfx.prop :as prop]
             [cljfx.context :as context]
             [clojure.set :as set]))
@@ -123,25 +124,31 @@
      `advance (fn [_ _ v _] v)
      `delete (fn [_ _ _])}))
 
-(defn- make-handler-fn [desc opts]
+(defn- create-event-handler-component [desc opts]
   (cond
     (map? desc)
-    (let [map-event-handler (:fx.opt/map-event-handler opts)]
-      #(when-not *in-progress?*
-         (map-event-handler (assoc desc :fx/event %))))
+    (let [map-event-handler (:fx.opt/map-event-handler opts)
+          v (volatile! desc)]
+      (with-meta
+        {:kind :map
+         :volatile v
+         :fx.opt/map-event-handler map-event-handler
+         :value #(when-not *in-progress?* (map-event-handler (assoc @v :fx/event %)))}
+        {`component/instance :value}))
 
     (fn? desc)
-    #(when-not *in-progress?*
-       (desc %))
+    (let [v (volatile! desc)]
+      (with-meta
+        {:kind :fn
+         :volatile v
+         :value #(when-not *in-progress?* (@v %))}
+        {`component/instance :value}))
 
     :else
-    desc))
-
-(defn- create-event-handler-component [desc opts]
-  (with-meta {:desc desc
-              :fx.opt/map-event-handler (:fx.opt/map-event-handler opts)
-              :value (make-handler-fn desc opts)}
-             {`component/instance :value}))
+    (with-meta
+      {:kind :else
+       :value desc}
+      {`component/instance :value})))
 
 (def event-handler
   (with-meta
@@ -149,11 +156,23 @@
     {`create (fn [_ desc opts]
                (create-event-handler-component desc opts))
      `advance (fn [_ component desc opts]
-                (if (and (= desc (:desc component))
-                         (= (:fx.opt/map-event-handler component)
-                            (:fx.opt/map-event-handler opts)))
-                  component
-                  (create-event-handler-component desc opts)))
+                (let [component-kind (:kind component)
+                      desc-kind (if (map? desc) :map (if (fn? desc) :fn :else))]
+                  (if (not (identical? desc-kind component-kind))
+                    (create-event-handler-component desc opts)
+                    (let [vol (:volatile component)]
+                      (case component-kind
+                        :map
+                        (if (= (:fx.opt/map-event-handler component)
+                               (:fx.opt/map-event-handler opts))
+                          (do (vreset! vol desc) component)
+                          (create-event-handler-component desc opts))
+                        :fn
+                        (do (vreset! vol desc) component)
+                        :else
+                        (if (= desc @vol)
+                          component
+                          (create-event-handler-component desc opts)))))))
      `delete (fn [_ _ _])}))
 
 (def change-listener
@@ -658,3 +677,111 @@
               (create-if-desc-component new-lifecycle desc opts)))))
     (delete [_ component opts]
       (delete (:lifecycle component) (:child component) opts))))
+
+
+
+(defn- complete-rendering [old-state value new-component]
+  (-> old-state
+      (assoc :component new-component)
+      (cond-> (= value (:value old-state))
+        (dissoc :value))))
+
+(defn- complete-advance [old-state desc opts value new-component]
+  (-> old-state
+      (assoc :desc desc :opts opts)
+      (complete-rendering value new-component)))
+
+(defn- perform-render [state]
+  ;; advance is a mutating operation on DOM, can't retry => no swap!
+  ;; new request may arrive during advancing => we might enqueue another request
+  (let [current-state @state
+        ;; default to ::deleted so that advance can signal that there is no need
+        ;; to re-render by dissoc-ing the :value
+        value (:value current-state ::deleted)]
+    (when-not (identical? value ::deleted)
+      (let [{:keys [desc opts component]} current-state
+            old-instance (component/instance component)
+            new-component (advance root component (assoc desc :value value) opts)
+            new-instance (component/instance new-component)
+            _ (when-not (= old-instance new-instance)
+                (throw (ex-info "Root instance replace forbidden"
+                                {:old old-instance :new new-instance})))
+            new-state (swap! state complete-rendering value new-component)]
+        (when (contains? new-state :value)
+          (platform/run-later (perform-render state)))))))
+
+(defn- set-new-value-if-not-deleted [state value]
+  (if (identical? ::deleted (:value state))
+    state
+    (assoc state :value value)))
+
+(defn- request-render [state value]
+  (let [[old new] (swap-vals! state set-new-value-if-not-deleted value)]
+    (when (and (not (contains? old :value))
+               (contains? new :value))
+      (platform/run-later (perform-render state)))))
+
+(def ext-watcher
+  (reify Lifecycle
+    (create [_ {:keys [ref desc]} opts]
+      (let [state (atom {:component (create dynamic (assoc desc :value @ref) opts)
+                         :ref ref
+                         :desc desc
+                         :opts opts}
+                        :meta {`component/instance #(component/instance (:component @%))})]
+        (add-watch ref state #(request-render state %4))
+        state))
+    (advance [this component {:keys [ref desc] :as this-desc} opts]
+      (let [current-state @component
+            current-ref (:ref current-state)]
+        (if (= ref current-ref)
+          (let [value @ref
+                new-component (advance dynamic (:component @component) (assoc desc :value value) opts)]
+            (doto component (swap! complete-advance desc opts value new-component)))
+          (do (delete this component opts)
+              (create this this-desc opts)))))
+    (delete [_ component opts]
+      (let [current-state @component]
+        (remove-watch (:ref current-state) component)
+        (swap! component assoc :value ::deleted)
+        (delete dynamic (:component current-state) opts)))))
+
+(def ^:private ext-convey-local-state
+  (reify Lifecycle
+    (create [_ {:keys [desc value swap-state]} opts]
+      (create dynamic (assoc desc :state value :swap-state swap-state) opts))
+    (advance [_ component {:keys [desc value swap-state]} opts]
+      (advance dynamic component (assoc desc :state value :swap-state swap-state) opts))
+    (delete [_ component opts]
+      (delete dynamic component opts))))
+
+(def ext-local-state
+  (reify Lifecycle
+    (create [_ {:keys [initial-state desc]} opts]
+      (let [a (atom initial-state)
+            swap-state (partial swap! a)]
+        (with-meta
+          {:ref a
+           :swap-state swap-state
+           :initial-state initial-state
+           :child (create ext-watcher
+                          {:ref a
+                           :desc {:fx/type ext-convey-local-state
+                                  :desc desc
+                                  :swap-state swap-state}}
+                          opts)}
+          {`component/instance #(-> % :child component/instance)})))
+    (advance [this component {:keys [initial-state desc] :as this-desc} opts]
+      (if (= initial-state (:initial-state component))
+        (update component :child
+                #(advance
+                   ext-watcher
+                   %
+                   {:ref (:ref component)
+                    :desc {:fx/type ext-convey-local-state
+                           :desc desc
+                           :swap-state (:swap-state component)}} opts))
+        (do (delete this component opts)
+            (create this this-desc opts))))
+    (delete [_ component opts]
+      (delete ext-watcher (:child component) opts))))

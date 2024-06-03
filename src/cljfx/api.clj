@@ -23,6 +23,8 @@
     - [[ext-get-env]] - get values from environment
     - [[ext-many]] - manage a vector of components
     - [[make-ext-with-props]] - create lifecycle that uses user-defined props
+    - [[ext-watcher]] - watch an IRef as a component
+    - [[ext-local-state]] - create a component with a local state
   - automatic component lifecycle:
     - [[keyword->lifecycle]] - component/renderer `:fx.opt/type->lifecycle` opt function
       that returns lifecycle of keyword fx-types
@@ -251,6 +253,36 @@
   [props-config]
   (lifecycle/make-ext-with-props lifecycle/dynamic props-config))
 
+(def ext-watcher
+  "Extension lifecycle that creates a component that watches an IRef to define view
+
+  Re-rendering will happen on JavaFX UI thread with the latest value from the IRef
+  supplied to the description. It's safe to update the IRef from any thread as often as
+  needed. The description must ensure that the returned root JavaFX node always stays the
+  same.
+
+  Supported keys:
+  - `:ref` (required) - an IRef (e.g. atom, agent) that will be watched for updates
+  - `:desc` (required) - a component description that will receive an additional `:value`
+    key with the latest value from the IRef"
+  lifecycle/ext-watcher)
+
+(def ext-local-state
+  "Extension lifecycle that declaratively defines a stateful component
+
+  Supported keys:
+  - `:initial-state` (required) - the initial local state of the component. Whenever the
+    initial state changes, the local state will be discarded and re-created from scratch
+  - `:desc` (required) - the stateful component description that will receive 2 additional
+    keys:
+    - `:state` - current local state value
+    - `:swap-state` a retry-able vararg function that will update the local state when
+      invoked (same semantics as `clojure.core/swap!`). This function is intended to be
+      used in event handlers. It's safe to call from any thread as often as needed -
+      re-rendering will happen on JavaFX UI thread with the latest value
+    The description must ensure that the returned root JavaFX node always stays the same."
+  lifecycle/ext-local-state)
+
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class
 
@@ -302,7 +334,7 @@
   "Returns a stateful function that manages lifecycle of a component
 
   This renderer function can be called from any thread with new description for a
-  component. and advances component on JavaFX application thread with most actual
+  component. It advances component on JavaFX application thread with most actual
   description
 
   It has special semantics for `nil` descriptions meaning absence of any description, this
