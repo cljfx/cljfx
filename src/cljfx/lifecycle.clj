@@ -704,7 +704,7 @@
             new-component (advance root component (assoc desc :value value) opts)
             new-instance (component/instance new-component)
             _ (when-not (= old-instance new-instance)
-                (throw (ex-info "Root instance replace forbidden"
+                (throw (ex-info "Instance replace forbidden"
                                 {:old old-instance :new new-instance})))
             new-state (swap! state complete-rendering value new-component)]
         (when (contains? new-state :value)
@@ -736,7 +736,15 @@
             current-ref (:ref current-state)]
         (if (= ref current-ref)
           (let [value @ref
-                new-component (advance dynamic (:component @component) (assoc desc :value value) opts)]
+                old-component (:component @component)
+                old-instance (component/instance old-component)
+                new-component (advance dynamic old-component (assoc desc :value value) opts)
+                new-instance (component/instance new-component)]
+            ;; we report error here because new instance won't be picked up, since
+            ;; instance for old component and new component will stay the same, because
+            ;; the component is the same atom
+            (when-not (= old-instance new-instance)
+              (throw (ex-info "Instance replace forbidden" {:old old-instance :new new-instance})))
             (doto component (swap! complete-advance desc opts value new-component)))
           (do (delete this component opts)
               (create this this-desc opts)))))
@@ -755,6 +763,10 @@
     (delete [_ component opts]
       (delete dynamic component opts))))
 
+(defn- reset-local-state [local-state-component new-initial-state]
+  (reset! (:ref local-state-component) new-initial-state)
+  (assoc local-state-component :initial-state new-initial-state))
+
 (def ext-local-state
   (reify Lifecycle
     (create [_ {:keys [initial-state desc]} opts]
@@ -771,17 +783,15 @@
                                   :swap-state swap-state}}
                           opts)}
           {`component/instance #(-> % :child component/instance)})))
-    (advance [this component {:keys [initial-state desc] :as this-desc} opts]
-      (if (= initial-state (:initial-state component))
-        (update component :child
-                #(advance
-                   ext-watcher
-                   %
-                   {:ref (:ref component)
-                    :desc {:fx/type ext-convey-local-state
-                           :desc desc
-                           :swap-state (:swap-state component)}} opts))
-        (do (delete this component opts)
-            (create this this-desc opts))))
+    (advance [_ component {:keys [initial-state desc]} opts]
+      (-> component
+          (cond-> (not= initial-state (:initial-state component)) (reset-local-state initial-state))
+          (update :child #(advance
+                            ext-watcher
+                            %
+                            {:ref (:ref component)
+                             :desc {:fx/type ext-convey-local-state
+                                    :desc desc
+                                    :swap-state (:swap-state component)}} opts))))
     (delete [_ component opts]
       (delete ext-watcher (:child component) opts))))
