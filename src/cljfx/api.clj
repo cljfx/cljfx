@@ -25,6 +25,8 @@
     - [[make-ext-with-props]] - create lifecycle that uses user-defined props
     - [[ext-watcher]] - watch an IRef as a component
     - [[ext-local-state]] - create a component with a local state
+    - [[ext-process]] - launch async background process
+    - [[ext-recreate-on-key-changed]] - recreate child component
   - automatic component lifecycle:
     - [[keyword->lifecycle]] - component/renderer `:fx.opt/type->lifecycle` opt function
       that returns lifecycle of keyword fx-types
@@ -261,27 +263,51 @@
   needed. The description must ensure that the returned root JavaFX node always stays the
   same.
 
-  Supported keys:
-  - `:ref` (required) - an IRef (e.g. atom, agent) that will be watched for updates
-  - `:desc` (required) - a component description that will receive an additional `:value`
-    key with the latest value from the IRef"
+  Supported keys (all required):
+    :ref     an IRef (e.g. atom, agent) that will be watched for updates
+    :desc    a component description that will receive an additional `:value` key with the
+             latest value from the IRef"
   lifecycle/ext-watcher)
 
 (def ext-local-state
   "Extension lifecycle that declaratively defines a stateful component
 
-  Supported keys:
-  - `:initial-state` (required) - the initial local state of the component. Whenever the
-    initial state changes, the local state will be discarded and re-created from scratch
-  - `:desc` (required) - the stateful component description that will receive 2 additional
-    keys:
-    - `:state` - current local state value
-    - `:swap-state` a retry-able vararg function that will update the local state when
-      invoked (same semantics as `clojure.core/swap!`). This function is intended to be
-      used in event handlers. It's safe to call from any thread as often as needed -
-      re-rendering will happen on JavaFX UI thread with the latest value
-    The description must ensure that the returned root JavaFX node always stays the same."
+  Supported keys (all required):
+    :initial-state    the initial local state of the component. Whenever the initial state
+                      changes, the state will be discarded and recreated from scratch
+    :desc             the stateful component description that will receive 2 additional
+                      keys:
+                        :state         current local state value
+                        :swap-state    a retry-able vararg function that will update the
+                                       local state when invoked (same semantics as
+                                       `clojure.core/swap!`). This function is intended to
+                                       be used in event handlers. It's safe to call from
+                                       any thread as often as needed - re-rendering will
+                                       happen on JavaFX UI thread with the latest value
+                      The description must ensure that the returned root JavaFX node
+                      always stays the same."
   lifecycle/ext-local-state)
+
+(def ext-process
+  "Extension lifecycle that declaratively defines a presumably asynchronous process
+
+  Supported keys (all required):
+    :fn      function that starts the async process; if returns a fn it will be called to
+             shut down the process when it's considered cancelled. Whenever it changes,
+             the process will be restarted.
+    :args    vector of args to :fn; whenever it changes, the process will be restarted
+    :desc    component description related to the process; will not receive any additional
+             props. Use e.g. `ext-local-state` and supply `swap-state` as fn arg to
+             communicate with the desc"
+  lifecycle/ext-process)
+
+(def ext-recreate-on-key-changed
+  "Extension lifecycle that re-creates its child lifecycle when needed
+
+  Supported keys (all required):
+    :key     a key that, when changed, will recreate the desc
+    :desc    the child component description"
+  lifecycle/ext-recreate-on-key-changed)
 
 (defn keyword->lifecycle
   "When given fitting keyword, returns lifecycle for corresponding JavaFX class

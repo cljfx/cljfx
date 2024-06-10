@@ -722,37 +722,39 @@
       (platform/run-later (perform-render state)))))
 
 (def ext-watcher
-  (reify Lifecycle
-    (create [_ {:keys [ref desc]} opts]
-      (let [state (atom {:component (create dynamic (assoc desc :value @ref) opts)
-                         :ref ref
-                         :desc desc
-                         :opts opts}
-                        :meta {`component/instance #(component/instance (:component @%))})]
-        (add-watch ref state #(request-render state %4))
-        state))
-    (advance [this component {:keys [ref desc] :as this-desc} opts]
-      (let [current-state @component
-            current-ref (:ref current-state)]
-        (if (= ref current-ref)
-          (let [value @ref
-                old-component (:component @component)
-                old-instance (component/instance old-component)
-                new-component (advance dynamic old-component (assoc desc :value value) opts)
-                new-instance (component/instance new-component)]
-            ;; we report error here because new instance won't be picked up, since
-            ;; instance for old component and new component will stay the same, because
-            ;; the component is the same atom
-            (when-not (= old-instance new-instance)
-              (throw (ex-info "Instance replace forbidden" {:old old-instance :new new-instance})))
-            (doto component (swap! complete-advance desc opts value new-component)))
-          (do (delete this component opts)
-              (create this this-desc opts)))))
-    (delete [_ component opts]
-      (let [current-state @component]
-        (remove-watch (:ref current-state) component)
-        (swap! component assoc :value ::deleted)
-        (delete dynamic (:component current-state) opts)))))
+  (annotate
+    (reify Lifecycle
+      (create [_ {:keys [ref desc]} opts]
+        (let [state (atom {:component (create dynamic (assoc desc :value @ref) opts)
+                           :ref ref
+                           :desc desc
+                           :opts opts}
+                          :meta {`component/instance #(component/instance (:component @%))})]
+          (add-watch ref state #(request-render state %4))
+          state))
+      (advance [this component {:keys [ref desc] :as this-desc} opts]
+        (let [current-state @component
+              current-ref (:ref current-state)]
+          (if (= ref current-ref)
+            (let [value @ref
+                  old-component (:component @component)
+                  old-instance (component/instance old-component)
+                  new-component (advance dynamic old-component (assoc desc :value value) opts)
+                  new-instance (component/instance new-component)]
+              ;; we report error here because new instance won't be picked up, since
+              ;; instance for old component and new component will stay the same, because
+              ;; the component is the same atom
+              (when-not (= old-instance new-instance)
+                (throw (ex-info "Instance replace forbidden" {:old old-instance :new new-instance})))
+              (doto component (swap! complete-advance desc opts value new-component)))
+            (do (delete this component opts)
+                (create this this-desc opts)))))
+      (delete [_ component opts]
+        (let [current-state @component]
+          (remove-watch (:ref current-state) component)
+          (swap! component assoc :value ::deleted)
+          (delete dynamic (:component current-state) opts))))
+    'cljfx.api/ext-watcher))
 
 (def ^:private ext-convey-local-state
   (reify Lifecycle
@@ -768,30 +770,74 @@
   (assoc local-state-component :initial-state new-initial-state))
 
 (def ext-local-state
-  (reify Lifecycle
-    (create [_ {:keys [initial-state desc]} opts]
-      (let [a (atom initial-state)
-            swap-state (partial swap! a)]
-        (with-meta
-          {:ref a
-           :swap-state swap-state
-           :initial-state initial-state
-           :child (create ext-watcher
-                          {:ref a
-                           :desc {:fx/type ext-convey-local-state
-                                  :desc desc
-                                  :swap-state swap-state}}
-                          opts)}
-          {`component/instance #(-> % :child component/instance)})))
-    (advance [_ component {:keys [initial-state desc]} opts]
-      (-> component
-          (cond-> (not= initial-state (:initial-state component)) (reset-local-state initial-state))
-          (update :child #(advance
-                            ext-watcher
-                            %
-                            {:ref (:ref component)
+  (annotate
+    (reify Lifecycle
+      (create [_ {:keys [initial-state desc]} opts]
+        (let [a (atom initial-state)
+              swap-state (partial swap! a)]
+          (with-meta
+            {:ref a
+             :swap-state swap-state
+             :initial-state initial-state
+             :child (create ext-watcher
+                            {:ref a
                              :desc {:fx/type ext-convey-local-state
                                     :desc desc
-                                    :swap-state (:swap-state component)}} opts))))
-    (delete [_ component opts]
-      (delete ext-watcher (:child component) opts))))
+                                    :swap-state swap-state}}
+                            opts)}
+            {`component/instance #(-> % :child component/instance)})))
+      (advance [_ component {:keys [initial-state desc]} opts]
+        (-> component
+            (cond-> (not= initial-state (:initial-state component)) (reset-local-state initial-state))
+            (update :child #(advance
+                              ext-watcher
+                              %
+                              {:ref (:ref component)
+                               :desc {:fx/type ext-convey-local-state
+                                      :desc desc
+                                      :swap-state (:swap-state component)}} opts))))
+      (delete [_ component opts]
+        (delete ext-watcher (:child component) opts)))
+    'cljfx.api/ext-local-state))
+
+(def ext-process
+  (annotate
+    (reify Lifecycle
+      (create [_ {:keys [args fn desc]} opts]
+        (let [ret (apply fn args)]
+          (with-meta
+            {:args args
+             :fn fn
+             :stop (when (fn? ret) ret)
+             :child (create dynamic desc opts)}
+            {`component/instance #(-> % :child component/instance)})))
+      (advance [_ component {:keys [args fn desc]} opts]
+        (let [new-component (update component :child #(advance dynamic % desc opts))]
+          (if (and (= args (:args component))
+                   (= fn (:fn component)))
+            new-component
+            (let [stop (:stop component)
+                  _ (when stop (stop))
+                  ret (apply fn args)]
+              (assoc new-component :args args :fn fn :stop (when (fn? ret) ret))))))
+      (delete [_ {:keys [stop child]} opts]
+        (when stop (stop))
+        (delete dynamic child opts)))
+    'cljfx.api/ext-process))
+
+(def ext-recreate-on-key-changed
+  (annotate
+    (reify Lifecycle
+      (create [_ {:keys [key desc]} opts]
+        (with-meta
+          {:key key
+           :child (create dynamic desc opts)}
+          {`component/instance #(-> % :child component/instance)}))
+      (advance [this component {:keys [key desc] :as this-desc} opts]
+        (if (= key (:key component))
+          (update component :child #(advance dynamic % desc opts))
+          (do (delete this component opts)
+              (create this this-desc opts))))
+      (delete [_ component opts]
+        (delete dynamic (:child component) opts)))
+    'cljfx.api/ext-recreate-on-key-changed))
