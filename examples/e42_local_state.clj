@@ -22,7 +22,7 @@
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene
-             :root {:fx/type fx/ext-local-state
+             :root {:fx/type fx/ext-state
                     :initial-state {:first-name "Vlops"
                                     :last-name "Props"}
                     :desc {:fx/type form-view}}}}))

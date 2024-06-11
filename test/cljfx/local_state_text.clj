@@ -12,7 +12,7 @@
                           :on-text-changed #(swap-state (constantly %))})
        ;; initial creation
        c1 (fx/create-component
-            {:fx/type fx/ext-local-state
+            {:fx/type fx/ext-state
              :initial-state "text"
              :desc {:fx/type text-field-view
                     :key 1}})
@@ -24,14 +24,14 @@
        ;; advance: change desc
        c2 (fx/advance-component
             c1
-            {:fx/type fx/ext-local-state
+            {:fx/type fx/ext-state
              :initial-state "text"
              :desc {:fx/type text-field-view
                     :key 2}})
        ;; advance: change initial state
        _ (fx/advance-component
            c2
-           {:fx/type fx/ext-local-state
+           {:fx/type fx/ext-state
             :initial-state "new initial text"
             :desc {:fx/type text-field-view
                    :key 2}})]

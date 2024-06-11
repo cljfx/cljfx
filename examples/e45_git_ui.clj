@@ -1,7 +1,6 @@
 (ns e45-git-ui
   (:require [cljfx.api :as fx]
             [cljfx.ext.list-view :as fx.ext.list-view]
-            [cljfx.lifecycle :as lifecycle]
             [clojure.java.io :as io]
             [clojure.java.shell :as sh]
             [clojure.string :as str])
@@ -12,7 +11,7 @@
            [javafx.stage DirectoryChooser]))
 
 ;; git log ui: shows changes and diffs for a selected directory.
-;; uses ext-process and ext-local-state for the state management.
+;; uses ext-effect and ext-state for the state management.
 
 (defn- sh! [opts & args]
   (let [{:keys [exit out err] :as ret} (apply sh/sh (if (map? opts)
@@ -140,7 +139,7 @@
   (let [{:keys [files diff]} detail
         selected-file (files state)
         diff (get diff selected-file)]
-    {:fx/type fx/ext-process
+    {:fx/type fx/ext-effect
      :args [dir sha diff selected-file swap-parent-state]
      :fn load-file-diff!
      :desc {:fx/type files-with-diff-view
@@ -154,7 +153,7 @@
     (if (seq files)
       {:fx/type fx/ext-recreate-on-key-changed
        :key sha
-       :desc {:fx/type fx/ext-local-state
+       :desc {:fx/type fx/ext-state
               :initial-state 0
               :desc {:fx/type commit-files-impl-view
                      :dir dir
@@ -167,7 +166,7 @@
   (let [{:keys [type files]} entry
         selected-file (files state)
         diff (get diff selected-file)]
-    {:fx/type fx/ext-process
+    {:fx/type fx/ext-effect
      :args [dir type diff selected-file swap-parent-state]
      :fn load-uncommitted-file-diff!
      :desc {:fx/type files-with-diff-view
@@ -180,7 +179,7 @@
   (let [{:keys [dir diff]} parent-state]
     {:fx/type fx/ext-recreate-on-key-changed
      :key (:type entry)
-     :desc {:fx/type fx/ext-local-state
+     :desc {:fx/type fx/ext-state
             :initial-state 0
             :desc {:fx/type uncommited-files-impl-view
                    :dir dir
@@ -201,12 +200,12 @@
 ;; here, state is a local state of the log view.
 
 (defn- log-impl-view [{:keys [state swap-state parent-state swap-parent-state]}]
-  (let [{:keys [log]} parent-state
-        {:keys [dir index details]} state
+  (let [{:keys [log dir]} parent-state
+        {:keys [index details]} state
         selected-entry (log index)
         maybe-sha (:sha selected-entry)
         maybe-detail (details maybe-sha)]
-    {:fx/type fx/ext-process
+    {:fx/type fx/ext-effect
      :args [dir maybe-sha maybe-detail swap-state]
      :fn load-commit-details!
      :desc {:fx/type :h-box
@@ -321,7 +320,7 @@
   (let [{:keys [dir]} state]
     {:fx/type fx/ext-recreate-on-key-changed
      :key dir
-     :desc {:fx/type fx/ext-local-state
+     :desc {:fx/type fx/ext-state
             :initial-state {:index 0 :details {}}
             :desc {:fx/type log-impl-view
                    :parent-state state
@@ -343,7 +342,7 @@
 
 (defn- root-view [{:keys [state swap-state]}]
   (let [{:keys [dir invalid log]} state]
-    {:fx/type fx/ext-process
+    {:fx/type fx/ext-effect
      :args [dir swap-state]
      :fn load-log!
      :desc {:fx/type :stage
@@ -376,7 +375,7 @@
                                                 (.getWindow (.getScene ^Node (.getTarget e))))]
                                  (swap-state #(-> %
                                                   (assoc :dir (.getCanonicalPath dir))
-                                                  (dissoc :invalid :log)))))}]}
+                                                  (dissoc :invalid :log :diff)))))}]}
                (cond
                  invalid
                  {:fx/type :label
@@ -396,6 +395,6 @@
 
 (fx/on-fx-thread
   (fx/create-component
-    {:fx/type fx/ext-local-state
+    {:fx/type fx/ext-state
      :initial-state {:dir (.getCanonicalPath (io/file "."))}
      :desc {:fx/type root-view}}))

@@ -24,7 +24,7 @@
     - [[ext-many]] - manage a vector of components
     - [[make-ext-with-props]] - create lifecycle that uses user-defined props
     - [[ext-watcher]] - watch an IRef as a component
-    - [[ext-local-state]] - create a component with a local state
+    - [[ext-state]] - create a component with a local state
     - [[ext-process]] - launch async background process
     - [[ext-recreate-on-key-changed]] - recreate child component
   - automatic component lifecycle:
@@ -269,12 +269,16 @@
              latest value from the IRef"
   lifecycle/ext-watcher)
 
-(def ext-local-state
+(def ext-state
   "Extension lifecycle that declaratively defines a stateful component
 
   Supported keys (all required):
     :initial-state    the initial local state of the component. Whenever the initial state
-                      changes, the state will be discarded and recreated from scratch
+                      changes, the state will be discarded and recreated from scratch. The
+                      child component, on the other hand, will not be discarded. Instead,
+                      it will advance to the new initial state. Use the helper
+                      `ext-recreate-on-key-changed` lifecycle if you need to recreate the
+                      JavaFX views on state reset.
     :desc             the stateful component description that will receive 2 additional
                       keys:
                         :state         current local state value
@@ -286,9 +290,11 @@
                                        happen on JavaFX UI thread with the latest value
                       The description must ensure that the returned root JavaFX node
                       always stays the same."
-  lifecycle/ext-local-state)
+  lifecycle/ext-state)
 
-(def ext-process
+;; todo one last thing to consider: :fx.opt/error-handler
+
+(def ext-effect
   "Extension lifecycle that declaratively defines a presumably asynchronous process
 
   Supported keys (all required):
@@ -297,9 +303,9 @@
              the process will be restarted.
     :args    vector of args to :fn; whenever it changes, the process will be restarted
     :desc    component description related to the process; will not receive any additional
-             props. Use e.g. `ext-local-state` and supply `swap-state` as fn arg to
+             props. Use e.g. `ext-state` and supply `swap-state` as fn arg to
              communicate with the desc"
-  lifecycle/ext-process)
+  lifecycle/ext-effect)
 
 (def ext-recreate-on-key-changed
   "Extension lifecycle that re-creates its child lifecycle when needed

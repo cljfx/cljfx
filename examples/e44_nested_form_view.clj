@@ -25,7 +25,7 @@
      :on-action (fn [_] (swap-text (constantly edit)))}))
 
 (defn text-field-view [{:keys [state swap-state]}]
-  {:fx/type fx/ext-local-state
+  {:fx/type fx/ext-state
    :initial-state {:text state :edit state}
    :desc {:fx/type text-field-impl-view
           :swap-text swap-state}})
@@ -90,7 +90,7 @@
                                           (swap-parent-state (constantly edit)))}]}]}))
 
 (defn committable-schema-view [{:keys [schema state swap-state]}]
-  {:fx/type fx/ext-local-state
+  {:fx/type fx/ext-state
    :initial-state {:current state :edit state}
    :desc {:fx/type committable-schema-impl-view
           :swap-parent-state swap-state
@@ -105,7 +105,7 @@
      :scene {:fx/type :scene
              :root {:fx/type :v-box
                     :padding 10
-                    :children [{:fx/type fx/ext-local-state
+                    :children [{:fx/type fx/ext-state
                                 :initial-state {:first-name "Vlop"
                                                 :last-name "Prop"
                                                 :cool true}

@@ -3,6 +3,24 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.9.0](https://github.com/cljfx/cljfx/releases/tag/1.8.0) - 2024-06-10
+
+- Changed event handler semantics. Now, even when cljfx description's event  
+  handler changes, the JavaFX EventHandler/ChangeListener object stays the same.
+  We no longer check for equality to replace event handlers, instead we simply
+  update the reference to the latest handler in the state. This improves 
+  performance and makes map events unnecessary.
+- Added new extension lifecycles:
+  - `ext-watcher` - watches an IRef. This makes `renderer` concept unnecessary.
+  - `ext-state` - creates and manages a local mutable state. This helps
+    to decouple independent parts of the cljfx application. This extension 
+    lifecycle is semantically similar to the React `useState` hook.
+  - `ext-effect` - launches a cancellable asynchronous process. This is useful
+    to do asynchronous side effects in conjunction with `ext-state`. This
+    extension lifecycle is semantically similar to the React `useEffect` hook.
+  - `ext-recreate-on-key-changed` - helper lifecycle that may be composed with
+    `ext-state` to force a local state and view reset.
+
 ### [1.8.0](https://github.com/cljfx/cljfx/releases/tag/1.8.0) - 2024-01-07
 - Support both JDK 8, 11 and 17, automatically picking the newest dependencies 
   available

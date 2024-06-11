@@ -15,7 +15,7 @@
                :on-text-changed #(swap-text (constantly %))}]})
 
 (defn- parent-view [{readonly :state swap-readonly :swap-state}]
-  {:fx/type fx/ext-local-state
+  {:fx/type fx/ext-state
    :initial-state "my text"
    :desc {:fx/type text-view
           :readonly readonly
@@ -26,8 +26,6 @@
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene
-             :root {:fx/type fx/ext-local-state
+             :root {:fx/type fx/ext-state
                     :initial-state true
                     :desc {:fx/type parent-view}}}}))
-
-;; todo tests for ext-watcher, ext-local-state

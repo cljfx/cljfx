@@ -769,7 +769,7 @@
   (reset! (:ref local-state-component) new-initial-state)
   (assoc local-state-component :initial-state new-initial-state))
 
-(def ext-local-state
+(def ext-state
   (annotate
     (reify Lifecycle
       (create [_ {:keys [initial-state desc]} opts]
@@ -798,9 +798,9 @@
                                       :swap-state (:swap-state component)}} opts))))
       (delete [_ component opts]
         (delete ext-watcher (:child component) opts)))
-    'cljfx.api/ext-local-state))
+    'cljfx.api/ext-state))
 
-(def ext-process
+(def ext-effect
   (annotate
     (reify Lifecycle
       (create [_ {:keys [args fn desc]} opts]
@@ -823,7 +823,7 @@
       (delete [_ {:keys [stop child]} opts]
         (when stop (stop))
         (delete dynamic child opts)))
-    'cljfx.api/ext-process))
+    'cljfx.api/ext-effect))
 
 (def ext-recreate-on-key-changed
   (annotate
