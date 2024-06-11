@@ -3,7 +3,7 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.9.0](https://github.com/cljfx/cljfx/releases/tag/1.8.0) - 2024-06-10
+### [1.9.0](https://github.com/cljfx/cljfx/releases/tag/1.9.0) - 2024-06-10
 
 - Changed event handler semantics. Now, even when cljfx description's event  
   handler changes, the JavaFX EventHandler/ChangeListener object stays the same.

@@ -292,8 +292,6 @@
                       always stays the same."
   lifecycle/ext-state)
 
-;; todo one last thing to consider: :fx.opt/error-handler
-
 (def ext-effect
   "Extension lifecycle that declaratively defines a presumably asynchronous process
 

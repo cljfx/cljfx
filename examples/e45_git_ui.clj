@@ -346,6 +346,7 @@
      :args [dir swap-state]
      :fn load-log!
      :desc {:fx/type :stage
+            :title "Git UI"
             :width 1400
             :height 768
             :showing true
