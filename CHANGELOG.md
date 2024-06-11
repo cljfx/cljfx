@@ -21,6 +21,18 @@ documented in this file.
   - `ext-recreate-on-key-changed` - helper lifecycle that may be composed with
     `ext-state` to force a local state and view reset.
 
+This is a small update in terms of new features, but it represents lessons 
+learned from 5 years of using cljfx. In the beginning, cljfx strived to be a UI
+framework like re-frame: single atom with a data structure that describes the 
+whole UI state (using `renderer` abstraction). This conceptual simplicity has a 
+heavy trade-off: with a single mutable state, every isolated component, if it 
+has some state in it, must be a part of a big global thing. Starting with cljfx
+1.9.0, it's now possible to have isolated stateful components with their state
+stored in the cljfx component tree. Check out new examples showing the features:
+- [minimal local mutable state example](https://github.com/cljfx/cljfx/blob/master/examples/e42_local_state.clj)
+- [more advanced local state example with nesting and communicating changes](https://github.com/cljfx/cljfx/blob/master/examples/e44_nested_form_view.clj)
+- [super advanced example that uses all new features to define a git log viewer with auto-updates and on-demand history loading](https://github.com/cljfx/cljfx/blob/master/examples/e45_git_ui.clj)
+
 ### [1.8.0](https://github.com/cljfx/cljfx/releases/tag/1.8.0) - 2024-01-07
 - Support both JDK 8, 11 and 17, automatically picking the newest dependencies 
   available
