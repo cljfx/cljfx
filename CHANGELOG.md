@@ -3,12 +3,12 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
-### [1.9.0](https://github.com/cljfx/cljfx/releases/tag/1.9.0) - 2024-06-10
+### [1.9.0](https://github.com/cljfx/cljfx/releases/tag/1.9.0) - 2024-06-11
 
 - Changed event handler semantics. Now, even when cljfx description's event  
   handler changes, the JavaFX EventHandler/ChangeListener object stays the same.
-  We no longer check for equality to replace event handlers, instead we simply
-  update the reference to the latest handler in the state. This improves 
+  We no longer check for equality to replace event handlers, instead we only
+  update the reference to the current handler in the state. This improves 
   performance and makes map events unnecessary.
 - Added new extension lifecycles:
   - `ext-watcher` - watches an IRef. This makes `renderer` concept unnecessary.
