@@ -116,6 +116,7 @@
      :menu-item (lazy-load cljfx.fx.menu-item/lifecycle)
      :check-menu-item (lazy-load cljfx.fx.check-menu-item/lifecycle)
      :custom-menu-item (lazy-load cljfx.fx.custom-menu-item/lifecycle)
+     :separator-menu-item (lazy-load cljfx.fx.separator-menu-item/lifecycle)
      :menu (lazy-load cljfx.fx.menu/lifecycle)
      :radio-menu-item (lazy-load cljfx.fx.radio-menu-item/lifecycle)
      :tooltip (lazy-load cljfx.fx.tooltip/lifecycle)

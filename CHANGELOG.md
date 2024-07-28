@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.9.1](https://github.com/cljfx/cljfx/releases/tag/1.9.1) - 2024-07-28
+
+- Add missing `:separator-menu-item` lifecycle (see [example](https://github.com/cljfx/cljfx/blob/master/examples/e46_menu_items.clj))
+
 ### [1.9.0](https://github.com/cljfx/cljfx/releases/tag/1.9.0) - 2024-06-11
 
 - Changed event handler semantics. Now, even when cljfx description's event  
