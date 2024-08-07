@@ -160,19 +160,18 @@
                       desc-kind (if (map? desc) :map (if (fn? desc) :fn :else))]
                   (if (not (identical? desc-kind component-kind))
                     (create-event-handler-component desc opts)
-                    (let [vol (:volatile component)]
-                      (case component-kind
-                        :map
-                        (if (= (:fx.opt/map-event-handler component)
-                               (:fx.opt/map-event-handler opts))
-                          (do (vreset! vol desc) component)
-                          (create-event-handler-component desc opts))
-                        :fn
-                        (do (vreset! vol desc) component)
-                        :else
-                        (if (= desc @vol)
-                          component
-                          (create-event-handler-component desc opts)))))))
+                    (case component-kind
+                      :map
+                      (if (= (:fx.opt/map-event-handler component)
+                             (:fx.opt/map-event-handler opts))
+                        (do (vreset! (:volatile component) desc) component)
+                        (create-event-handler-component desc opts))
+                      :fn
+                      (do (vreset! (:volatile component) desc) component)
+                      :else
+                      (if (= desc (:value component))
+                        component
+                        (create-event-handler-component desc opts))))))
      `delete (fn [_ _ _])}))
 
 (def change-listener

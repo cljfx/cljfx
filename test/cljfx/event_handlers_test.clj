@@ -74,3 +74,17 @@
             {:map-event-handler :second
              :fx/event "text 5"}]
            @events))))
+
+(deftest test-swapping-else-handlers
+  (let [handler (reify ChangeListener
+                  (changed [_ _ _ _]))
+        c1 (fx/create-component
+             {:fx/type :text-field
+              :on-text-changed handler})]
+    (try
+      (fx/advance-component
+        c1
+        {:fx/type :text-field
+         :on-text-changed handler})
+      (catch Exception e
+        (is false (str e))))))
