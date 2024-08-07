@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.9.2](https://github.com/cljfx/cljfx/releases/tag/1.9.2) - 2024-08-07
+
+- Fix advancing the component tree when event handler is a ChangeListener 
+  instance (instead of e.g. a map or a function)
+
 ### [1.9.1](https://github.com/cljfx/cljfx/releases/tag/1.9.1) - 2024-07-28
 
 - Add missing `:separator-menu-item` lifecycle (see [example](https://github.com/cljfx/cljfx/blob/master/examples/e46_menu_items.clj))
