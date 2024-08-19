@@ -6,7 +6,7 @@
 (defmacro run-later [& body]
   `(let [*result# (promise)]
      (Platform/runLater
-       (fn []
+       (bound-fn []
          (let [result# (try
                          [nil (do ~@body)]
                          (catch Exception e#

@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.9.3](https://github.com/cljfx/cljfx/releases/tag/1.9.3) - 2024-08-19
+
+- convey thread bindings in `run-later` and `on-fx-thread`
+
 ### [1.9.2](https://github.com/cljfx/cljfx/releases/tag/1.9.2) - 2024-08-07
 
 - Fix advancing the component tree when event handler is a ChangeListener 
