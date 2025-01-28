@@ -19,7 +19,7 @@
    :on-value-changed {:event/type ::set-volume}})
 
 (def media-url
-  "https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_1mb.mp4")
+  "https://www.sample-videos.com/video321/mp4/480/big_buck_bunny_480p_1mb.mp4")
 
 (defn media-view [{:keys [media-state volume]}]
   {:fx/type :media-view
