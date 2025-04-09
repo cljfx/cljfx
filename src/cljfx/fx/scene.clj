@@ -2,8 +2,10 @@
   "Part of a public API"
   (:require [cljfx.composite :as composite]
             [cljfx.coerce :as coerce]
-            [cljfx.lifecycle :as lifecycle])
-  (:import [javafx.scene Scene]
+            [cljfx.lifecycle :as lifecycle]
+            [cljfx.mutator :as mutator])
+  (:import [javafx.event Event EventHandler]
+           [javafx.scene Scene]
            [javafx.geometry NodeOrientation]))
 
 (set! *warn-on-reflection* true)
@@ -22,6 +24,15 @@
     :camera [:setter lifecycle/dynamic :default {:fx/type :parallel-camera}]
     :cursor [:setter lifecycle/scalar :coerce coerce/cursor]
     :event-dispatcher [:setter lifecycle/scalar]
+    ; takes an event description that receives filtered Events with event type Event/ANY
+    :event-filter [(mutator/adder-remover
+                     #(.addEventFilter ^Scene %1 Event/ANY ^EventHandler %2)
+                     #(.removeEventFilter ^Scene %1 Event/ANY ^EventHandler %2))
+                   (lifecycle/wrap-coerce lifecycle/event-handler coerce/event-handler)]
+    :event-handler [(mutator/adder-remover
+                      #(.addEventHandler ^Scene %1 Event/ANY ^EventHandler %2)
+                      #(.removeEventHandler ^Scene %1 Event/ANY ^EventHandler %2))
+                    (lifecycle/wrap-coerce lifecycle/event-handler coerce/event-handler)]
     :fill [:setter lifecycle/scalar :coerce coerce/paint :default :white]
     :node-orientation [:setter lifecycle/scalar :coerce (coerce/enum NodeOrientation)]
     :on-context-menu-requested [:setter lifecycle/event-handler

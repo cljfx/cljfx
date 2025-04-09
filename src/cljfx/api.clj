@@ -265,8 +265,9 @@
 
   Supported keys (all required):
     :ref     an IRef (e.g. atom, agent) that will be watched for updates
-    :desc    a component description that will receive an additional `:value` key with the
-             latest value from the IRef"
+    :key     a key to use when passing the value to a wrapped component, default `:value`
+    :desc    a component description that will receive an additional key with the latest
+             value from the IRef"
   lifecycle/ext-watcher)
 
 (def ext-state

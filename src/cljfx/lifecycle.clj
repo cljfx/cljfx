@@ -685,9 +685,9 @@
       (cond-> (= value (:value old-state))
         (dissoc :value))))
 
-(defn- complete-advance [old-state desc opts value new-component]
+(defn- complete-advance [old-state desc key opts value new-component]
   (-> old-state
-      (assoc :desc desc :opts opts)
+      (assoc :desc desc :key key :opts opts)
       (complete-rendering value new-component)))
 
 (defn- perform-render [state]
@@ -698,9 +698,9 @@
         ;; to re-render by dissoc-ing the :value
         value (:value current-state ::deleted)]
     (when-not (identical? value ::deleted)
-      (let [{:keys [desc opts component]} current-state
+      (let [{:keys [desc key opts component]} current-state
             old-instance (component/instance component)
-            new-component (advance root component (assoc desc :value value) opts)
+            new-component (advance root component (assoc desc key value) opts)
             new-instance (component/instance new-component)
             _ (when-not (= old-instance new-instance)
                 (throw (ex-info "Instance replace forbidden"
@@ -723,29 +723,30 @@
 (def ext-watcher
   (annotate
     (reify Lifecycle
-      (create [_ {:keys [ref desc]} opts]
-        (let [state (atom {:component (create dynamic (assoc desc :value @ref) opts)
+      (create [_ {:keys [ref desc key] :or {key :value}} opts]
+        (let [state (atom {:component (create dynamic (assoc desc key @ref) opts)
                            :ref ref
                            :desc desc
+                           :key key
                            :opts opts}
                           :meta {`component/instance #(component/instance (:component @%))})]
           (add-watch ref state #(request-render state %4))
           state))
-      (advance [this component {:keys [ref desc] :as this-desc} opts]
+      (advance [this component {:keys [ref desc key] :or {key :value} :as this-desc} opts]
         (let [current-state @component
               current-ref (:ref current-state)]
           (if (= ref current-ref)
             (let [value @ref
                   old-component (:component @component)
                   old-instance (component/instance old-component)
-                  new-component (advance dynamic old-component (assoc desc :value value) opts)
+                  new-component (advance dynamic old-component (assoc desc key value) opts)
                   new-instance (component/instance new-component)]
               ;; we report error here because new instance won't be picked up, since
               ;; instance for old component and new component will stay the same, because
               ;; the component is the same atom
               (when-not (= old-instance new-instance)
                 (throw (ex-info "Instance replace forbidden" {:old old-instance :new new-instance})))
-              (doto component (swap! complete-advance desc opts value new-component)))
+              (doto component (swap! complete-advance desc key opts value new-component)))
             (do (delete this component opts)
                 (create this this-desc opts)))))
       (delete [_ component opts]

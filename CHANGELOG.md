@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.9.4](https://github.com/cljfx/cljfx/releases/tag/1.9.4) - 2025-04-09
+
+- add `:key` prop to `fx/ext-watcher`
+- add `:event-filter` and `:event-handler` props to `:scene`
+
 ### [1.9.3](https://github.com/cljfx/cljfx/releases/tag/1.9.3) - 2024-08-19
 
 - convey thread bindings in `run-later` and `on-fx-thread`
