@@ -280,15 +280,17 @@
                       it will advance to the new initial state. Use the helper
                       `ext-recreate-on-key-changed` lifecycle if you need to recreate the
                       JavaFX views on state reset.
+    :key              a key to use when passing the current local state to the wrapped
+                      component, default `:state`
+    :swap-key         a key to use when passing the state updater function to the wrapped
+                      component, default `:swap-state`; the updater function is a
+                      retry-able vararg function that will update the local state when
+                      invoked (same semantics as `clojure.core/swap!`). This function is
+                      intended to be used in event handlers. It's safe to call from any
+                      thread as often as needed - re-rendering will happen on JavaFX UI
+                      thread with the latest value
     :desc             the stateful component description that will receive 2 additional
-                      keys:
-                        :state         current local state value
-                        :swap-state    a retry-able vararg function that will update the
-                                       local state when invoked (same semantics as
-                                       `clojure.core/swap!`). This function is intended to
-                                       be used in event handlers. It's safe to call from
-                                       any thread as often as needed - re-rendering will
-                                       happen on JavaFX UI thread with the latest value
+                      keys defined by `:key` and `:swap-key` props
                       The description must ensure that the returned root JavaFX node
                       always stays the same."
   lifecycle/ext-state)

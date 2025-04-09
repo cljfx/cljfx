@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.9.5](https://github.com/cljfx/cljfx/releases/tag/1.9.5) - 2025-04-09
+
+- add `:key` and `:swap-key` props to `fx/ext-state`
+
 ### [1.9.4](https://github.com/cljfx/cljfx/releases/tag/1.9.4) - 2025-04-09
 
 - add `:key` prop to `fx/ext-watcher`

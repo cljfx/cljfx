@@ -51,6 +51,9 @@
         _ (is (= "Some text" (.getPromptText text-field)))
         _ (reset! state "Another text")
         _ @(fx/run-later "Waiting...")
+        _ @(fx/run-later "Waiting...")
+        _ @(fx/run-later "Waiting...")
+        _ @(fx/run-later "Waiting...")
         _ (is (= "Another text" (.getPromptText text-field)))
         _ (is (nil? (.getText text-field)))]
     (fx/delete-component c2)
