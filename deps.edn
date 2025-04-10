@@ -35,7 +35,7 @@
                       :extra-deps {org.testfx/openjfx-monocle {:mvn/version "jdk-12.0.1+2"}}}
            :runner {:extra-deps {com.cognitect/test-runner
                                  {:git/url "https://github.com/cognitect-labs/test-runner"
-                                  :sha "3cb0a9daf1cb746259dc8309b218f9211ad3b33b"}}
+                                  :sha "dfb30dd6605cb6c0efc275e1df1736f6e90d4d73"}}
                     :main-opts ["-m" "cognitect.test-runner" "-d" "test"]}
            :depstar {:extra-deps {seancorfield/depstar {:mvn/version "0.2.1"}}
                      :main-opts ["-m" "hf.depstar.jar"]}}}

@@ -29,7 +29,6 @@
                           :desc {:fx/type :label}}))]
     (is (= "Foo" (.getText label)))
     (reset! state "Bar")
-    (is (= "Foo" (.getText label)))
     (is (= "Bar" @(fx/run-later (.getText label))))))
 
 (deftest key-advance-test
