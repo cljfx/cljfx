@@ -765,14 +765,16 @@
     (delete [_ component opts]
       (delete dynamic component opts))))
 
-(defn- reset-local-state [local-state-component new-initial-state]
-  (reset! (:ref local-state-component) new-initial-state)
+(defn- reset-local-state [local-state-component new-initial-state reset-fn]
+  (swap! (:ref local-state-component) reset-fn new-initial-state)
   (assoc local-state-component :initial-state new-initial-state))
+
+(defn- default-reset-local-state-fn [_old new] new)
 
 (def ext-state
   (annotate
     (reify Lifecycle
-      (create [_ {:keys [initial-state desc key swap-key] :or {key :state swap-key :swap-state}} opts]
+      (create [_ {:keys [initial-state desc] :as this-desc} opts]
         (let [a (atom initial-state)
               swap-state (partial swap! a)]
           (with-meta
@@ -784,13 +786,14 @@
                              :desc {:fx/type ext-convey-local-state
                                     :desc desc
                                     :swap-state swap-state
-                                    :key key
-                                    :swap-key swap-key}}
+                                    :key (:key this-desc :state)
+                                    :swap-key (:swap-key this-desc :swap-state)}}
                             opts)}
             {`component/instance #(-> % :child component/instance)})))
-      (advance [_ component {:keys [initial-state desc key swap-key] :or {key :state swap-key :swap-state}} opts]
+      (advance [_ component {:keys [initial-state desc] :as this-desc} opts]
         (-> component
-            (cond-> (not= initial-state (:initial-state component)) (reset-local-state initial-state))
+            (cond-> (not= initial-state (:initial-state component))
+                    (reset-local-state initial-state (:reset this-desc default-reset-local-state-fn)))
             (update :child #(advance
                               ext-watcher
                               %
@@ -798,8 +801,8 @@
                                :desc {:fx/type ext-convey-local-state
                                       :desc desc
                                       :swap-state (:swap-state component)
-                                      :key key
-                                      :swap-key swap-key}} opts))))
+                                      :key (:key this-desc :state)
+                                      :swap-key (:swap-key this-desc :swap-state)}} opts))))
       (delete [_ component opts]
         (delete ext-watcher (:child component) opts)))
     'cljfx.api/ext-state))

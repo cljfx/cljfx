@@ -1,6 +1,7 @@
 (ns cljfx.local-state-test
   (:require [cljfx.api :as fx]
             [cljfx.lifecycle :as lifecycle]
+            [clojure.string :as str]
             [clojure.test :refer :all])
   (:import [javafx.scene.control TextField]))
 
@@ -66,7 +67,8 @@
                  events)))))))
 
 (deftest key-test
-  (binding [*test-out* *out*]
+  (binding [lifecycle/*in-progress?* false
+            *test-out* *out*]
     (let [refresh-events (atom [])
           text-field-view (fn [{:keys [text prompt-text swap-text] :as props}]
                             (swap! refresh-events conj props)
@@ -108,3 +110,28 @@
               {:prompt-text "bar"
                :swap-text swap-text}]
              @refresh-events)))))
+
+(deftest reset-test
+  (binding [lifecycle/*in-progress?* false
+            *test-out* *out*]
+    (let [text-field (fn [{:keys [state]}]
+                       {:fx/type :text-field
+                        :text (str/join "," state)})
+          view (fn [{:keys [key]}]
+                 {:fx/type fx/ext-state
+                  :initial-state [key]
+                  :reset into
+                  :desc {:fx/type text-field}})
+          c (fx/create-component {:fx/type view :key :a})
+          ^TextField instance (fx/instance c)
+          _ (is (= ":a" (.getText instance)))
+          c (fx/advance-component c {:fx/type view :key :a})
+          _ (is (= ":a" (.getText instance)))
+          c (fx/advance-component c {:fx/type view :key :b})
+          _ (is (= ":a,:b" (.getText instance)))
+          c (fx/advance-component c {:fx/type view :key :b})
+          _ (is (= ":a,:b" (.getText instance)))
+          c (fx/advance-component c {:fx/type view :key :c})
+          _ (is (= ":a,:b,:c" (.getText instance)))
+          c (fx/advance-component c {:fx/type view :key :c})
+          _ (is (= ":a,:b,:c" (.getText instance)))])))
