@@ -3,7 +3,28 @@
 
   Shape of a prop config is internal and subject to change"
   (:require [cljfx.component :as component]
-            [cljfx.mutator :as mutator]))
+            [cljfx.mutator :as mutator])
+  (:import [clojure.lang IHashEq Util]))
+
+(set! *warn-on-reflection* true)
+
+(deftype Prop [mutator lifecycle coerce]
+  IHashEq
+  (hasheq [_]
+    (-> (Util/hasheq mutator)
+        (Util/hashCombine (Util/hasheq lifecycle))
+        (Util/hashCombine (Util/hasheq coerce))))
+  Object
+  (hashCode [_]
+    (-> (Util/hash mutator)
+        (Util/hashCombine (Util/hash lifecycle))
+        (Util/hashCombine (Util/hash coerce))))
+  (equals [_ that]
+    (and (instance? Prop that)
+         (let [^Prop that that]
+           (and (= mutator (.-mutator that))
+                (= lifecycle (.-lifecycle that))
+                (= coerce (.-coerce that)))))))
 
 (defn make
   "Creates a prop config that describes how to manage a prop value and how to assign it
@@ -19,30 +40,33 @@
   [mutator lifecycle & {:keys [coerce default]
                         :or {coerce identity
                              default ::no-default}}]
-  {:mutator (if (= default ::no-default)
-              mutator
-              (mutator/wrap-default mutator default))
-   :lifecycle lifecycle
-   :coerce coerce})
+  (->Prop (if (= default ::no-default)
+            mutator
+            (mutator/wrap-default mutator default))
+          lifecycle
+          coerce))
 
-(defn lifecycle [prop]
-  (:lifecycle prop))
+(defn lifecycle [^Prop prop]
+  (.-lifecycle prop))
 
-(defn coerce [prop component]
-  ((:coerce prop) (component/instance component)))
+(defn coerce [^Prop prop component]
+  ((.-coerce prop) (component/instance component)))
 
-(defn assign! [prop instance component]
-  (let [{:keys [mutator coerce]} prop]
-    (mutator/assign! mutator instance coerce (component/instance component))))
+(defn assign! [^Prop prop instance component]
+  (mutator/assign! (.-mutator prop) instance (.-coerce prop) (component/instance component)))
 
-(defn replace! [prop instance old-component new-component]
-  (let [{:keys [mutator coerce]} prop]
-    (mutator/replace! mutator
-                      instance
-                      coerce
-                      (component/instance old-component)
-                      (component/instance new-component))))
+(defn replace! [^Prop prop instance old-component new-component]
+  (mutator/replace! (.-mutator prop)
+                    instance
+                    (.-coerce prop)
+                    (component/instance old-component)
+                    (component/instance new-component)))
 
-(defn retract! [prop instance component]
-  (let [{:keys [mutator coerce]} prop]
-    (mutator/retract! mutator instance coerce (component/instance component))))
+(defn retract! [^Prop prop instance component]
+  (mutator/retract! (.-mutator prop) instance (.-coerce prop) (component/instance component)))
+
+(defn from [props-config k]
+  (let [ret (get props-config k k)]
+    (if (instance? Prop ret)
+      ret
+      (throw (ex-info (str "No such prop: " (pr-str k)) {:prop k})))))

@@ -207,21 +207,21 @@
           (and (some? old-e) (some? new-e))
           (let [component (val old-e)
                 desc (val new-e)
-                prop-config (get props-config k)
-                new-component (advance (prop/lifecycle prop-config) component desc opts)]
-            (prop/replace! prop-config instance component new-component)
+                prop (prop/from props-config k)
+                new-component (advance (prop/lifecycle prop) component desc opts)]
+            (prop/replace! prop instance component new-component)
             (assoc acc k new-component))
 
           (some? old-e)
-          (let [prop-config (get props-config k)]
-            (prop/retract! prop-config instance (val old-e))
-            (delete (prop/lifecycle prop-config) (val old-e) opts)
+          (let [prop (prop/from props-config k)]
+            (prop/retract! prop instance (val old-e))
+            (delete (prop/lifecycle prop) (val old-e) opts)
             (dissoc acc k))
 
           :else
-          (let [prop-config (get props-config k)
-                component (create (prop/lifecycle prop-config) (val new-e) opts)]
-            (prop/assign! prop-config instance component)
+          (let [prop (prop/from props-config k)
+                component (create (prop/lifecycle prop) (val new-e) opts)]
+            (prop/assign! prop instance component)
             (assoc acc k component)))))
     props
     (set/union (set (keys props)) (set (keys props-desc)))))
@@ -371,13 +371,13 @@
                prop-desc (select-keys desc prop-key-set)
                props (reduce
                        (fn [acc k]
-                         (assoc acc k (create (prop/lifecycle (get props-config k))
+                         (assoc acc k (create (prop/lifecycle (prop/from props-config k))
                                               (get prop-desc k)
                                               opts)))
                        prop-desc
                        (keys prop-desc))]
            (doseq [[k v] props]
-             (prop/assign! (get props-config k) instance v))
+             (prop/assign! (prop/from props-config k) instance v))
            (with-meta {:child child
                        :props props}
                       {`component/instance #(-> % :child component/instance)})))
@@ -396,13 +396,13 @@
              (do
                ;; TODO this is wrong, should re-create props
                (doseq [[k v] props-desc]
-                 (prop/assign! (get props-config k) new-instance v))
+                 (prop/assign! (prop/from props-config k) new-instance v))
                (assoc with-child :props props-desc)))))
 
        `delete
        (fn [_ component opts]
          (doseq [[k v] (:props component)]
-           (delete (prop/lifecycle (get props-config k)) v opts))
+           (delete (prop/lifecycle (prop/from props-config k)) v opts))
          (delete lifecycle (:child component) opts))})))
 
 (defn- props-on [props-config instance]
@@ -410,7 +410,7 @@
     (create [_ desc opts]
       (reduce-kv
         (fn [acc k v]
-          (let [prop (get props-config k)
+          (let [prop (prop/from props-config k)
                 prop-value (create (prop/lifecycle prop) v opts)]
             (prop/assign! prop instance prop-value)
             (assoc acc k prop-value)))
@@ -420,7 +420,7 @@
       (advance-prop-map component desc props-config instance opts))
     (delete [_ component opts]
       (doseq [[k v] component]
-        (delete (prop/lifecycle (get props-config k)) v opts)))))
+        (delete (prop/lifecycle (prop/from props-config k)) v opts)))))
 
 (defn make-ext-with-props [lifecycle props-config]
   (annotate (reify Lifecycle

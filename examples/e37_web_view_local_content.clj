@@ -8,17 +8,15 @@
 ;; Short snippet demonstrating how to display local content in a WebView
 ;; with a custom prop
 
-(def ext-with-html
-  (fx/make-ext-with-props
-    {:html (fx.prop/make
-             (fx.mutator/setter #(.loadContent (.getEngine ^WebView %1) %2))
-             fx.lifecycle/scalar)}))
+(def prop-html
+  (fx.prop/make
+    (fx.mutator/setter #(.loadContent (.getEngine ^WebView %1) %2))
+    fx.lifecycle/scalar))
 
 (fx/on-fx-thread
   (fx/create-component
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene
-             :root {:fx/type ext-with-html
-                    :props {:html "<h1>hello html!</h1>"}
-                    :desc {:fx/type :web-view}}}}))
+             :root {:fx/type :web-view
+                    prop-html "<h1>hello html!</h1>"}}}))

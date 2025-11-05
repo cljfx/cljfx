@@ -12,17 +12,17 @@
 ;; This example requires one additional property from web-view in order to understand when a link on a web page has been
 ;; clicked. See the README.md and e21-extension-lifecycle for some additional examples of this.
 
-(def web-view-with-ext-props
-  (fx/make-ext-with-props
-   {:on-location-changed (prop/make (mutator/property-change-listener
-                                      #(.locationProperty (.getEngine ^WebView %)))
-                                    lifecycle/change-listener)}))
+(def prop-on-location-changed
+  (prop/make (mutator/property-change-listener
+               #(.locationProperty (.getEngine ^WebView %)))
+             lifecycle/change-listener))
+
 ;; A well known URL
 (def home-url "https://www.google.com")
 
 ;; The strategy here is to have a partial-url associated with the text field so that typing into the text field
 ;; does not act as a URL until the return button is pressed. The resulting url is checked to see if the (usually omitted)
-;; http:// is prepended, if not - it adds it then loads the web-view vis the :url keyword.
+;; http:// is prepended, if not - it adds it then loads the web-view via the :url keyword.
 
 (def *state (atom {::partial-url home-url
                    ::current-url home-url}))
@@ -41,12 +41,11 @@
 
 ;; The web-pane function returns the extended web-view that has the additional property :on-location-changed installed.
 (defn web-pane [{:keys [state]}]
-  {:fx/type web-view-with-ext-props
-   :desc {:fx/type :web-view
-          :pref-height 1000
-          :pref-width 1500
-          :url (::current-url state)}
-   :props {:on-location-changed {:event/type ::url-changed}}})
+  {:fx/type :web-view
+   :pref-height 1000
+   :pref-width 1500
+   :url (::current-url state)
+   prop-on-location-changed {:event/type ::url-changed}})
 
 (defn body-pane [{:keys [state]}]
   {:fx/type :v-box

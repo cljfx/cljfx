@@ -99,4 +99,4 @@
                       _ (.removeListener (.itemProperty cell) on-item-changed)
                       _ (.removeListener (.emptyProperty cell) on-empty-changed)]
                 [k v] props]
-          (lifecycle/delete (prop/lifecycle (get props-config k)) v opts))))))
+          (lifecycle/delete (prop/lifecycle (prop/from props-config k)) v opts))))))
