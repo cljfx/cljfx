@@ -3,6 +3,22 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.0](https://github.com/cljfx/cljfx/releases/tag/1.10.0) - 2025-11-06
+
+Allow prop instances to be used directly in composite lifecycles, e.g.:
+```clj
+(def prop-userdata
+  (fx.prop/make (fx.mutator/setter #(.setUserData ^Node %1 %2)) fx.lifecycle/scalar))
+  
+(.getUserData
+  ^Node 
+  (fx/instance 
+    (fx/create-component 
+      {:fx/type :text-field 
+       prop-userdata 1})))
+=> 1
+```
+
 ### [1.9.6](https://github.com/cljfx/cljfx/releases/tag/1.9.6) - 2025-10-10
 
 - add `:reset` prop to `fx/ext-state`

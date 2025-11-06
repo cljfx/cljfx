@@ -4,11 +4,16 @@
   Shape of a prop config is internal and subject to change"
   (:require [cljfx.component :as component]
             [cljfx.mutator :as mutator])
-  (:import [clojure.lang IHashEq Util]))
+  (:import [clojure.lang IHashEq IObj Util]))
 
 (set! *warn-on-reflection* true)
 
-(deftype Prop [mutator lifecycle coerce]
+(deftype Prop [meta mutator lifecycle coerce]
+  IObj
+  (meta [_]
+    meta)
+  (withMeta [_ m]
+    (Prop. m mutator lifecycle coerce))
   IHashEq
   (hasheq [_]
     (-> (Util/hasheq mutator)
@@ -40,11 +45,13 @@
   [mutator lifecycle & {:keys [coerce default]
                         :or {coerce identity
                              default ::no-default}}]
-  (->Prop (if (= default ::no-default)
-            mutator
-            (mutator/wrap-default mutator default))
-          lifecycle
-          coerce))
+  (->Prop
+    nil
+    (if (= default ::no-default)
+      mutator
+      (mutator/wrap-default mutator default))
+    lifecycle
+    coerce))
 
 (defn lifecycle [^Prop prop]
   (.-lifecycle prop))
@@ -70,3 +77,16 @@
     (if (instance? Prop ret)
       ret
       (throw (ex-info (str "No such prop: " (pr-str k)) {:prop k})))))
+
+(defn annotate
+  "For cljfx.dev, annotate prop with a map describing the spec
+
+  Examples:
+    {:type :boolean}
+    {:type :number}
+    {:type :coll :item {:type :string}}
+    {:type :desc :of 'javafx.scene.Node}
+    {:type :enum :of 'javafx.stage.Modality}
+    {:type :event-handler :of 'javafx.event.EventHandler}"
+  [prop type-map]
+  (vary-meta prop assoc :cljfx/prop type-map))
