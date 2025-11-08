@@ -79,14 +79,15 @@
       (throw (ex-info (str "No such prop: " (pr-str k)) {:prop k})))))
 
 (defn annotate
-  "For cljfx.dev, annotate prop with a map describing the spec
+  "For cljfx.dev, annotate prop with a human-readable id and a type map
 
-  Examples:
+  Type map examples:
     {:type :boolean}
     {:type :number}
     {:type :coll :item {:type :string}}
     {:type :desc :of 'javafx.scene.Node}
     {:type :enum :of 'javafx.stage.Modality}
     {:type :event-handler :of 'javafx.event.EventHandler}"
-  [prop type-map]
-  (vary-meta prop assoc :cljfx/prop type-map))
+  [prop id type-map]
+  {:pre [(symbol? id) (map? type-map)]}
+  (vary-meta prop assoc :cljfx/id id :cljfx/prop type-map))

@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.1](https://github.com/cljfx/cljfx/releases/tag/1.10.1) - 2025-11-08
+
+Allow annotating props for [cljfx.dev](https://github.com/cljfx/dev).
+
 ### [1.10.0](https://github.com/cljfx/cljfx/releases/tag/1.10.0) - 2025-11-06
 
 Allow prop instances to be used directly in composite lifecycles, e.g.:

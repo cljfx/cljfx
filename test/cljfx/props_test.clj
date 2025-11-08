@@ -23,4 +23,5 @@
     (is (= {:meta true} (meta p2)))
     (is (= p1 p2))
     (is (.equals p1 p2))
-    (is (= {:cljfx/prop {:type :number} :meta true} (meta (prop/annotate p2 {:type :number}))))))
+    (is (= {:cljfx/id 'number-prop :cljfx/prop {:type :number} :meta true}
+           (meta (prop/annotate p2 'number-prop {:type :number}))))))
