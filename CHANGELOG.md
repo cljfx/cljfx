@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.2](https://github.com/cljfx/cljfx/releases/tag/1.10.2) - 2025-11-12
+
+Make `:grid-pane`'s `:grid-lines-visible` render consistently regardless of map 
+key order.
+
 ### [1.10.1](https://github.com/cljfx/cljfx/releases/tag/1.10.1) - 2025-11-08
 
 Allow annotating props for [cljfx.dev](https://github.com/cljfx/dev).
