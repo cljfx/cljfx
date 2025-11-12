@@ -96,5 +96,6 @@
   (lifecycle/annotate
     (composite/describe GridPane
       :ctor []
-      :props props)
+      :props props
+      :prop-order {:grid-lines-visible 1})
     :grid-pane))
