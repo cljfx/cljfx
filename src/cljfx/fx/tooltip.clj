@@ -46,8 +46,8 @@
       :wrap-text [:setter lifecycle/scalar :default false])))
 
 (def lifecycle
-  (lifecycle/annotate
-    (composite/describe Tooltip
-      :ctor []
-      :props props)
-    :tooltip))
+  (-> (composite/describe Tooltip
+        :ctor []
+        :props props)
+      (lifecycle/wrap-on-delete #(.hide ^Tooltip %))
+      (lifecycle/annotate :tooltip)))

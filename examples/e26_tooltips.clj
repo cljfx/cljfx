@@ -41,6 +41,7 @@
                                    (swap! *radius (fn [radius]
                                                     (-> radius
                                                         (+ (/ (.getDeltaY event) 10))
+                                                        int
                                                         (min 100)
                                                         (max 10))))))}))
 
