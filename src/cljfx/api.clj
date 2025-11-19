@@ -71,6 +71,7 @@
             [cljfx.fx :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]
+            [cljfx.prop :as prop]
             [cljfx.renderer :as renderer]))
 
 (defonce
@@ -310,6 +311,37 @@
              props. Use e.g. `ext-state` and supply `swap-state` as fn arg to
              communicate with the desc"
   lifecycle/ext-effect)
+
+(defn make-prop
+  "Make a prop that can be used as a key in a desc
+
+  Args:
+    mutator      a Mutator protocol instance that assigns the prop value to a mutable
+                 instance
+    lifecycle    a Lifecycle protocol instance that defines how the prop value is
+                 interpreted
+
+  Kv-args:
+    :coerce      a function that transforms the assigned value before it gets assigned to
+                 instance, defaults to [[identity]]
+    :default     the default value that is used as a new one when the prop is removed from
+                 the component"
+  [mutator lifecycle & {:keys [coerce default]
+                        :or {coerce identity
+                             default ::prop/no-default}}]
+  (prop/make mutator lifecycle :coerce coerce :default default))
+
+(defn make-binding-prop
+  "Make a prop from a function that binds instance and prop together
+
+  Args:
+    bind         a function that will receive 2 args: a target instance and a prop
+                 instance; if it returns a function, it will be called with 0 arguments
+                 when the prop is disposed
+    lifecycle    a Lifecycle protocol instance that defines how the prop value is
+                 interpreted"
+  [bind lifecycle]
+  (lifecycle/binding-prop bind lifecycle))
 
 (def ext-recreate-on-key-changed
   "Extension lifecycle that re-creates its child lifecycle when needed

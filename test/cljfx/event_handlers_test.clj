@@ -2,13 +2,12 @@
   (:require [cljfx.api :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
-            [cljfx.prop :as prop]
             [clojure.test :refer :all])
   (:import [javafx.beans.value ChangeListener]
            [javafx.scene.control TextField]))
 
 (defn make-prop-tracking-text-changed-listeners [f]
-  (prop/make
+  (fx/make-prop
     (mutator/adder-remover
       (fn [^TextField instance ^ChangeListener value]
         (f :add-listener)

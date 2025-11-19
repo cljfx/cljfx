@@ -8,6 +8,7 @@
   protocol implementations only, their internals are subject to change"
   (:require [cljfx.component :as component]
             [cljfx.coerce :as coerce]
+            [cljfx.mutator :as mutator]
             [cljfx.platform :as platform]
             [cljfx.prop :as prop]
             [cljfx.context :as context]
@@ -116,6 +117,29 @@
                     (assoc :value (coerce new-instance)))))
      `delete (fn [_ component opts]
                (delete lifecycle (:child component) opts))}))
+
+(defn binding-prop [bind lifecycle]
+  (prop/->Prop
+    nil
+    (mutator/adder-remover
+      (fn create-binding [instance f] (f instance))
+      (fn delete-binding [_ f] (f)))
+    (wrap-coerce
+      lifecycle
+      (fn coerce-binding [prop-instance]
+        (let [state (volatile! false)]
+          (fn binding
+            ([]
+             (let [dispose @state]
+               (when-not dispose
+                 (throw (IllegalStateException. "Cannot dispose a binding that is not initialized")))
+               (vreset! state false)
+               (when (fn? dispose) (dispose))))
+            ([instance]
+             (when @state (throw (IllegalStateException. "Cannot initialize a binding that is already initialized")))
+             (let [dispose (bind instance prop-instance)]
+               (vreset! state (if (fn? dispose) dispose true))))))))
+    identity))
 
 (def scalar
   (with-meta

@@ -2,7 +2,6 @@
   (:require [cljfx.api :as fx]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
-            [cljfx.prop :as prop]
             [clojure.string :as str])
   (:import [javafx.scene.web WebView]))
 
@@ -13,9 +12,9 @@
 ;; clicked. See the README.md and e21-extension-lifecycle for some additional examples of this.
 
 (def prop-on-location-changed
-  (prop/make (mutator/property-change-listener
-               #(.locationProperty (.getEngine ^WebView %)))
-             lifecycle/change-listener))
+  (fx/make-prop (mutator/property-change-listener
+                  #(.locationProperty (.getEngine ^WebView %)))
+                lifecycle/change-listener))
 
 ;; A well known URL
 (def home-url "https://www.google.com")
@@ -78,7 +77,7 @@
 
 (def renderer
   (fx/create-renderer
-   :middleware (fx/wrap-map-desc assoc :fx/type root)
-   :opts {:fx.opt/map-event-handler event-handler}))
+    :middleware (fx/wrap-map-desc assoc :fx/type root)
+    :opts {:fx.opt/map-event-handler event-handler}))
 
 (fx/mount-renderer *state renderer)

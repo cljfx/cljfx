@@ -1,10 +1,9 @@
 (ns e35-popup
   (:require [cljfx.api :as fx]
-            [cljfx.prop :as prop]
-            [cljfx.mutator :as mutator]
-            [cljfx.lifecycle :as lifecycle])
-  (:import [javafx.stage Popup]
-           [javafx.scene Node]))
+            [cljfx.lifecycle :as lifecycle]
+            [cljfx.mutator :as mutator])
+  (:import [javafx.scene Node]
+           [javafx.stage Popup]))
 
 (def *state (atom false))
 
@@ -17,7 +16,7 @@
 (def popup-width 300)
 
 (def prop-shown-on
-  (prop/make
+  (fx/make-prop
     (mutator/adder-remover
       (fn [^Popup popup ^Node node]
         (let [bounds (.getBoundsInLocal node)

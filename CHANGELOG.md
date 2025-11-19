@@ -3,6 +3,47 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.4](https://github.com/cljfx/cljfx/releases/tag/1.10.4) - 2025-11-19
+
+Expose prop creation to the `cljfx.api` ns. Implement a "binding" prop that uses
+a function of 2 args (owner instance + prop instance), binds them together, and 
+then returns a disposing  (0-arg) function. Using closures is very convenient 
+for implementing binding, e.g.:
+```clj
+(require '[cljfx.api :as fx]
+         '[cljfx.lifecycle :as fx.lifecycle])
+(import '[javafx.event EventHandler]
+        '[javafx.scene Node]
+        '[javafx.scene.input MouseEvent])
+
+;; bind a listener to 2 events as a single prop, return unbind fn
+
+(def prop-enter-exit
+  (fx/make-binding-prop
+    (fn [^Node instance f]
+      (let [on-enter-exit (reify EventHandler
+                            (handle [_ e]
+                              (f e)))]
+        (.addEventHandler instance MouseEvent/MOUSE_ENTERED on-enter-exit)
+        (.addEventHandler instance MouseEvent/MOUSE_EXITED on-enter-exit)
+        #(do (.removeEventFilter instance MouseEvent/MOUSE_ENTERED on-enter-exit)
+             (.removeEventFilter instance MouseEvent/MOUSE_EXITED on-enter-exit))))
+    fx.lifecycle/event-handler))
+
+;; use the prop
+
+(fx/on-fx-thread
+  (fx/create-component
+    {:fx/type :stage
+     :showing true
+     :scene {:fx/type :scene
+             :root {:fx/type :v-box
+                    :padding 100
+                    :children [{:fx/type :label
+                                :text "Hover me!"
+                                prop-enter-exit println}]}}}))
+```
+
 ### [1.10.3](https://github.com/cljfx/cljfx/releases/tag/1.10.3) - 2025-11-17
 
 Hide tooltips when their lifecycle is disposed
