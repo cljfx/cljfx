@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.5](https://github.com/cljfx/cljfx/releases/tag/1.10.5) - 2025-11-21
+
+This release adds a new `callback` lifecycle, which is similar to 
+`event-handler` lifecycle, but works for variadic functions.
+
 ### [1.10.4](https://github.com/cljfx/cljfx/releases/tag/1.10.4) - 2025-11-19
 
 Expose prop creation to the `cljfx.api` ns. Implement a "binding" prop that uses

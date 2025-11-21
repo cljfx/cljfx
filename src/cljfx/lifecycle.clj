@@ -12,7 +12,8 @@
             [cljfx.platform :as platform]
             [cljfx.prop :as prop]
             [cljfx.context :as context]
-            [clojure.set :as set]))
+            [clojure.set :as set])
+  (:import [clojure.lang MapEntry]))
 
 (set! *warn-on-reflection* true)
 
@@ -197,6 +198,16 @@
                         component
                         (create-event-handler-component desc opts))))))
      `delete (fn [_ _ _])}))
+
+(def callback
+  (reify Lifecycle
+    (create [_ desc _]
+      (let [v (volatile! desc)]
+        (with-meta {:volatile v :value #(when-not *in-progress?* (apply @v %&))} {`component/instance :value})))
+    (advance [_ component desc _]
+      (vreset! (:volatile component) desc)
+      component)
+    (delete [_ _ _])))
 
 (def change-listener
   (wrap-coerce event-handler coerce/change-listener))

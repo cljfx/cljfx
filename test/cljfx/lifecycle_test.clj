@@ -1,14 +1,13 @@
 (ns cljfx.lifecycle-test
-  (:require [clojure.test :refer :all]
-            [testit.core :refer :all]
-            [cljfx.test-helpers :refer :all]
-            [cljfx.context :as context]
-            [cljfx.prop :as prop]
-            [cljfx.mutator :as mutator]
-            [cljfx.lifecycle :as lifecycle]
+  (:require [cljfx.api :as fx]
             [cljfx.component :as component]
-            [cljfx.api :as fx])
-  (:import [javafx.scene.control Label]))
+            [cljfx.context :as context]
+            [cljfx.lifecycle :as lifecycle]
+            [cljfx.test-helpers :refer :all]
+            [clojure.test :refer :all]
+            [testit.core :refer :all])
+  (:import [javafx.beans.value ChangeListener]
+           [javafx.scene.control Label TextField]))
 
 (deftest env-test
   (let [label (fn [{:keys [a b]}]
@@ -478,3 +477,43 @@
                 => [])
         _ (fact (component/instance component)
                 => nil)]))
+
+(deftest callback-test
+  (binding [lifecycle/*in-progress?* false]
+    (let [events (atom [])
+          cb1 #(swap! events conj [:callback 1 %1 %2])
+          prop-text-changed (fx/make-binding-prop
+                              (fn bind-callback [^TextField text-field callback]
+                                (swap! events conj [:bind])
+                                (let [^ChangeListener listener (reify ChangeListener
+                                                                 (changed [_ _ old new]
+                                                                   (callback old new)))]
+                                  (.addListener (.textProperty text-field) listener)
+                                  #(do
+                                     (swap! events conj [:unbind])
+                                     (.removeListener (.textProperty text-field) listener))))
+                              lifecycle/callback)
+          ;; create => bind
+          c (fx/create-component {:fx/type :text-field prop-text-changed cb1})
+          ^TextField tf (fx/instance c)
+          ;; change text => callback 1
+          _ (.setText tf "a")
+          cb2 #(swap! events conj [:callback 2 %1 %2])
+          ;; callback lifecycle absorbs function changes
+          c (fx/advance-component c {:fx/type :text-field prop-text-changed cb2})
+          ;; change text => callback 2
+          _ (.setText tf "b")
+          ;; remove callback => unbind
+          c (fx/advance-component c {:fx/type :text-field})
+          ;; add callback again => bind
+          c (fx/advance-component c {:fx/type :text-field prop-text-changed cb2})
+          ;; change text => callback 2
+          _ (.setText tf "c")]
+      (fx/delete-component c)
+      (is (= [[:bind]
+              [:callback 1 "" "a"]
+              [:callback 2 "a" "b"]
+              [:unbind]
+              [:bind]
+              [:callback 2 "b" "c"]]
+             @events)))))
