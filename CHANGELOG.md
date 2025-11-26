@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.6](https://github.com/cljfx/cljfx/releases/tag/1.10.6) - 2025-11-26
+
+Added `:on-custom-colors-changed` prop to color picker.
+
 ### [1.10.5](https://github.com/cljfx/cljfx/releases/tag/1.10.5) - 2025-11-21
 
 This release adds a new `callback` lifecycle, which is similar to 

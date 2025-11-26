@@ -1,9 +1,10 @@
 (ns cljfx.fx.color-picker
   "Part of a public API"
-  (:require [cljfx.composite :as composite]
-            [cljfx.lifecycle :as lifecycle]
+  (:require [cljfx.coerce :as coerce]
+            [cljfx.composite :as composite]
             [cljfx.fx.combo-box-base :as fx.combo-box-base]
-            [cljfx.coerce :as coerce])
+            [cljfx.lifecycle :as lifecycle]
+            [cljfx.mutator :as mutator])
   (:import [javafx.scene.control ColorPicker]))
 
 (set! *warn-on-reflection* true)
@@ -17,7 +18,8 @@
                     :default "color-picker"]
       ;; definitions
       :value [:setter lifecycle/scalar :coerce coerce/color :default :white]
-      :custom-colors [:list lifecycle/scalar :coerce #(map coerce/color %)])))
+      :custom-colors [:list lifecycle/scalar :coerce #(mapv coerce/color %)]
+      :on-custom-colors-changed [(mutator/list-change-listener #(.getCustomColors ^ColorPicker %)) lifecycle/list-change-listener])))
 
 (def lifecycle
   (lifecycle/annotate
