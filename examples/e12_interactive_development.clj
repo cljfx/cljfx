@@ -31,6 +31,9 @@
 
 (def renderer
   (fx/create-renderer
+    ;; NOTE make sure not to reference `root-view` directly, i.e.
+    ;; :middleware (fx/wrap-map-desc assoc :fx/type root)
+    ;; Instead, wrap it in another lambda view like below.
     :middleware (fx/wrap-map-desc (fn [state]
                                     {:fx/type root-view
                                      :state state}))
