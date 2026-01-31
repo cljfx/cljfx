@@ -5,12 +5,18 @@
 (ns e12-interactive-development
   (:require [cljfx.api :as fx]))
 
+;; Parameters
+(def title "App Interactive Dev with Cljfx!")
+(def width 780)
+(def height 780)
+
 ;; I want to build an interactive chart that shows how bouncing object falls
 ;; on the ground. I want to be able to edit gravity and friction to see how
 ;; it affects object's behavior, so I will put it into state:
 
 (def *state
-  (atom {:gravity 10
+  (atom {:dummy-timestamp (java.time.Instant/now)
+         :gravity 10
          :friction 0.4}))
 
 ;; I want to have map event handlers extensible during runtime to avoid full app
@@ -21,25 +27,30 @@
 
 ;; Now we'll create our app with dummy root view
 
-(defn root-view [{{:keys [gravity friction]} :state}]
+(defn root-view [{{:keys [gravity friction]} :value}]
   {:fx/type :stage
    :showing true
+   :title title
+   :width width
+   :height height
    :scene {:fx/type :scene
            :root {:fx/type :h-box
                   :children [{:fx/type :label
                               :text (str "g = " gravity ", f = " friction)}]}}})
 
-(def renderer
-  (fx/create-renderer
-    ;; NOTE make sure not to reference `root-view` directly, i.e.
-    ;; :middleware (fx/wrap-map-desc assoc :fx/type root)
-    ;; Instead, wrap it in another lambda view like below.
-    :middleware (fx/wrap-map-desc (fn [state]
-                                    {:fx/type root-view
-                                     :state state}))
-    :opts {:fx.opt/map-event-handler event-handler}))
-
-(fx/mount-renderer *state renderer)
+;; Use ext-watch to watch the state, so that the view gets rerendered
+;; when the state is changed.
+(fx/instance
+ @(fx/on-fx-thread
+    (fx/create-component
+     {:fx/type fx/ext-watcher
+      :ref *state
+      ;; The state will be passed in as {:value @*state}
+      :desc {:fx/type #'root-view}}
+     {:fx.opt/map-event-handler #'event-handler
+      :fx.opt/type->lifecycle (some-fn fx/keyword->lifecycle
+                                       #(when (ifn? %)
+                                          cljfx.lifecycle/dynamic-fn->dynamic))})))
 
 ;; At this point, really tiny window appears that displays current gravity and
 ;; friction. We want to have an ability to change these values, so let's create
@@ -53,9 +64,12 @@
 
 ;; Now we will update our root view to display these sliders:
 
-(defn root-view [{{:keys [gravity friction]} :state}]
+(defn root-view [{{:keys [gravity friction]} :value}]
   {:fx/type :stage
    :showing true
+   :title title
+   :width width
+   :height height
    :scene {:fx/type :scene
            :root {:fx/type :h-box
                   :children [{:fx/type slider-view
@@ -69,10 +83,9 @@
 
 ;; Now we updated our root function, but window didn't change. It happens
 ;; because cljfx has no way to know if definition of some component functions is
-;; changed. But we can ask renderer to refresh itself by calling it without any
-;; arguments:
+;; changed. But we can update the state to trigger it.
 
-(renderer)
+(swap! *state assoc :dummy-value (java.time.Instant/now))
 
 ;; Now small label got replaced with 2 sliders. Problem is, there are no labels
 ;; on them, so users can't really see what these sliders mean, so let's fix it:
@@ -88,9 +101,12 @@
                :major-tick-unit max
                :show-tick-labels true}]})
 
-(defn root-view [{{:keys [gravity friction]} :state}]
+(defn root-view [{{:keys [gravity friction]} :value}]
   {:fx/type :stage
    :showing true
+   :title title
+   :width width
+   :height height
    :scene {:fx/type :scene
            :root {:fx/type :h-box
                   :spacing 10
@@ -105,7 +121,7 @@
                               :label "Friction"
                               :value friction}]}}})
 
-(renderer)
+(swap! *state assoc :dummy-value (java.time.Instant/now))
 
 ;; Great, time to add a chart that uses gravity and friction, but first let's
 ;; try to display something dummy to make sure it works
@@ -123,9 +139,12 @@
                     :x-value t
                     :y-value t})}]})
 
-(defn root-view [{{:keys [gravity friction]} :state}]
+(defn root-view [{{:keys [gravity friction]} :value}]
   {:fx/type :stage
    :showing true
+   :title title
+   :width width
+   :height height
    :scene {:fx/type :scene
            :root {:fx/type :v-box
                   :spacing 20
@@ -146,7 +165,7 @@
                                           :label "Friction"
                                           :value friction}]}]}}})
 
-(renderer)
+(swap! *state assoc :dummy-value (java.time.Instant/now))
 
 ;; Now chart is added to a window. Everything looks fine, time to do some
 ;; simulation:
@@ -174,7 +193,7 @@
                                       :x-value index
                                       :y-value y})))}]})
 
-(renderer)
+(swap! *state assoc :dummy-value (java.time.Instant/now))
 
 ;; Okay, there are some results showing, but there is no bouncing, probably
 ;; gravity and friction have some weird values. It's time to make it all alive!
@@ -199,9 +218,12 @@
                :major-tick-unit max
                :show-tick-labels true}]})
 
-(defn root-view [{{:keys [gravity friction]} :state}]
+(defn root-view [{{:keys [gravity friction]} :value}]
   {:fx/type :stage
    :showing true
+   :title title
+   :width width
+   :height height
    :scene {:fx/type :scene
            :root {:fx/type :v-box
                   :spacing 20
@@ -224,7 +246,7 @@
                                           :value friction
                                           :event ::set-friction}]}]}}})
 
-(renderer)
+(swap! *state assoc :dummy-value (java.time.Instant/now))
 
 ;; Nice, now playing with sliders makes chart data change! And all this is
 ;; done in runtime! Looks like the problem was that gravity is too high, so as a
@@ -232,9 +254,12 @@
 
 (swap! *state assoc :gravity 1)
 
-(defn root-view [{{:keys [gravity friction]} :state}]
+(defn root-view [{{:keys [gravity friction]} :value}]
   {:fx/type :stage
    :showing true
+   :title title
+   :width width
+   :height height
    :scene {:fx/type :scene
            :root {:fx/type :v-box
                   :spacing 20
@@ -257,4 +282,4 @@
                                           :value friction
                                           :event ::set-friction}]}]}}})
 
-(renderer)
+(swap! *state assoc :dummy-value (java.time.Instant/now))
