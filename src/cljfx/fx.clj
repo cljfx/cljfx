@@ -161,10 +161,12 @@
      :tool-bar (lazy-load cljfx.fx.tool-bar/lifecycle)
      :tree-table-view (lazy-load cljfx.fx.tree-table-view/lifecycle)
      :tree-item (lazy-load cljfx.fx.tree-item/lifecycle)
+     :check-box-tree-item (lazy-load cljfx.fx.check-box-tree-item/lifecycle)
      :tree-table-column (lazy-load cljfx.fx.tree-table-column/lifecycle)
      :tree-view (lazy-load cljfx.fx.tree-view/lifecycle)
      ;; cells
      :cell (lazy-load cljfx.fx.cell/lifecycle)
+     :check-box-tree-cell (lazy-load cljfx.fx.check-box-tree-cell/lifecycle)
      :date-cell (lazy-load cljfx.fx.date-cell/lifecycle)
      :indexed-cell (lazy-load cljfx.fx.indexed-cell/lifecycle)
      :list-cell (lazy-load cljfx.fx.list-cell/lifecycle)
