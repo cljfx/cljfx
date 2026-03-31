@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.7](https://github.com/cljfx/cljfx/releases/tag/1.10.7) - 2026-03-31
+
+Add `:check-box-tree-item` and `:check-box-tree-cell` lifecycles, along with
+[an example](https://github.com/cljfx/cljfx/blob/master/examples/e47_check_box_tree.clj).
+
 ### [1.10.6](https://github.com/cljfx/cljfx/releases/tag/1.10.6) - 2025-11-26
 
 Added `:on-custom-colors-changed` prop to color picker.
