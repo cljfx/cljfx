@@ -1,5 +1,7 @@
 /.cpcache
 /.nrepl-port
+/.clj-kondo/.cache/
+/.lsp/
 /classes
 /.idea
 /cljfx.iml

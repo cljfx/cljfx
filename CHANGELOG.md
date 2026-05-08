@@ -3,6 +3,11 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.8](https://github.com/cljfx/cljfx/releases/tag/1.10.8) - 2026-05-08
+
+Improve update performance. JavaFX mutations are still the main bottleneck, but
+state updates that do not change the UI should do less work now.
+
 ### [1.10.7](https://github.com/cljfx/cljfx/releases/tag/1.10.7) - 2026-03-31
 
 Add `:check-box-tree-item` and `:check-box-tree-cell` lifecycles, along with
