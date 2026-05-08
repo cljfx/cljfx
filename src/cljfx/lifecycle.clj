@@ -13,7 +13,8 @@
             [cljfx.prop :as prop]
             [cljfx.context :as context]
             [clojure.set :as set])
-  (:import [clojure.lang MapEntry]))
+  (:import [clojure.lang MapEntry]
+           [java.util HashMap]))
 
 (set! *warn-on-reflection* true)
 
@@ -279,40 +280,32 @@
                   (create this desc opts)))
      `delete (fn [_ _ _])}))
 
-(defn- ordered-keys+key->val
-  "Return a vec of ordered calculated keys and a map of calculated keys to components
+(defn- ordered-keyed-descs
+  "Return a vec of map entries with ordered calculated keys and descs
 
   Example:
   ```
-  (ordered-keys+key->val #(-> % meta (get :key ::no-key))
-                         [{:x 1}
-                          (with-meta {:key 1} {:key 1})
-                          (with-meta {:also 1} {:key 1})
-                          {}])
-  => [[[::no-key 0]
-       [1 0]
-       [1 1]
-       [::no-key 1]]
-      {[::no-key 0] {:x 1},
-       [1 0] {:key 1},
-       [1 1] {:also 1},
-       [::no-key 1] {}}]
+  (mapv (fn [^MapEntry e] [(.key e) (.val e)])
+        (ordered-keyed-descs #(-> % meta (get :key ::no-key))
+                             [{:x 1}
+                              (with-meta {:key 1} {:key 1})
+                              (with-meta {:also 1} {:key 1})
+                              {}]))
+  => [[[::no-key 0] {:x 1}]
+      [[1 0] {:key 1}]
+      [[1 1] {:also 1}]
+      [[::no-key 1] {}]]
   ```"
   [key-fn coll]
-  (loop [key-value->counter (transient {})
-         keys (transient [])
-         vals (transient {})
-         xs (seq coll)]
-    (if xs
-      (let [[x & rest] xs
-            key-value (key-fn x)
-            key-index (key-value->counter key-value 0)
-            key [key-value key-index]]
-        (recur (assoc! key-value->counter key-value (inc key-index))
-               (conj! keys key)
-               (assoc! vals key x)
-               rest))
-      [(persistent! keys) (persistent! vals)])))
+  (let [^HashMap key-value->counter (HashMap.)]
+    (mapv
+      (fn [x]
+        (let [key-value (key-fn x)
+              key-index (long (or (.get key-value->counter key-value) 0))
+              key [key-value key-index]]
+          (.put key-value->counter key-value (unchecked-inc key-index))
+          (MapEntry/create key x)))
+      coll)))
 
 (defn- fx-key-from-map [desc]
   (:fx/key desc ::no-key))
@@ -328,46 +321,45 @@
      [::many lifecycle desc->key desc->child-desc]
      {`create
       (fn [_ desc opts]
-        (let [[ordered-keys key->desc] (ordered-keys+key->val desc->key desc)
-              key->component (reduce (fn [acc key]
-                                       (update acc key #(create lifecycle
-                                                                (desc->child-desc %)
-                                                                opts)))
-                                     key->desc
-                                     ordered-keys)]
+        (let [key->component (volatile! (transient {}))
+              instance (mapv
+                         (fn [^MapEntry entry]
+                           (let [component (create lifecycle
+                                                   (desc->child-desc (.val entry))
+                                                   opts)]
+                             (vswap! key->component assoc! (.key entry) component)
+                             (component/instance component)))
+                         (ordered-keyed-descs desc->key desc))]
           (with-meta
-            {:instance (mapv #(-> % key->component component/instance) ordered-keys)
-             :key->component key->component}
+            {:instance instance
+             :key->component (persistent! @key->component)}
             {`component/instance :instance})))
 
       `advance
       (fn [_ component desc opts]
         (let [old-key->component (:key->component component)
-              [ordered-keys key->desc] (ordered-keys+key->val desc->key desc)
-              key->component (reduce
-                               (fn [acc key]
-                                 (let [old-e (find acc key)
-                                       new-e (find key->desc key)]
-                                   (cond
-                                     (and (some? old-e) (some? new-e))
-                                     (assoc acc key (advance lifecycle
-                                                             (val old-e)
-                                                             (desc->child-desc (val new-e))
-                                                             opts))
-
-                                     (some? old-e)
-                                     (do (delete lifecycle (val old-e) opts)
-                                         (dissoc acc key))
-
-                                     :else
-                                     (assoc acc key (create lifecycle
-                                                            (desc->child-desc (val new-e))
-                                                            opts)))))
-                               old-key->component
-                               (set (concat (keys old-key->component) ordered-keys)))]
+              key->component (volatile! (transient {}))
+              instance (mapv
+                         (fn [^MapEntry entry]
+                           (let [key (.key entry)
+                                 child-desc (desc->child-desc (.val entry))
+                                 old-component (get old-key->component key ::no-key)
+                                 new-component (if (identical? ::no-key old-component)
+                                                 (create lifecycle child-desc opts)
+                                                 (advance lifecycle old-component child-desc opts))]
+                             (vswap! key->component assoc! key new-component)
+                             (component/instance new-component)))
+                         (ordered-keyed-descs desc->key desc))
+              key->component (persistent! @key->component)]
+          (reduce-kv
+            (fn [_ key old-component]
+              (when-not (contains? key->component key)
+                (delete lifecycle old-component opts)))
+            nil
+            old-key->component)
           (assoc component
             :key->component key->component
-            :instance (mapv #(-> % key->component component/instance) ordered-keys))))
+            :instance instance)))
 
       `delete (fn [_ component opts]
                 (doseq [x (vals (:key->component component))]

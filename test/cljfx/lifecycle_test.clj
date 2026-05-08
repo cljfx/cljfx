@@ -505,6 +505,100 @@
         _ (fact (component/instance component)
                 => nil)]))
 
+(defn- tracking-lifecycle [events]
+  (let [next-id (atom 0)]
+    (reify lifecycle/Lifecycle
+      (create [_ desc opts]
+        (let [id (swap! next-id inc)]
+          (swap! events conj [:create id desc opts])
+          (with-meta
+            {:id id
+             :desc desc}
+            {`component/instance :id})))
+      (advance [_ component desc opts]
+        (swap! events conj [:advance (:id component) (:desc component) desc opts])
+        (assoc component :desc desc))
+      (delete [_ component opts]
+        (swap! events conj [:delete (:id component) opts])))))
+
+(deftest wrap-many-preserves-key-occurrences-test
+  (let [events (atom [])
+        lifecycle (lifecycle/wrap-many (tracking-lifecycle events))
+        component (lifecycle/create
+                    lifecycle
+                    [{:fx/key :a :v 1}
+                     {:fx/key :a :v 2}
+                     {:v 3}
+                     {:v 4}]
+                    {::foo 1})
+        _ (fact (component/instance component)
+                => [1 2 3 4])
+        _ (fact @events
+                => [[:create 1 {:v 1} {::foo 1}]
+                    [:create 2 {:v 2} {::foo 1}]
+                    [:create 3 {:v 3} {::foo 1}]
+                    [:create 4 {:v 4} {::foo 1}]])
+        _ (reset! events [])
+        component (lifecycle/advance
+                    lifecycle
+                    component
+                    [{:v 30}
+                     {:fx/key :a :v 10}
+                     {:fx/key :a :v 20}
+                     {:v 40}]
+                    {::foo 2})
+        _ (fact (component/instance component)
+                => [3 1 2 4])
+        _ (fact (set @events)
+                => #{[:advance 1 {:v 1} {:v 10} {::foo 2}]
+                     [:advance 2 {:v 2} {:v 20} {::foo 2}]
+                     [:advance 3 {:v 3} {:v 30} {::foo 2}]
+                     [:advance 4 {:v 4} {:v 40} {::foo 2}]})
+        _ (reset! events [])
+        component (lifecycle/advance
+                    lifecycle
+                    component
+                    [{:fx/key :a :v 11}
+                     {:v 31}]
+                    {::foo 3})
+        _ (fact (component/instance component)
+                => [1 3])
+        _ (fact (set @events)
+                => #{[:advance 1 {:v 10} {:v 11} {::foo 3}]
+                     [:advance 3 {:v 30} {:v 31} {::foo 3}]
+                     [:delete 2 {::foo 3}]
+                     [:delete 4 {::foo 3}]})
+        _ (reset! events [])
+        _ (lifecycle/delete lifecycle component {::foo 4})]
+    (fact (set @events)
+          => #{[:delete 1 {::foo 4}]
+               [:delete 3 {::foo 4}]})))
+
+(deftest wrap-many-uses-custom-key-and-child-desc-test
+  (let [events (atom [])
+        lifecycle (lifecycle/wrap-many
+                    (tracking-lifecycle events)
+                    :id
+                    #(select-keys % [:payload]))
+        component (lifecycle/create
+                    lifecycle
+                    [{:id 1 :payload "a" :ignored true}]
+                    nil)
+        _ (fact (component/instance component)
+                => [1])
+        _ (fact @events
+                => [[:create 1 {:payload "a"} nil]])
+        _ (reset! events [])
+        component (lifecycle/advance
+                    lifecycle
+                    component
+                    [{:id 1 :payload "b" :ignored false}]
+                    nil)]
+    (fact (component/instance component)
+          => [1])
+    (fact @events
+          => [[:advance 1 {:payload "a"} {:payload "b"} nil]])))
+
 (deftest callback-test
   (binding [lifecycle/*in-progress?* false]
     (let [events (atom [])
