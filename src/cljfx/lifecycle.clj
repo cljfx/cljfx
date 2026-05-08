@@ -234,32 +234,30 @@
      `delete (fn [_ _ _])}))
 
 (defn advance-prop-map [props props-desc props-config instance opts]
-  (reduce
-    (fn [acc k]
-      (let [old-e (find props k)
-            new-e (find props-desc k)]
-        (cond
-          (and (some? old-e) (some? new-e))
-          (let [component (val old-e)
-                desc (val new-e)
-                prop (prop/from props-config k)
-                new-component (advance (prop/lifecycle prop) component desc opts)]
-            (prop/replace! prop instance component new-component)
-            (assoc acc k new-component))
-
-          (some? old-e)
+  (let [ret (reduce-kv
+              (fn [acc k desc]
+                (let [component (get props k ::no-key)]
+                  (if (identical? ::no-key component)
+                    (let [prop (prop/from props-config k)
+                          component (create (prop/lifecycle prop) desc opts)]
+                      (prop/assign! prop instance component)
+                      (assoc acc k component))
+                    (let [prop (prop/from props-config k)
+                          new-component (advance (prop/lifecycle prop) component desc opts)]
+                      (prop/replace! prop instance component new-component)
+                      (assoc acc k new-component)))))
+              props
+              props-desc)]
+    (reduce-kv
+      (fn [acc k component]
+        (if (contains? props-desc k)
+          acc
           (let [prop (prop/from props-config k)]
-            (prop/retract! prop instance (val old-e))
-            (delete (prop/lifecycle prop) (val old-e) opts)
-            (dissoc acc k))
-
-          :else
-          (let [prop (prop/from props-config k)
-                component (create (prop/lifecycle prop) (val new-e) opts)]
-            (prop/assign! prop instance component)
-            (assoc acc k component)))))
-    props
-    (set/union (set (keys props)) (set (keys props-desc)))))
+            (prop/retract! prop instance component)
+            (delete (prop/lifecycle prop) component opts)
+            (dissoc acc k))))
+      ret
+      props)))
 
 (defn detached-prop-map [props-config]
   (with-meta

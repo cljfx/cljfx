@@ -108,3 +108,36 @@
                 => [])
         _ (fact (component/instance component)
                 => nil)]))
+
+(deftest unordered-composite-lifecycle-preserves-nil-valued-props-test
+  (let [{:keys [props-config grab-history]} (mk-props [:a :b])
+        lifecycle (composite/lifecycle
+                    {:ctor (fn [] :obj)
+                     :args []
+                     :props props-config})
+        component (lifecycle/create
+                    lifecycle
+                    {:fx/type lifecycle
+                     :a nil}
+                    nil)
+        _ (fact (grab-history)
+                => [{:op :assign!, :prop :a, :instance :obj, :coerced-value "nil", :value nil}])
+        component (lifecycle/advance
+                    lifecycle
+                    component
+                    {:fx/type lifecycle
+                     :a nil}
+                    nil)
+        _ (fact (grab-history)
+                => [{:op :replace!, :prop :a, :instance :obj, :coerced-new-value "nil", :old-value nil, :new-value nil}])
+        component (lifecycle/advance
+                    lifecycle
+                    component
+                    {:fx/type lifecycle
+                     :b nil}
+                    nil)]
+    (fact (set (grab-history))
+          => #{{:op :assign!, :prop :b, :instance :obj, :coerced-value "nil", :value nil}
+               {:op :retract!, :prop :a, :instance :obj, :coerced-value "nil", :value nil}})
+    (fact (component/instance component)
+          => :obj)))

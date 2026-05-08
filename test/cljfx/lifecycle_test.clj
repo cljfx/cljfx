@@ -3,11 +3,38 @@
             [cljfx.component :as component]
             [cljfx.context :as context]
             [cljfx.lifecycle :as lifecycle]
+            [cljfx.mutator :as mutator]
+            [cljfx.prop :as prop]
             [cljfx.test-helpers :refer :all]
             [clojure.test :refer :all]
             [testit.core :refer :all])
   (:import [javafx.beans.value ChangeListener]
            [javafx.scene.control Label TextField]))
+
+(deftest advance-prop-map-preserves-nil-valued-props-test
+  (let [events (atom [])
+        prop-lifecycle (reify lifecycle/Lifecycle
+                         (create [_ desc _]
+                           (swap! events conj [:create desc])
+                           desc)
+                         (advance [_ component desc _]
+                           (swap! events conj [:advance component desc])
+                           desc)
+                         (delete [_ component _]
+                           (swap! events conj [:delete component])))
+        prop-mutator (reify mutator/Mutator
+                       (assign! [_ _ _ value]
+                         (swap! events conj [:assign value]))
+                       (replace! [_ _ _ old-value new-value]
+                         (swap! events conj [:replace old-value new-value]))
+                       (retract! [_ _ _ value]
+                         (swap! events conj [:retract value])))
+        props-config {:x (prop/make prop-mutator prop-lifecycle)}]
+    (fact (lifecycle/advance-prop-map {:x nil} {:x nil} props-config (Object.) nil)
+          => {:x nil})
+    (fact @events
+          => [[:advance nil nil]
+              [:replace nil nil]])))
 
 (deftest env-test
   (let [label (fn [{:keys [a b]}]
