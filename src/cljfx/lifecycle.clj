@@ -33,11 +33,12 @@
     (or (type->lifecycle type)
         type)))
 
+(deftype DynamicComponent [lifecycle child]
+  component/Component
+  (instance [_] (component/instance child)))
+
 (defn- create-dynamic-component [lifecycle child-desc opts]
-  (with-meta
-    {:lifecycle lifecycle
-     :child (create lifecycle child-desc opts)}
-    {`component/instance #(-> % :child component/instance)}))
+  (->DynamicComponent lifecycle (create lifecycle child-desc opts)))
 
 (def dynamic
   (reify Lifecycle
@@ -45,80 +46,91 @@
       (let [lifecycle (desc->lifecycle desc opts)]
         (create-dynamic-component lifecycle desc opts)))
     (advance [_ component desc opts]
-      (let [lifecycle (:lifecycle component)
+      (let [^DynamicComponent component component
+            old-lifecycle (.-lifecycle component)
+            old-child (.-child component)
             new-lifecycle (desc->lifecycle desc opts)]
-        (if (identical? lifecycle new-lifecycle)
-          (-> component
-              (update :child #(advance lifecycle % desc opts)))
-          (do (delete lifecycle (:child component) opts)
+        (if (identical? old-lifecycle new-lifecycle)
+          (let [new-child (advance new-lifecycle old-child desc opts)]
+            (if (identical? old-child new-child)
+              component
+              (->DynamicComponent new-lifecycle new-child)))
+          (do (delete old-lifecycle (.-child component) opts)
               (create-dynamic-component new-lifecycle desc opts)))))
     (delete [_ component opts]
-      (delete (:lifecycle component) (:child component) opts))))
+      (let [^DynamicComponent component component]
+        (delete (.-lifecycle component) (.-child component) opts)))))
 
 (def ^:dynamic *in-progress?* false)
 
 (def root
-  (with-meta
-    [::root]
-    {`create (fn [_ desc opts]
-               (binding [*in-progress?* true]
-                 (create dynamic desc opts)))
-     `advance (fn [_ component desc opts]
-                (binding [*in-progress?* true]
-                  (advance dynamic component desc opts)))
-     `delete (fn [_ component opts]
-               (binding [*in-progress?* true]
-                 (delete dynamic component opts)))}))
+  (reify Lifecycle
+    (create [_ desc opts]
+      (binding [*in-progress?* true]
+        (create dynamic desc opts)))
+    (advance [_ component desc opts]
+      (binding [*in-progress?* true]
+        (advance dynamic component desc opts)))
+    (delete [_ component opts]
+      (binding [*in-progress?* true]
+        (delete dynamic component opts)))))
 
 (defn- call-dynamic-fn [desc]
   ((:fx/type desc) (dissoc desc :fx/type)))
 
+(deftype DynamicFnComponent [child-desc desc child]
+  component/Component
+  (instance [_] (component/instance child)))
+
 (defn wrap-dynamic-fn [lifecycle]
-  (with-meta
-    [::dynamic-fn lifecycle]
-    {`create (fn [_ desc opts]
-               (let [child-desc (call-dynamic-fn desc)]
-                 (with-meta {:child-desc child-desc
-                             :desc desc
-                             :child (create lifecycle child-desc opts)}
-                            {`component/instance #(-> % :child component/instance)})))
-     `advance (fn [_ component desc opts]
-                (if (= desc (:desc component))
-                  (update component :child #(advance lifecycle
-                                                     %
-                                                     (:child-desc component)
-                                                     opts))
-                  (let [child-desc (call-dynamic-fn desc)]
-                    (-> component
-                        (assoc :child-desc child-desc :desc desc)
-                        (update :child #(advance lifecycle % child-desc opts))))))
-     `delete (fn [_ component opts]
-               (delete lifecycle (:child component) opts))}))
+  (reify Lifecycle
+    (create [_ desc opts]
+      (let [child-desc (call-dynamic-fn desc)]
+        (->DynamicFnComponent child-desc desc (create lifecycle child-desc opts))))
+    (advance [_ component desc opts]
+      (let [^DynamicFnComponent component component
+            child (.-child component)]
+        (if (= desc (.-desc component))
+          (let [child-desc (.-child-desc component)
+                new-child (advance lifecycle child child-desc opts)]
+            (if (identical? child new-child)
+              component
+              (->DynamicFnComponent child-desc desc new-child)))
+          (let [child-desc (call-dynamic-fn desc)
+                new-child (advance lifecycle child child-desc opts)]
+            (->DynamicFnComponent child-desc desc new-child)))))
+    (delete [_ component opts]
+      (delete lifecycle (.-child ^DynamicFnComponent component) opts))))
 
 (def dynamic-fn->dynamic
   (wrap-dynamic-fn dynamic))
 
-(defn wrap-coerce [lifecycle coerce]
-  (with-meta
-    [::coerce lifecycle coerce]
-    {`create (fn [_ desc opts]
-               (let [child (create lifecycle desc opts)]
-                 (with-meta {:child child
-                             :value (coerce (component/instance child))}
-                            {`component/instance :value})))
-     `advance (fn [_ component desc opts]
-                (let [child (:child component)
-                      old-instance (component/instance child)
-                      new-child (advance lifecycle child desc opts)
-                      new-instance (component/instance new-child)]
-                  (cond-> component
-                    :always
-                    (assoc :child new-child)
+(deftype CoerceComponent [child value]
+  component/Component
+  (instance [_] value))
 
-                    (not= old-instance new-instance)
-                    (assoc :value (coerce new-instance)))))
-     `delete (fn [_ component opts]
-               (delete lifecycle (:child component) opts))}))
+(defn wrap-coerce [lifecycle coerce]
+  (reify Lifecycle
+    (create [_ desc opts]
+      (let [child (create lifecycle desc opts)]
+        (->CoerceComponent child (coerce (component/instance child)))))
+    (advance [_ component desc opts]
+      (let [^CoerceComponent component component
+            child (.-child component)
+            old-instance (component/instance child)
+            new-child (advance lifecycle child desc opts)
+            new-instance (component/instance new-child)]
+        (cond
+          (not= old-instance new-instance)
+          (->CoerceComponent new-child (coerce new-instance))
+
+          (identical? child new-child)
+          component
+
+          :else
+          (->CoerceComponent new-child (.-value component)))))
+    (delete [_ component opts]
+      (delete lifecycle (.-child ^CoerceComponent component) opts))))
 
 (defn binding-prop [bind lifecycle]
   (prop/->Prop
@@ -144,61 +156,73 @@
     identity))
 
 (def scalar
-  (with-meta
-    [::scalar]
-    {`create (fn [_ v _] v)
-     `advance (fn [_ _ v _] v)
-     `delete (fn [_ _ _])}))
+  (reify Lifecycle
+    (create [_ v _] v)
+    (advance [_ _ v _] v)
+    (delete [_ _ _])))
+
+(deftype MapEventHandlerComponent [v map-event-handler value]
+  component/Component
+  (instance [_] value))
+
+(deftype FnEventHandlerComponent [v value]
+  component/Component
+  (instance [_] value))
+
+(deftype ElseEventHandlerComponent [value]
+  component/Component
+  (instance [_] value))
 
 (defn- create-event-handler-component [desc opts]
   (cond
     (map? desc)
     (let [map-event-handler (:fx.opt/map-event-handler opts)
           v (volatile! desc)]
-      (with-meta
-        {:kind :map
-         :volatile v
-         :fx.opt/map-event-handler map-event-handler
-         :value #(when-not *in-progress?* (map-event-handler (assoc @v :fx/event %)))}
-        {`component/instance :value}))
+      (->MapEventHandlerComponent
+        v
+        map-event-handler
+        #(when-not *in-progress?* (map-event-handler (assoc @v :fx/event %)))))
 
     (fn? desc)
     (let [v (volatile! desc)]
-      (with-meta
-        {:kind :fn
-         :volatile v
-         :value #(when-not *in-progress?* (@v %))}
-        {`component/instance :value}))
+      (->FnEventHandlerComponent
+        v
+        #(when-not *in-progress?* (@v %))))
 
     :else
-    (with-meta
-      {:kind :else
-       :value desc}
-      {`component/instance :value})))
+    (->ElseEventHandlerComponent desc)))
 
 (def event-handler
-  (with-meta
-    [::event-handler]
-    {`create (fn [_ desc opts]
-               (create-event-handler-component desc opts))
-     `advance (fn [_ component desc opts]
-                (let [component-kind (:kind component)
-                      desc-kind (if (map? desc) :map (if (fn? desc) :fn :else))]
-                  (if (not (identical? desc-kind component-kind))
-                    (create-event-handler-component desc opts)
-                    (case component-kind
-                      :map
-                      (if (= (:fx.opt/map-event-handler component)
-                             (:fx.opt/map-event-handler opts))
-                        (do (vreset! (:volatile component) desc) component)
-                        (create-event-handler-component desc opts))
-                      :fn
-                      (do (vreset! (:volatile component) desc) component)
-                      :else
-                      (if (= desc (:value component))
-                        component
-                        (create-event-handler-component desc opts))))))
-     `delete (fn [_ _ _])}))
+  (reify Lifecycle
+    (create [_ desc opts]
+      (create-event-handler-component desc opts))
+    (advance [_ component desc opts]
+      (let [component-kind (cond
+                             (instance? MapEventHandlerComponent component) :map
+                             (instance? FnEventHandlerComponent component) :fn
+                             :else :else)
+            desc-kind (if (map? desc) :map (if (fn? desc) :fn :else))]
+        (if (not (identical? desc-kind component-kind))
+          (create-event-handler-component desc opts)
+          (case component-kind
+            :map
+            (let [component ^MapEventHandlerComponent component]
+              (if (= (.-map-event-handler component)
+                     (:fx.opt/map-event-handler opts))
+                (do (vreset! (.-v component) desc) component)
+                (create-event-handler-component desc opts)))
+
+            :fn
+            (let [component ^FnEventHandlerComponent component]
+              (vreset! (.-v component) desc)
+              component)
+
+            :else
+            (let [component ^ElseEventHandlerComponent component]
+              (if (= desc (.-value component))
+                component
+                (create-event-handler-component desc opts)))))))
+    (delete [_ _ _])))
 
 (def callback
   (reify Lifecycle
@@ -313,57 +337,54 @@
 (defn- strip-fx-key [desc]
   (dissoc desc :fx/key))
 
+(deftype ManyComponent [instance key->component]
+  component/Component
+  (instance [_] instance))
+
 (defn wrap-many
   ([lifecycle]
    (wrap-many lifecycle fx-key-from-map strip-fx-key))
   ([lifecycle desc->key desc->child-desc]
-   (with-meta
-     [::many lifecycle desc->key desc->child-desc]
-     {`create
-      (fn [_ desc opts]
-        (let [key->component (volatile! (transient {}))
-              instance (mapv
-                         (fn [^MapEntry entry]
-                           (let [component (create lifecycle
-                                                   (desc->child-desc (.val entry))
-                                                   opts)]
-                             (vswap! key->component assoc! (.key entry) component)
-                             (component/instance component)))
-                         (ordered-keyed-descs desc->key desc))]
-          (with-meta
-            {:instance instance
-             :key->component (persistent! @key->component)}
-            {`component/instance :instance})))
+   (reify Lifecycle
+     (create [_ desc opts]
+       (let [key->component (volatile! (transient {}))
+             instance (mapv
+                        (fn [^MapEntry entry]
+                          (let [component (create lifecycle
+                                                  (desc->child-desc (.val entry))
+                                                  opts)]
+                            (vswap! key->component assoc! (.key entry) component)
+                            (component/instance component)))
+                        (ordered-keyed-descs desc->key desc))]
+         (->ManyComponent instance (persistent! @key->component))))
 
-      `advance
-      (fn [_ component desc opts]
-        (let [old-key->component (:key->component component)
-              key->component (volatile! (transient {}))
-              instance (mapv
-                         (fn [^MapEntry entry]
-                           (let [key (.key entry)
-                                 child-desc (desc->child-desc (.val entry))
-                                 old-component (get old-key->component key ::no-key)
-                                 new-component (if (identical? ::no-key old-component)
-                                                 (create lifecycle child-desc opts)
-                                                 (advance lifecycle old-component child-desc opts))]
-                             (vswap! key->component assoc! key new-component)
-                             (component/instance new-component)))
-                         (ordered-keyed-descs desc->key desc))
-              key->component (persistent! @key->component)]
-          (reduce-kv
-            (fn [_ key old-component]
-              (when-not (contains? key->component key)
-                (delete lifecycle old-component opts)))
-            nil
-            old-key->component)
-          (assoc component
-            :key->component key->component
-            :instance instance)))
+     (advance [_ component desc opts]
+       (let [^ManyComponent component component
+             old-key->component (.-key->component component)
+             key->component (volatile! (transient {}))
+             instance (mapv
+                        (fn [^MapEntry entry]
+                          (let [key (.key entry)
+                                child-desc (desc->child-desc (.val entry))
+                                old-component (get old-key->component key ::no-key)
+                                new-component (if (identical? ::no-key old-component)
+                                                (create lifecycle child-desc opts)
+                                                (advance lifecycle old-component child-desc opts))]
+                            (vswap! key->component assoc! key new-component)
+                            (component/instance new-component)))
+                        (ordered-keyed-descs desc->key desc))
+             key->component (persistent! @key->component)]
+         (reduce-kv
+          (fn [_ key old-component]
+            (when-not (contains? key->component key)
+              (delete lifecycle old-component opts)))
+          nil
+          old-key->component)
+         (->ManyComponent instance key->component)))
 
-      `delete (fn [_ component opts]
-                (doseq [x (vals (:key->component component))]
-                  (delete lifecycle x opts)))})))
+     (delete [_ component opts]
+       (doseq [x (vals (.-key->component ^ManyComponent component))]
+         (delete lifecycle x opts))))))
 
 (def dynamics
   (wrap-many dynamic))
@@ -384,16 +405,27 @@
                (log-fn `delete (:desc component))
                (delete lifecycle (:child component) opts))}))
 
+(defn- fast-select-keys [m ks]
+  (persistent!
+   (reduce
+    (fn [acc k]
+      (let [v (get m k ::no-key)]
+        (if (identical? v ::no-key)
+          acc
+          (assoc! acc k v))))
+    (transient {})
+    ks)))
+
 (defn wrap-extra-props [lifecycle props-config]
-  (let [prop-key-set (set (keys props-config))]
+  (let [prop-keys (vec (keys props-config))]
     (with-meta
       [::extra-props lifecycle props-config]
       {`create
        (fn [_ desc opts]
-         (let [child-desc (apply dissoc desc prop-key-set)
+         (let [child-desc (reduce dissoc desc prop-keys)
                child (create lifecycle child-desc opts)
                instance (component/instance child)
-               prop-desc (select-keys desc prop-key-set)
+               prop-desc (fast-select-keys desc prop-keys)
                props (reduce
                        (fn [acc k]
                          (assoc acc k (create (prop/lifecycle (prop/from props-config k))
@@ -411,13 +443,14 @@
        (fn [_ component desc opts]
          (let [child (:child component)
                instance (component/instance child)
-               child-desc (apply dissoc desc prop-key-set)
+               child-desc (reduce dissoc desc prop-keys)
                new-child (advance lifecycle child child-desc opts)
                new-instance (component/instance new-child)
                with-child (assoc component :child new-child)
-               props-desc (select-keys desc prop-key-set)]
+               props-desc (fast-select-keys desc prop-keys)]
            (if (identical? instance new-instance)
-             (update with-child :props advance-prop-map props-desc props-config instance opts)
+             (let [props (:props with-child)]
+               (assoc with-child :props (advance-prop-map props props-desc props-config instance opts)))
              (do
                ;; TODO this is wrong, should re-create props
                (doseq [[k v] props-desc]

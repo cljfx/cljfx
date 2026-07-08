@@ -23,15 +23,14 @@
     "Removes a value from a mutable instance when prop is deleted"))
 
 (defn setter [set-fn]
-  (with-meta
-    [::setter set-fn]
-    {`assign! (fn [_ instance coerce value]
-                (set-fn instance (coerce value)))
-     `replace! (fn [_ instance coerce old-value new-value]
-                 (when-not (= old-value new-value)
-                   (set-fn instance (coerce new-value))))
-     `retract! (fn [_ instance _ _]
-                 (set-fn instance nil))}))
+  (reify Mutator
+    (assign! [_ instance coerce value]
+      (set-fn instance (coerce value)))
+    (replace! [_ instance coerce old-value new-value]
+      (when-not (= old-value new-value)
+        (set-fn instance (coerce new-value))))
+    (retract! [_ instance _ _]
+      (set-fn instance nil))))
 
 (defn adder-remover [add! remove!]
   (reify Mutator
@@ -61,66 +60,61 @@
 (defn observable-list [get-list-fn]
   (let [set-all! #(.setAll ^ObservableList (get-list-fn %1)
                            ^Collection %2)]
-    (with-meta
-      [::observable-list get-list-fn]
-      {`assign! (fn [_ instance coerce value]
-                  (set-all! instance (coerce value)))
-       `replace! (fn [_ instance coerce old-value new-value]
-                   (when-not (= old-value new-value)
-                     (set-all! instance (coerce new-value))))
-       `retract! (fn [_ instance _ _]
-                   (set-all! instance []))})))
+    (reify Mutator
+      (assign! [_ instance coerce value]
+        (set-all! instance (coerce value)))
+      (replace! [_ instance coerce old-value new-value]
+        (when-not (= old-value new-value)
+          (set-all! instance (coerce new-value))))
+      (retract! [_ instance _ _]
+        (set-all! instance [])))))
 
 (defn observable-map [get-map-fn]
   (let [set-all! #(let [^ObservableMap m (get-map-fn %1)]
                     (.clear m)
                     (.putAll m %2))]
-    (with-meta
-      [::observable-map get-map-fn]
-      {`assign! (fn [_ instance coerce value]
-                  (set-all! instance (coerce value)))
-       `replace! (fn [_ instance coerce old-value new-value]
-                   (when-not (= old-value new-value)
-                     (set-all! instance (coerce new-value))))
-       `retract! (fn [_ instance _ _]
-                   (set-all! instance {}))})))
+    (reify Mutator
+      (assign! [_ instance coerce value]
+        (set-all! instance (coerce value)))
+      (replace! [_ instance coerce old-value new-value]
+        (when-not (= old-value new-value)
+          (set-all! instance (coerce new-value))))
+      (retract! [_ instance _ _]
+        (set-all! instance {})))))
 
 (defn set-difference [add! remove!]
-  (with-meta
-    [::set-difference add! remove!]
-    {`assign! (fn [_ instance coerce value]
-                (run! #(add! instance (coerce %)) value))
-     `replace! (fn [_ instance coerce old-value new-value]
-                 (when-not (= old-value new-value)
-                   (let [removed (set/difference old-value new-value)
-                         added (set/difference new-value old-value)]
-                     (run! #(remove! instance (coerce %)) removed)
-                     (run! #(add! instance (coerce %)) added))))
-     `retract! (fn [_ instance coerce value]
-                 (run! #(remove! instance (coerce %)) value))}))
+  (reify Mutator
+    (assign! [_ instance coerce value]
+      (run! #(add! instance (coerce %)) value))
+    (replace! [_ instance coerce old-value new-value]
+      (when-not (= old-value new-value)
+        (let [removed (set/difference old-value new-value)
+              added (set/difference new-value old-value)]
+          (run! #(remove! instance (coerce %)) removed)
+          (run! #(add! instance (coerce %)) added))))
+    (retract! [_ instance coerce value]
+      (run! #(remove! instance (coerce %)) value))))
 
 (def forbidden
-  (with-meta
-    [::forbidden]
-    {`assign! (fn [_ _ _ value]
-                (throw (ex-info "Assign forbidden" {:value value})))
-     `replace! (fn [_ _ _ old-value new-value]
-                 (when-not (= old-value new-value)
-                   (throw (ex-info "Replace forbidden"
-                                   {:old-value old-value
-                                    :new-value new-value}))))
-     `retract! (fn [_ _ _ value]
-                 (throw (ex-info "Retract forbidden" {:value value})))}))
+  (reify Mutator
+    (assign! [_ _ _ value]
+      (throw (ex-info "Assign forbidden" {:value value})))
+    (replace! [_ _ _ old-value new-value]
+      (when-not (= old-value new-value)
+        (throw (ex-info "Replace forbidden"
+                        {:old-value old-value
+                         :new-value new-value}))))
+    (retract! [_ _ _ value]
+      (throw (ex-info "Retract forbidden" {:value value})))))
 
 (defn wrap-default [mutator default]
-  (with-meta
-    [::default mutator default]
-    {`assign! (fn [_ instance coerce value]
-                (assign! mutator instance coerce value))
-     `replace! (fn [_ instance coerce old-value new-value]
-                 (replace! mutator instance coerce old-value new-value))
-     `retract! (fn [_ instance coerce value]
-                 (replace! mutator instance coerce value default))}))
+  (reify Mutator
+    (assign! [_ instance coerce value]
+      (assign! mutator instance coerce value))
+    (replace! [_ instance coerce old-value new-value]
+      (replace! mutator instance coerce old-value new-value))
+    (retract! [_ instance coerce value]
+      (replace! mutator instance coerce value default))))
 
 (defn constraint
   "This mutator re-implements javafx.scene.layout.Pane/setConstraint (which is internal)"

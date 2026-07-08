@@ -64,6 +64,154 @@
         _ (fact (.getText i-3) => ":a 1, :b 2")
         _ (fact (= i-1 i-2 i-3) => true)]))
 
+(deftest root-binds-in-progress-while-delegating-test
+  (let [events (atom [])
+        child-lifecycle (reify lifecycle/Lifecycle
+                          (create [_ desc opts]
+                            (swap! events conj [:create lifecycle/*in-progress?* desc opts])
+                            (with-meta {:instance (:value desc)}
+                                       {`component/instance :instance}))
+                          (advance [_ component desc opts]
+                            (swap! events conj [:advance lifecycle/*in-progress?* component desc opts])
+                            (with-meta {:instance (:value desc)}
+                                       {`component/instance :instance}))
+                          (delete [_ component opts]
+                            (swap! events conj [:delete lifecycle/*in-progress?* component opts])))
+        opts {:fx.opt/type->lifecycle identity}
+        desc-1 {:fx/type child-lifecycle :value 1}
+        desc-2 {:fx/type child-lifecycle :value 2}
+        component-1 (lifecycle/create lifecycle/root desc-1 opts)
+        component-2 (lifecycle/advance lifecycle/root component-1 desc-2 opts)
+        _ (lifecycle/delete lifecycle/root component-2 opts)]
+    (fact (map first @events)
+          => [:create :advance :delete])
+    (fact (map second @events)
+          => [true true true])
+    (fact (component/instance component-1)
+          => 1)
+    (fact (component/instance component-2)
+          => 2)))
+
+(deftest dynamic-advances-same-lifecycle-and-recreates-changed-lifecycle-test
+  (let [events (atom [])
+        lifecycle-1 (reify lifecycle/Lifecycle
+                      (create [_ desc opts]
+                        (swap! events conj [:create-1 desc opts])
+                        (with-meta {:desc desc :instance [:lifecycle-1 (:value desc)]}
+                                   {`component/instance :instance}))
+                      (advance [_ component desc opts]
+                        (swap! events conj [:advance-1 (:desc component) desc opts])
+                        (with-meta {:desc desc :instance [:lifecycle-1 (:value desc)]}
+                                   {`component/instance :instance}))
+                      (delete [_ component opts]
+                        (swap! events conj [:delete-1 (:desc component) opts])))
+        lifecycle-2 (reify lifecycle/Lifecycle
+                      (create [_ desc opts]
+                        (swap! events conj [:create-2 desc opts])
+                        (with-meta {:desc desc :instance [:lifecycle-2 (:value desc)]}
+                                   {`component/instance :instance}))
+                      (advance [_ component desc opts]
+                        (swap! events conj [:advance-2 (:desc component) desc opts])
+                        (with-meta {:desc desc :instance [:lifecycle-2 (:value desc)]}
+                                   {`component/instance :instance}))
+                      (delete [_ component opts]
+                        (swap! events conj [:delete-2 (:desc component) opts])))
+        opts {:fx.opt/type->lifecycle identity}
+        desc-1 {:fx/type lifecycle-1 :value 1}
+        desc-2 {:fx/type lifecycle-1 :value 2}
+        desc-3 {:fx/type lifecycle-2 :value 3}
+        component-1 (lifecycle/create lifecycle/dynamic desc-1 opts)
+        component-2 (lifecycle/advance lifecycle/dynamic component-1 desc-2 opts)
+        component-3 (lifecycle/advance lifecycle/dynamic component-2 desc-3 opts)
+        _ (lifecycle/delete lifecycle/dynamic component-3 opts)]
+    (fact (component/instance component-1)
+          => [:lifecycle-1 1])
+    (fact (component/instance component-2)
+          => [:lifecycle-1 2])
+    (fact (component/instance component-3)
+          => [:lifecycle-2 3])
+    (fact @events
+          => [[:create-1 desc-1 opts]
+              [:advance-1 desc-1 desc-2 opts]
+              [:delete-1 desc-2 opts]
+              [:create-2 desc-3 opts]
+              [:delete-2 desc-3 opts]])))
+
+(deftest wrap-coerce-recoerces-only-when-child-instance-changes-test
+  (let [coerced (atom [])
+        events (atom [])
+        child-lifecycle (reify lifecycle/Lifecycle
+                          (create [_ desc opts]
+                            (swap! events conj [:create desc opts])
+                            (with-meta {:desc desc
+                                        :instance (:instance desc)}
+                                       {`component/instance :instance}))
+                          (advance [_ component desc opts]
+                            (swap! events conj [:advance (:desc component) desc opts])
+                            (with-meta {:desc desc
+                                        :instance (:instance desc)}
+                                       {`component/instance :instance}))
+                          (delete [_ component opts]
+                            (swap! events conj [:delete (:desc component) opts])))
+        lifecycle (lifecycle/wrap-coerce child-lifecycle
+                                         (fn [x]
+                                           (swap! coerced conj x)
+                                           [:coerced x]))
+        component-1 (lifecycle/create lifecycle {:instance 1 :other :a} {::foo 1})
+        component-2 (lifecycle/advance lifecycle component-1 {:instance 1 :other :b} {::foo 2})
+        component-3 (lifecycle/advance lifecycle component-2 {:instance 2 :other :c} {::foo 3})
+        _ (lifecycle/delete lifecycle component-3 {::foo 4})]
+    (fact @coerced
+          => [1 2])
+    (fact (component/instance component-1)
+          => [:coerced 1])
+    (fact (component/instance component-2)
+          => [:coerced 1])
+    (fact (component/instance component-3)
+          => [:coerced 2])
+    (fact @events
+          => [[:create {:instance 1 :other :a} {::foo 1}]
+              [:advance {:instance 1 :other :a} {:instance 1 :other :b} {::foo 2}]
+              [:advance {:instance 1 :other :b} {:instance 2 :other :c} {::foo 3}]
+              [:delete {:instance 2 :other :c} {::foo 4}]])))
+
+(deftest event-handler-preserves-same-kind-components-test
+  (binding [lifecycle/*in-progress?* false]
+    (let [events (atom [])
+          handler-1 #(swap! events conj [:handler-1 %])
+          handler-2 #(swap! events conj [:handler-2 %])
+          opts-1 {:fx.opt/map-event-handler #(swap! events conj [:map-1 %])}
+          opts-2 {:fx.opt/map-event-handler #(swap! events conj [:map-2 %])}
+          map-component-1 (lifecycle/create lifecycle/event-handler {:a 1} opts-1)
+          map-component-2 (lifecycle/advance lifecycle/event-handler map-component-1 {:a 2} opts-1)
+          map-component-3 (lifecycle/advance lifecycle/event-handler map-component-2 {:a 3} opts-2)
+          fn-component-1 (lifecycle/create lifecycle/event-handler handler-1 nil)
+          fn-component-2 (lifecycle/advance lifecycle/event-handler fn-component-1 handler-2 nil)
+          else-component-1 (lifecycle/create lifecycle/event-handler :handler nil)
+          else-component-2 (lifecycle/advance lifecycle/event-handler else-component-1 :handler nil)
+          else-component-3 (lifecycle/advance lifecycle/event-handler else-component-2 :other nil)]
+      ((component/instance map-component-1) :event-1)
+      ((component/instance map-component-2) :event-2)
+      ((component/instance map-component-3) :event-3)
+      ((component/instance fn-component-1) :event-4)
+      ((component/instance fn-component-2) :event-5)
+      (fact (identical? map-component-1 map-component-2)
+            => true)
+      (fact (identical? map-component-2 map-component-3)
+            => false)
+      (fact (identical? fn-component-1 fn-component-2)
+            => true)
+      (fact (identical? else-component-1 else-component-2)
+            => true)
+      (fact (identical? else-component-2 else-component-3)
+            => false)
+      (fact @events
+            => [[:map-1 {:a 2 :fx/event :event-1}]
+                [:map-1 {:a 2 :fx/event :event-2}]
+                [:map-2 {:a 3 :fx/event :event-3}]
+                [:handler-2 :event-4]
+                [:handler-2 :event-5]]))))
+
 (deftest wrap-extra-props-test
   (let [extra-props #{:a :b :c}
         existing-props #{:d :e}
