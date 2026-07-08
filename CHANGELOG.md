@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.9](https://github.com/cljfx/cljfx/releases/tag/1.10.9) - 2026-07-08
+
+Improve noop advance performance.
+
 ### [1.10.8](https://github.com/cljfx/cljfx/releases/tag/1.10.8) - 2026-05-08
 
 Improve update performance. JavaFX mutations are still the main bottleneck, but
