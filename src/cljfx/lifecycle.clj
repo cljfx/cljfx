@@ -13,8 +13,8 @@
             [cljfx.prop :as prop]
             [cljfx.context :as context]
             [clojure.set :as set])
-  (:import [clojure.lang MapEntry]
-           [java.util HashMap]))
+  (:import [clojure.lang IPersistentVector MapEntry RT]
+           [java.util HashMap Iterator]))
 
 (set! *warn-on-reflection* true)
 
@@ -304,42 +304,22 @@
                   (create this desc opts)))
      `delete (fn [_ _ _])}))
 
-(defn- ordered-keyed-descs
-  "Return a vec of map entries with ordered calculated keys and descs
-
-  Example:
-  ```
-  (mapv (fn [^MapEntry e] [(.key e) (.val e)])
-        (ordered-keyed-descs #(-> % meta (get :key ::no-key))
-                             [{:x 1}
-                              (with-meta {:key 1} {:key 1})
-                              (with-meta {:also 1} {:key 1})
-                              {}]))
-  => [[[::no-key 0] {:x 1}]
-      [[1 0] {:key 1}]
-      [[1 1] {:also 1}]
-      [[::no-key 1] {}]]
-  ```"
-  [key-fn coll]
-  (let [^HashMap key-value->counter (HashMap.)]
-    (mapv
-      (fn [x]
-        (let [key-value (key-fn x)
-              key-index (long (or (.get key-value->counter key-value) 0))
-              key [key-value key-index]]
-          (.put key-value->counter key-value (unchecked-inc key-index))
-          (MapEntry/create key x)))
-      coll)))
-
 (defn- fx-key-from-map [desc]
   (:fx/key desc ::no-key))
 
 (defn- strip-fx-key [desc]
   (dissoc desc :fx/key))
 
-(deftype ManyComponent [instance key->component]
+(deftype ManyComponent [instance key->component keys]
   component/Component
   (instance [_] instance))
+
+(defn- transient-vector-prefix [^IPersistentVector v ^long end]
+  (loop [ret (transient [])
+         i 0]
+    (if (< i end)
+      (recur (conj! ret (.nth v i)) (unchecked-inc i))
+      ret)))
 
 (defn wrap-many
   ([lifecycle]
@@ -347,40 +327,118 @@
   ([lifecycle desc->key desc->child-desc]
    (reify Lifecycle
      (create [_ desc opts]
-       (let [key->component (volatile! (transient {}))
-             instance (mapv
-                        (fn [^MapEntry entry]
-                          (let [component (create lifecycle
-                                                  (desc->child-desc (.val entry))
-                                                  opts)]
-                            (vswap! key->component assoc! (.key entry) component)
-                            (component/instance component)))
-                        (ordered-keyed-descs desc->key desc))]
-         (->ManyComponent instance (persistent! @key->component))))
+       (let [^Iterator it (RT/iter desc)
+             ^HashMap key-value->counter (HashMap.)]
+         (loop [key->component (transient {})
+                instance (transient [])
+                keys (transient [])]
+           (if (.hasNext it)
+             (let [desc (.next it)
+                   key-value (desc->key desc)
+                   key-index (long (or (.get key-value->counter key-value) 0))
+                   key (MapEntry/create key-value key-index)
+                   child (create lifecycle (desc->child-desc desc) opts)]
+               (.put key-value->counter key-value (unchecked-inc key-index))
+               (recur (assoc! key->component key child)
+                      (conj! instance (component/instance child))
+                      (conj! keys key)))
+             (->ManyComponent (persistent! instance)
+                              (persistent! key->component)
+                              (persistent! keys))))))
 
      (advance [_ component desc opts]
-       (let [^ManyComponent component component
+       (let [^Iterator it (RT/iter desc)
+             ^ManyComponent component component
+             ^IPersistentVector old-instance (.-instance component)
+             old-instance-count (count old-instance)
              old-key->component (.-key->component component)
-             key->component (volatile! (transient {}))
-             instance (mapv
-                        (fn [^MapEntry entry]
-                          (let [key (.key entry)
-                                child-desc (desc->child-desc (.val entry))
-                                old-component (get old-key->component key ::no-key)
-                                new-component (if (identical? ::no-key old-component)
-                                                (create lifecycle child-desc opts)
-                                                (advance lifecycle old-component child-desc opts))]
-                            (vswap! key->component assoc! key new-component)
-                            (component/instance new-component)))
-                        (ordered-keyed-descs desc->key desc))
-             key->component (persistent! @key->component)]
-         (reduce-kv
-          (fn [_ key old-component]
-            (when-not (contains? key->component key)
-              (delete lifecycle old-component opts)))
-          nil
-          old-key->component)
-         (->ManyComponent instance key->component)))
+             ^IPersistentVector old-keys (.-keys component)
+             old-key-count (count old-keys)
+             ^HashMap key-value->counter (HashMap.)]
+         (loop [index 0
+                key->component nil
+                instance nil
+                keys nil]
+           (if (.hasNext it)
+             (let [desc (.next it)
+                   key-value (desc->key desc)
+                   key-index (long (or (.get key-value->counter key-value) 0))
+                   key (MapEntry/create key-value key-index)
+                   old-child (get old-key->component key ::no-key)
+                   new-child (if (identical? ::no-key old-child)
+                               (create lifecycle (desc->child-desc desc) opts)
+                               (advance lifecycle old-child (desc->child-desc desc) opts))
+                   new-child-instance (component/instance new-child)]
+               (.put key-value->counter key-value (unchecked-inc key-index))
+               (recur
+                (unchecked-inc index)
+                (if (identical? old-child new-child)
+                  key->component
+                  (assoc! (or key->component (transient old-key->component))
+                          key
+                          new-child))
+                (cond
+                  (some? instance)
+                  (conj! instance new-child-instance)
+
+                  (and (< index old-instance-count)
+                       (identical? (.nth old-instance index) new-child-instance))
+                  nil
+
+                  :else
+                  (conj! (transient-vector-prefix old-instance index)
+                         new-child-instance))
+                (cond
+                  (some? keys)
+                  (conj! keys key)
+
+                  (and (< index old-key-count)
+                       (= (.nth old-keys index) key))
+                  nil
+
+                  :else
+                  (conj! (transient-vector-prefix old-keys index) key))))
+             (let [keys (cond
+                          (some? keys)
+                          (persistent! keys)
+
+                          (= index old-key-count)
+                          old-keys
+
+                          :else
+                          (persistent! (transient-vector-prefix old-keys index)))
+                   key->component
+                   (if (identical? old-keys keys)
+                     key->component
+                     (let [key-set (set keys)]
+                       (reduce-kv
+                        (fn [ret key old-child]
+                          (if (contains? key-set key)
+                            ret
+                            (do
+                              (delete lifecycle old-child opts)
+                              (dissoc! (or ret (transient old-key->component)) key))))
+                        key->component
+                        old-key->component)))
+                   instance (cond
+                              (some? instance)
+                              (persistent! instance)
+
+                              (= index old-instance-count)
+                              old-instance
+
+                              :else
+                              (persistent! (transient-vector-prefix old-instance index)))]
+               (if (and (nil? key->component)
+                        (identical? old-instance instance)
+                        (identical? old-keys keys))
+                 component
+                 (->ManyComponent
+                  instance
+                  (if (nil? key->component)
+                    old-key->component
+                    (persistent! key->component))
+                  keys)))))))
 
      (delete [_ component opts]
        (doseq [x (vals (.-key->component ^ManyComponent component))]

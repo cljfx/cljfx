@@ -6,4 +6,5 @@
 /classes
 /.idea
 /cljfx.iml
+/target
 *.swp

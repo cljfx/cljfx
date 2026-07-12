@@ -669,6 +669,146 @@
       (delete [_ component opts]
         (swap! events conj [:delete (:id component) opts])))))
 
+(deftest wrap-many-preserves-component-on-noop-advance-test
+  (let [events (atom [])
+        child-lifecycle (reify lifecycle/Lifecycle
+                          (create [_ desc opts]
+                            (swap! events conj [:create desc opts])
+                            desc)
+                          (advance [_ component desc opts]
+                            (swap! events conj [:advance component desc opts])
+                            (if (= component desc) component desc))
+                          (delete [_ component opts]
+                            (swap! events conj [:delete component opts])))
+        lifecycle (lifecycle/wrap-many child-lifecycle identity identity)
+        desc [:a :b :c]
+        component-1 (lifecycle/create lifecycle desc {::foo 1})
+        instance-1 (component/instance component-1)
+        _ (reset! events [])
+        component-2 (lifecycle/advance lifecycle component-1 desc {::foo 2})]
+    (fact @events
+          => [[:advance :a :a {::foo 2}]
+              [:advance :b :b {::foo 2}]
+              [:advance :c :c {::foo 2}]])
+    (fact (identical? component-1 component-2)
+          => true)
+    (fact (identical? instance-1 (component/instance component-2))
+          => true)
+    (reset! events [])
+    (let [component-3 (lifecycle/advance lifecycle component-2 [:a :c] {::foo 3})]
+      (fact @events
+            => [[:advance :a :a {::foo 3}]
+                [:advance :c :c {::foo 3}]
+                [:delete :b {::foo 3}]])
+      (fact (component/instance component-3)
+            => [:a :c])
+      (reset! events [])
+      (let [component-4 (lifecycle/advance lifecycle component-3 desc {::foo 4})]
+        (fact @events
+              => [[:advance :a :a {::foo 4}]
+                  [:create :b {::foo 4}]
+                  [:advance :c :c {::foo 4}]])
+        (fact (component/instance component-4)
+              => desc)))))
+
+(deftest wrap-many-reuses-instance-when-only-child-components-change-test
+  (let [child-lifecycle (reify lifecycle/Lifecycle
+                          (create [_ {:keys [instance value]} _]
+                            (with-meta
+                              {:instance instance
+                               :value value}
+                              {`component/instance :instance}))
+                          (advance [_ component {:keys [instance value]} _]
+                            (assoc component :instance instance :value value))
+                          (delete [_ _ _]))
+        lifecycle (lifecycle/wrap-many child-lifecycle :key #(dissoc % :key))
+        instance-a (Object.)
+        instance-b (Object.)
+        component-1 (lifecycle/create
+                      lifecycle
+                      [{:key :a :instance instance-a :value 1}
+                       {:key :b :instance instance-b :value 2}]
+                      nil)
+        instance-1 (component/instance component-1)
+        component-2 (lifecycle/advance
+                      lifecycle
+                      component-1
+                      [{:key :a :instance instance-a :value 10}
+                       {:key :b :instance instance-b :value 20}]
+                      nil)]
+    (fact (identical? component-1 component-2)
+          => false)
+    (fact (identical? instance-1 (component/instance component-2))
+          => true)))
+
+(deftest wrap-many-supports-ordered-seqable-inputs-test
+  (let [events (atom [])
+        child-lifecycle (reify lifecycle/Lifecycle
+                          (create [_ desc opts]
+                            (swap! events conj [:create desc opts])
+                            desc)
+                          (advance [_ component desc opts]
+                            (swap! events conj [:advance component desc opts])
+                            (if (= component desc) component desc))
+                          (delete [_ component opts]
+                            (swap! events conj [:delete component opts])))
+        lifecycle (lifecycle/wrap-many child-lifecycle identity identity)
+        component-1 (lifecycle/create lifecycle [:a :b :c] nil)
+        _ (reset! events [])
+        component-2 (lifecycle/advance lifecycle component-1 '(:a :b :c) {::foo 1})]
+    (fact @events
+          => [[:advance :a :a {::foo 1}]
+              [:advance :b :b {::foo 1}]
+              [:advance :c :c {::foo 1}]])
+    (fact (identical? component-1 component-2)
+          => true)
+    (reset! events [])
+    (let [desc (for [x [:a :b :c]] x)
+          component-3 (lifecycle/advance lifecycle component-2 desc {::foo 2})]
+      (fact @events
+            => [[:advance :a :a {::foo 2}]
+                [:advance :b :b {::foo 2}]
+                [:advance :c :c {::foo 2}]])
+      (fact (identical? component-2 component-3)
+            => true)
+      (fact (identical? (component/instance component-2)
+                        (component/instance component-3))
+            => true))))
+
+(deftest wrap-many-handles-empty-and-nil-transitions-test
+  (let [events (atom [])
+        lifecycle (lifecycle/wrap-many
+                   (tracking-lifecycle events)
+                   identity
+                   identity)
+        component-1 (lifecycle/create lifecycle nil {::foo 1})
+        component-2 (lifecycle/advance lifecycle component-1 [] {::foo 2})]
+    (fact (component/instance component-1)
+          => [])
+    (fact @events
+          => [])
+    (fact (identical? component-1 component-2)
+          => true)
+    (let [component-3 (lifecycle/advance lifecycle component-2 [:a :b] {::foo 3})]
+      (fact (component/instance component-3)
+            => [1 2])
+      (fact @events
+            => [[:create 1 :a {::foo 3}]
+                [:create 2 :b {::foo 3}]])
+      (reset! events [])
+      (let [component-4 (lifecycle/advance lifecycle component-3 nil {::foo 4})]
+        (fact (component/instance component-4)
+              => [])
+        (fact (set @events)
+              => #{[:delete 1 {::foo 4}]
+                   [:delete 2 {::foo 4}]})
+        (reset! events [])
+        (let [component-5 (lifecycle/advance lifecycle component-4 nil {::foo 5})]
+          (fact @events
+                => [])
+          (fact (identical? component-4 component-5)
+                => true))))))
+
 (deftest wrap-many-preserves-key-occurrences-test
   (let [events (atom [])
         lifecycle (lifecycle/wrap-many (tracking-lifecycle events))
@@ -722,6 +862,33 @@
           => #{[:delete 1 {::foo 4}]
                [:delete 3 {::foo 4}]})))
 
+(deftest wrap-many-distinguishes-nil-and-missing-keys-test
+  (let [events (atom [])
+        lifecycle (lifecycle/wrap-many (tracking-lifecycle events))
+        component (lifecycle/create
+                   lifecycle
+                   [{:fx/key nil :v 1}
+                    {:v 2}
+                    {:fx/key nil :v 3}
+                    {:v 4}]
+                   nil)
+        _ (reset! events [])
+        component (lifecycle/advance
+                   lifecycle
+                   component
+                   [{:v 20}
+                    {:fx/key nil :v 10}
+                    {:v 40}
+                    {:fx/key nil :v 30}]
+                   nil)]
+    (fact (component/instance component)
+          => [2 1 4 3])
+    (fact (set @events)
+          => #{[:advance 1 {:v 1} {:v 10} nil]
+               [:advance 2 {:v 2} {:v 20} nil]
+               [:advance 3 {:v 3} {:v 30} nil]
+               [:advance 4 {:v 4} {:v 40} nil]})))
+
 (deftest wrap-many-uses-custom-key-and-child-desc-test
   (let [events (atom [])
         lifecycle (lifecycle/wrap-many
@@ -746,6 +913,24 @@
           => [1])
     (fact @events
           => [[:advance 1 {:payload "a"} {:payload "b"} nil]])))
+
+(deftest wrap-many-preserves-clojure-equivalent-keys-test
+  (let [events (atom [])
+        lifecycle (lifecycle/wrap-many
+                    (tracking-lifecycle events)
+                    :id
+                    #(select-keys % [:payload]))
+        component (lifecycle/create lifecycle [{:id 1M :payload "a"}] nil)
+        _ (reset! events [])
+        component (lifecycle/advance lifecycle component [{:id 1.0M :payload "b"}] nil)]
+    (fact (component/instance component)
+          => [1])
+    (fact @events
+          => [[:advance 1 {:payload "a"} {:payload "b"} nil]])
+    (reset! events [])
+    (lifecycle/delete lifecycle component nil)
+    (fact @events
+          => [[:delete 1 nil]])))
 
 (deftest callback-test
   (binding [lifecycle/*in-progress?* false]
