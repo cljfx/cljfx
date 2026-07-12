@@ -3,6 +3,10 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+### [1.10.10](https://github.com/cljfx/cljfx/releases/tag/1.10.10) - 2026-07-12
+
+Improve noop advance performance even more.
+
 ### [1.10.9](https://github.com/cljfx/cljfx/releases/tag/1.10.9) - 2026-07-08
 
 Improve noop advance performance.
