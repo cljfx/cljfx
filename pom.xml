@@ -5,9 +5,6 @@
   <artifactId>cljfx</artifactId>
   <version>1.10.10</version>
   <name>cljfx</name>
-  <properties>
-    <cljfx.version>1.10.10</cljfx.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.clojure</groupId>
@@ -23,7 +20,6 @@
   </repositories>
   <scm>
     <url>https://github.com/cljfx/cljfx</url>
-    <tag>1.10.10</tag>
   </scm>
   <profiles>
     <profile>
@@ -35,7 +31,7 @@
         <dependency>
           <groupId>cljfx</groupId>
           <artifactId>cljfx</artifactId>
-          <version>${cljfx.version}</version>
+          <version>${project.version}</version>
           <classifier>jdk8</classifier>
         </dependency>
       </dependencies>
@@ -49,7 +45,7 @@
         <dependency>
           <groupId>cljfx</groupId>
           <artifactId>cljfx</artifactId>
-          <version>${cljfx.version}</version>
+          <version>${project.version}</version>
           <classifier>jdk11</classifier>
         </dependency>
         <dependency>
@@ -88,7 +84,7 @@
         <dependency>
           <groupId>cljfx</groupId>
           <artifactId>cljfx</artifactId>
-          <version>${cljfx.version}</version>
+          <version>${project.version}</version>
           <classifier>jdk11</classifier>
         </dependency>
         <dependency>

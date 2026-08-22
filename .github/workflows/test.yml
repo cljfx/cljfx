@@ -2,6 +2,9 @@ name: Clojure CI
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,3 +43,33 @@ jobs:
             ~/.m2/repository
             ~/.gitlibs
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+
+  release:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - uses: DeLaGuardo/setup-clojure@13
+        with:
+          cli: '1.12.0.1479'
+      - name: Restore Clojure deps cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: ${{ runner.os }}-clojure-${{ hashFiles('pom.xml') }}-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure-${{ hashFiles('pom.xml') }}-
+            ${{ runner.os }}-clojure-
+      - name: Release to Clojars
+        env:
+          CLOJARS_TOKEN: ${{ secrets.CLOJARS_TOKEN }}
+        run: clojure -T:build release
