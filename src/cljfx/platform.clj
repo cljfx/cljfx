@@ -9,12 +9,10 @@
        (bound-fn []
          (let [result# (try
                          [nil (do ~@body)]
-                         (catch Exception e#
+                         (catch Throwable e#
                            [e# nil]))
                [err# ~'_] result#]
-           (deliver *result# result#)
-           (when err#
-             (.printStackTrace ^Throwable err#)))))
+           (deliver *result# result#))))
      (delay
        (let [[err# val#] @*result#]
          (if err#
@@ -23,7 +21,10 @@
 
 (defmacro on-fx-thread [& body]
   `(if (Platform/isFxApplicationThread)
-     (deliver (promise) (do ~@body))
+     (try
+       (deliver (promise) (do ~@body))
+       (catch Throwable e#
+         (delay (throw e#))))
      (run-later ~@body)))
 
 (defn initialize []
