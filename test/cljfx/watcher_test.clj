@@ -5,19 +5,31 @@
 
 (deftest dedupe-on-fx-thread
   (let [state (atom 0)
-        refresh-counter (atom 0)]
-    (fx/instance
-      (fx/create-component
-        {:fx/type fx/ext-watcher
-         :ref state
-         :desc {:fx/type (fn [{:keys [value key]}]
-                           (swap! refresh-counter inc)
-                           {:fx/type :label
-                            :text (str value key)})
-                :key :test}}))
-    (dotimes [_ 100000]
-      (swap! state inc))
-    (is (< @refresh-counter 1000))))
+        refresh-counter (atom 0)
+        component (fx/create-component
+                    {:fx/type fx/ext-watcher
+                     :ref state
+                     :desc {:fx/type (fn [{:keys [value key]}]
+                                       (swap! refresh-counter inc)
+                                       {:fx/type :label
+                                        :text (str value key)})
+                            :key :test}})
+        fx-thread-blocked (promise)
+        release-fx-thread (promise)]
+    (fx/instance component)
+    (fx/run-later
+      (deliver fx-thread-blocked true)
+      @release-fx-thread)
+    @fx-thread-blocked
+    (try
+      (dotimes [_ 100000]
+        (swap! state inc))
+      (deliver release-fx-thread true)
+      @(fx/run-later)
+      (is (= 2 @refresh-counter))
+      (finally
+        (deliver release-fx-thread true)
+        (fx/delete-component component)))))
 
 (deftest key-test
   (let [state (atom "Foo")
