@@ -44,10 +44,12 @@ jobs:
             ~/.gitlibs
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
 
-  release:
+  publish:
     if: github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,7 +71,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-clojure-${{ hashFiles('pom.xml') }}-
             ${{ runner.os }}-clojure-
+      - name: Determine release version
+        id: version
+        run: echo "version=$(clojure -T:build print-version)" >> "$GITHUB_OUTPUT"
       - name: Release to Clojars
         env:
           CLOJARS_TOKEN: ${{ secrets.CLOJARS_TOKEN }}
         run: clojure -T:build release
+
+  release:
+    if: github.ref == 'refs/heads/master'
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.publish.outputs.version }}
+        run: |
+          START_TAG="$(gh release list --limit 1 --json tagName --jq '.[0].tagName')"
+          if [ -z "$START_TAG" ]; then
+            START_TAG="1.10.10"
+          fi
+          gh release create "$VERSION" \
+            --target "$GITHUB_SHA" \
+            --title "$VERSION" \
+            --generate-notes \
+            --notes-start-tag "$START_TAG"

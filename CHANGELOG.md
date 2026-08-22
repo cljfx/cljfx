@@ -3,6 +3,14 @@
 All notable changes to [cljfx](https://github.com/cljfx/cljfx) will be 
 documented in this file.
 
+## Releases after 1.10.10
+
+Starting after 1.10.10, every successful push to `master` is published with a
+version of the form `1.10.<number-of-commits>`. Release notes for these versions
+are available on the [GitHub Releases](https://github.com/cljfx/cljfx/releases)
+page. The entries below are the historical changelog for releases through
+1.10.10.
+
 ### [1.10.10](https://github.com/cljfx/cljfx/releases/tag/1.10.10) - 2026-07-12
 
 Improve noop advance performance even more.

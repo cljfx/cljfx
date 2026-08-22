@@ -28,6 +28,9 @@
 (defn clean [_]
   (b/delete {:path target-dir}))
 
+(defn print-version [_]
+  (println version))
+
 (defn- pom-opts [destination]
   (merge {:basis @pom-basis
           :lib lib
