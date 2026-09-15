@@ -86,7 +86,7 @@
     (instance? Image x) x
     (string? x) (Image. ^String x)
     (map? x) (if (contains? x :url)
-               (Image. (:url x)
+               (Image. ^String (:url x)
                        (double (:requested-width x 0))
                        (double (:requested-height x 0))
                        (boolean (:preserve-ratio x))
