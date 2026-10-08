@@ -261,11 +261,15 @@
 
   Re-rendering will happen on JavaFX UI thread with the latest value from the IRef
   supplied to the description. It's safe to update the IRef from any thread as often as
-  needed. The description must ensure that the returned root JavaFX node always stays the
-  same.
+  needed. While watching the same ref, the description must ensure that the returned root
+  JavaFX node stays the same.
+
+  Changing :ref preserves the child component and advances it with the new ref's value.
+  Use ext-recreate-on-key-changed if changing the ref should recreate the child instead.
+  A nil ref supplies nil to the description without watching for updates.
 
   Supported keys (all required):
-    :ref     an IRef (e.g. atom, agent) that will be watched for updates
+    :ref     an IRef (e.g. atom, agent) that will be watched for updates, or nil
     :key     a key to use when passing the value to a wrapped component, default `:value`
     :desc    a component description that will receive an additional key with the latest
              value from the IRef"

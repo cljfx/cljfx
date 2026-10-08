@@ -833,26 +833,42 @@
 (defn- request-render [state value]
   (let [[old new] (swap-vals! state set-new-value-if-not-deleted value)]
     (when (and (not (contains? old :value))
-               (contains? new :value))
+               (contains? new :value)
+               (contains? old :component))
       (platform/run-later (perform-render state)))))
+
+(defn- dispose-watcher [state]
+  (some-> (:ref @state) (remove-watch state))
+  (swap! state assoc :value ::deleted))
+
+(defn- create-watcher [ref desc key opts child]
+  (let [state (atom {:ref ref
+                     :desc desc
+                     :key key
+                     :opts opts}
+                    :meta {`component/instance #(component/instance (:component @%))})]
+    (when ref
+      (add-watch ref state #(request-render state %4)))
+    (let [value (when ref @ref)
+          child-desc (assoc desc key value)
+          new-child (if child
+                      (advance dynamic child child-desc opts)
+                      (create dynamic child-desc opts))
+          new-state (swap! state complete-rendering value new-child)]
+      (when (contains? new-state :value)
+        (platform/run-later (perform-render state))))
+    state))
 
 (def ext-watcher
   (annotate
     (reify Lifecycle
       (create [_ {:keys [ref desc key] :or {key :value}} opts]
-        (let [state (atom {:component (create dynamic (assoc desc key @ref) opts)
-                           :ref ref
-                           :desc desc
-                           :key key
-                           :opts opts}
-                          :meta {`component/instance #(component/instance (:component @%))})]
-          (add-watch ref state #(request-render state %4))
-          state))
-      (advance [this component {:keys [ref desc key] :or {key :value} :as this-desc} opts]
+        (create-watcher ref desc key opts nil))
+      (advance [_ component {:keys [ref desc key] :or {key :value}} opts]
         (let [current-state @component
               current-ref (:ref current-state)]
           (if (= ref current-ref)
-            (let [value @ref
+            (let [value (when ref @ref)
                   old-component (:component @component)
                   old-instance (component/instance old-component)
                   new-component (advance dynamic old-component (assoc desc key value) opts)
@@ -863,12 +879,11 @@
               (when-not (= old-instance new-instance)
                 (throw (ex-info "Instance replace forbidden" {:old old-instance :new new-instance})))
               (doto component (swap! complete-advance desc key opts value new-component)))
-            (do (delete this component opts)
-                (create this this-desc opts)))))
+            (do (dispose-watcher component)
+                (create-watcher ref desc key opts (:component current-state))))))
       (delete [_ component opts]
         (let [current-state @component]
-          (remove-watch (:ref current-state) component)
-          (swap! component assoc :value ::deleted)
+          (dispose-watcher component)
           (delete dynamic (:component current-state) opts))))
     'cljfx.api/ext-watcher))
 
