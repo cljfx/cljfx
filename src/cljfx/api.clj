@@ -261,8 +261,7 @@
 
   Re-rendering will happen on JavaFX UI thread with the latest value from the IRef
   supplied to the description. It's safe to update the IRef from any thread as often as
-  needed. While watching the same ref, the description must ensure that the returned root
-  JavaFX node stays the same.
+  needed. Ref-triggered re-renders must preserve the root JavaFX instance.
 
   Changing :ref preserves the child component and advances it with the new ref's value.
   Use ext-recreate-on-key-changed if changing the ref should recreate the child instead.
@@ -281,8 +280,7 @@
   Supported keys:
     :desc             required, the stateful component description that will receive 2
                       additional keys defined by `:key` and `:swap-key` props
-                      The description must ensure that the returned root JavaFX node
-                      always stays the same.
+                      Local state updates must preserve the root instance.
     :initial-state    the initial local state of the component. Whenever the initial state
                       changes, the state will be discarded and recreated from scratch. The
                       child component, on the other hand, will not be discarded. Instead,

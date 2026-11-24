@@ -2,14 +2,23 @@
   (:require [cljfx.api :as fx]
             [cljfx.component :as component]
             [cljfx.context :as context]
+            [cljfx.fx.border-pane :as fx.border-pane]
+            [cljfx.fx.label :as fx.label]
+            [cljfx.fx.tab :as fx.tab]
+            [cljfx.fx.tab-pane :as fx.tab-pane]
+            [cljfx.fx.text-field :as fx.text-field]
+            [cljfx.fx.v-box :as fx.v-box]
             [cljfx.lifecycle :as lifecycle]
             [cljfx.mutator :as mutator]
             [cljfx.prop :as prop]
             [cljfx.test-helpers :refer :all]
             [clojure.test :refer :all]
             [testit.core :refer :all])
-  (:import [javafx.beans.value ChangeListener]
-           [javafx.scene.control Label TextField]))
+  (:import [clojure.lang IRef]
+           [javafx.beans.value ChangeListener]
+           [javafx.geometry Insets Pos]
+           [javafx.scene.control Label Tab TabPane TextField]
+           [javafx.scene.layout BorderPane Priority VBox]))
 
 (deftest advance-prop-map-preserves-nil-valued-props-test
   (let [events (atom [])
@@ -971,3 +980,513 @@
               [:bind]
               [:callback 2 "b" "c"]]
              @events)))))
+
+;; Nil descriptions represent absence without suppressing invalid descriptions
+;; or discarding the state of a component whose function returns nil.
+(deftest dynamic-nil-description-test
+  (testing "Nil bypasses type resolution and reuses an already absent component"
+    (let [resolved-types (atom [])
+
+          opts
+          {:fx.opt/type->lifecycle
+           (fn resolve-type [type]
+             (swap! resolved-types conj type)
+             type)}
+
+          child (lifecycle/create lifecycle/dynamic nil opts)]
+      (try
+        (is (nil? (component/instance child)))
+        (is (identical? child (lifecycle/advance lifecycle/dynamic child nil opts)))
+        (is (= [] @resolved-types))
+        (finally
+          (lifecycle/delete lifecycle/dynamic child opts)))))
+  (testing "Transitioning to nil deletes the old child; restoring creates a new one"
+    (let [events (atom [])
+          child-lifecycle (tracking-lifecycle events)
+          desc {:fx/type child-lifecycle}
+          current (volatile! (fx/create-component nil))]
+      (try
+        (vswap! current fx/advance-component desc)
+        (let [first-component @current]
+          (is (= 1 (fx/instance first-component)))
+          (vswap! current fx/advance-component nil)
+          (is (nil? (fx/instance @current)))
+          (is (= 1 (fx/instance first-component)))
+          (is (= [[:create 1] [:delete 1]]
+                 (mapv #(subvec % 0 2) @events))))
+        (vswap! current fx/advance-component desc)
+        (is (= 2 (fx/instance @current)))
+        (finally
+          (fx/delete-component @current)))
+      (is (= [[:create 1] [:delete 1] [:create 2] [:delete 2]]
+             (mapv #(subvec % 0 2) @events)))))
+  (testing "An explicit nil child clears a native property"
+    @(fx/on-fx-thread
+       (let [desc
+             {:fx/type fx.tab/lifecycle
+              :content {:fx/type fx.label/lifecycle :text "Content"}}
+
+             current (volatile! (fx/create-component desc))
+             ^Tab tab (fx/instance @current)]
+         (try
+           (is (= "Content" (.getText ^Label (.getContent tab))))
+           (vswap! current fx/advance-component (assoc desc :content nil))
+           (is (identical? tab (fx/instance @current)))
+           (is (nil? (.getContent tab)))
+           (vswap! current fx/advance-component desc)
+           (is (= "Content" (.getText ^Label (.getContent tab))))
+           (finally
+             (fx/delete-component @current))))))
+  (testing "A function can return nil while ext-state stays mounted"
+    (let [current (atom nil)
+          update-state (atom nil)
+
+          view
+          (fn optional-view [{:keys [visible state swap-state]}]
+            (reset! update-state swap-state)
+            (when visible
+              {:fx/type fx.label/lifecycle :text (str state)}))
+
+          desc
+          (fn describe-stateful-view [visible]
+            {:fx/type fx.tab/lifecycle
+             :content {:fx/type fx/ext-state
+                       :initial-state 0
+                       :desc {:fx/type view :visible visible}}})]
+      (try
+        (reset! current @(fx/on-fx-thread (fx/create-component (desc false))))
+        (let [^Tab tab (fx/instance @current)
+              updater @update-state]
+          (is (nil? (.getContent tab)))
+          (updater inc)
+          @(fx/run-later)
+          (is (nil? (.getContent tab)))
+          (reset! current @(fx/on-fx-thread
+                             (fx/advance-component @current (desc true))))
+          (is (= "1" (.getText ^Label (.getContent tab))))
+          (reset! current @(fx/on-fx-thread
+                             (fx/advance-component @current (desc false))))
+          (is (nil? (.getContent tab)))
+          (updater inc)
+          @(fx/run-later)
+          (reset! current @(fx/on-fx-thread
+                             (fx/advance-component @current (desc true))))
+          (is (= "2" (.getText ^Label (.getContent tab))))
+          (is (identical? updater @update-state)))
+        (finally
+          (when @current
+            @(fx/on-fx-thread (fx/delete-component @current)))))))
+  (testing "Malformed nonnil descriptions still fail during creation and advancement"
+    (let [child (fx/create-component nil)]
+      (try
+        (doseq [desc [{} {:fx/type nil} {:fx/type ::unknown} false]]
+          (is (thrown? IllegalArgumentException (fx/create-component desc)))
+          (is (thrown? IllegalArgumentException (fx/advance-component child desc))))
+        (is (thrown? IllegalArgumentException
+                     (fx/create-component {:fx/type (fn invalid-view [_] {})})))
+        (finally
+          (fx/delete-component child)))))
+  (testing "Exceptions from a function component propagate unchanged"
+    (let [failure (ex-info "View failed" {})
+
+          view
+          (fn broken-view [_] (throw failure))]
+      (is (identical? failure
+                      (try
+                        (fx/create-component {:fx/type view})
+                        (catch Exception caught caught)))))))
+
+;; Extra-prop resources belong to a nonnil target, while the child component
+;; survives target changes and absence in both wrapper APIs.
+(deftest extra-props-target-lifetime-test
+  (doseq [style [:inline :detached]]
+    (testing (name style)
+      (let [events (atom [])
+            next-id (atom 0)
+            child-created (atom 0)
+            child-deleted (atom [])
+            forwarded (atom [])
+            target-a (atom {:name :a})
+            target-b (atom {:name :b})
+            opts {::option :passed}
+
+            child-lifecycle
+            (reify lifecycle/Lifecycle
+              (create [_ desc opts]
+                (swap! child-created inc)
+                (swap! forwarded conj [(dissoc desc :target) opts])
+                (with-meta {:instance (:target desc) :generation 0}
+                  {`component/instance :instance}))
+              (advance [_ child desc opts]
+                (swap! forwarded conj [(dissoc desc :target) opts])
+                (assoc child :instance (:target desc)
+                       :generation (inc (:generation child))))
+              (delete [_ child _]
+                (swap! child-deleted conj (:generation child))))
+
+            value-lifecycle
+            (reify lifecycle/Lifecycle
+              (create [_ desc _]
+                (let [id (swap! next-id inc)]
+                  (swap! events conj [:create id desc])
+                  {:id id :value desc}))
+              (advance [_ value desc _]
+                (swap! events conj [:advance (:id value) (:value value) desc])
+                (assoc value :value desc))
+              (delete [_ value _]
+                (swap! events conj [:delete (:id value) (:value value)])))
+
+            extra-prop
+            (prop/make
+              (mutator/setter
+                (fn assign-extra! [target value]
+                  (swap! events conj [:assign (:name @target) value])
+                  (swap! target assoc :extra value)))
+              value-lifecycle
+              :coerce (fn coerce-extra [{:keys [id value]}]
+                        (swap! events conj [:coerce id value])
+                        [:applied id value]))
+
+            wrapper
+            (case style
+              :inline (lifecycle/wrap-extra-props child-lifecycle {:extra extra-prop})
+              :detached (lifecycle/make-ext-with-props child-lifecycle {:extra extra-prop}))
+
+            describe
+            (fn describe-wrapper [target props]
+              (case style
+                :inline (assoc props :target target :forwarded :child)
+                :detached {:desc {:target target :forwarded :child} :props props}))
+
+            current
+            (volatile! (lifecycle/create wrapper (describe nil {:extra :initial}) opts))]
+        (try
+          (is (nil? (component/instance @current)))
+          (is (= [] @events))
+          (vswap! current #(lifecycle/advance wrapper % (describe nil {:extra :hidden}) opts))
+          (is (= [] @events))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-a {:extra :first}) opts))
+          (is (= [:applied 1 :first] (:extra @target-a)))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-a {:extra :first}) opts))
+          (is (= [:advance 1 :first :first] (peek @events)))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-a {:extra :updated}) opts))
+          (is (= [:applied 1 :updated] (:extra @target-a)))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-b {:extra :next}) opts))
+          (is (= [:applied 2 :next] (:extra @target-b)))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-b {}) opts))
+          (is (nil? (:extra @target-b)))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-b {:extra nil}) opts))
+          (is (= [:applied 3 nil] (:extra @target-b)))
+          (vswap! current #(lifecycle/advance wrapper % (describe nil {:extra :unmounted}) opts))
+          (is (nil? (component/instance @current)))
+          (vswap! current #(lifecycle/advance wrapper % (describe nil {:extra :new-hidden}) opts))
+          (is (= 3 @next-id))
+          (vswap! current #(lifecycle/advance wrapper % (describe target-a {:extra :restored}) opts))
+          (is (= [:applied 4 :restored] (:extra @target-a)))
+          (finally
+            (lifecycle/delete wrapper @current opts)))
+        (is (= [[:create 1 :first] [:coerce 1 :first] [:assign :a [:applied 1 :first]]
+                [:advance 1 :first :first]
+                [:advance 1 :first :updated] [:coerce 1 :updated] [:assign :a [:applied 1 :updated]]
+                [:delete 1 :updated]
+                [:create 2 :next] [:coerce 2 :next] [:assign :b [:applied 2 :next]]
+                [:assign :b nil] [:delete 2 :next]
+                [:create 3 nil] [:coerce 3 nil] [:assign :b [:applied 3 nil]]
+                [:delete 3 nil]
+                [:create 4 :restored] [:coerce 4 :restored] [:assign :a [:applied 4 :restored]]
+                [:delete 4 :restored]]
+               @events))
+        (is (= 1 @child-created))
+        (is (= [10] @child-deleted))
+        (is (= (vec (repeat 11 [{:forwarded :child} opts])) @forwarded))
+        (let [event-count (count @events)
+
+              absent
+              (lifecycle/create wrapper (describe nil {:extra :unused}) opts)]
+          (lifecycle/delete wrapper absent opts)
+          (is (= event-count (count @events))))))))
+
+;; Native constraints are assigned only to present nodes, including recreated
+;; roots, without resetting the surrounding ext-state component.
+(deftest extra-props-native-constraints-test
+  (let [current (atom nil)
+        update-state (atom nil)
+
+        view
+        (fn constrained-view [{:keys [kind state swap-state]}]
+          (reset! update-state swap-state)
+          (when-not (= :none kind)
+            {:fx/type (case kind
+                        :label fx.label/lifecycle
+                        :text-field fx.text-field/lifecycle)
+             :text (str state)}))
+
+        describe
+        (fn describe-pane [kind margin]
+          {:fx/type fx.border-pane/lifecycle
+           :center {:fx/type fx/ext-state
+                    :initial-state 0
+                    :border-pane/margin margin
+                    :border-pane/alignment :bottom-right
+                    :desc {:fx/type view :kind kind}}})]
+    (try
+      (reset! current @(fx/on-fx-thread (fx/create-component (describe :none 10))))
+      (let [^BorderPane pane (fx/instance @current)
+            updater @update-state]
+        (is (nil? (.getCenter pane)))
+        (updater inc)
+        @(fx/run-later)
+        (reset! current @(fx/on-fx-thread
+                           (fx/advance-component @current (describe :label 10))))
+        (is (= "1" (.getText ^Label (.getCenter pane))))
+        (is (= (Insets. 10.0) (BorderPane/getMargin (.getCenter pane))))
+        (is (= Pos/BOTTOM_RIGHT (BorderPane/getAlignment (.getCenter pane))))
+        (reset! current @(fx/on-fx-thread
+                           (fx/advance-component @current (describe :text-field 20))))
+        (is (= "1" (.getText ^TextField (.getCenter pane))))
+        (is (= (Insets. 20.0) (BorderPane/getMargin (.getCenter pane))))
+        (is (= Pos/BOTTOM_RIGHT (BorderPane/getAlignment (.getCenter pane))))
+        (reset! current @(fx/on-fx-thread
+                           (fx/advance-component @current (describe :none 30))))
+        (is (nil? (.getCenter pane)))
+        (updater inc)
+        @(fx/run-later)
+        (reset! current @(fx/on-fx-thread
+                           (fx/advance-component @current (describe :label 30))))
+        (is (= "2" (.getText ^Label (.getCenter pane))))
+        (is (= (Insets. 30.0) (BorderPane/getMargin (.getCenter pane))))
+        (is (identical? updater @update-state))
+        (let [label (.getCenter pane)
+
+              without-constraints
+              (update (describe :label 30) :center
+                      dissoc :border-pane/margin :border-pane/alignment)]
+          (reset! current @(fx/on-fx-thread
+                             (fx/advance-component @current without-constraints)))
+          (is (identical? label (.getCenter pane)))
+          (is (nil? (BorderPane/getMargin (.getCenter pane))))
+          (is (nil? (BorderPane/getAlignment (.getCenter pane))))))
+      (finally
+        (when @current
+          @(fx/on-fx-thread (fx/delete-component @current)))))))
+
+;; Compacted instance positions stay independent from description positions
+;; for every transition between four visible/absent children, including false.
+(deftest wrap-many-nil-position-transitions-test
+  (let [instances [(Object.) false (Object.) (Object.)]
+        wrapped (lifecycle/wrap-many lifecycle/scalar :key :instance)
+
+        describe
+        (fn describe-mask [mask]
+          (mapv (fn [key instance]
+                  {:key key :instance (when (bit-test mask key) instance)})
+                (range 4) instances))]
+    (doseq [before (range 16)
+            after (range 16)]
+      (let [before-desc (describe before)
+            after-desc (describe after)
+            first-component (lifecycle/create wrapped before-desc {})
+            first-instance (component/instance first-component)
+            current (volatile! first-component)]
+        (try
+          (is (= (into [] (keep :instance) before-desc) first-instance))
+          (vswap! current #(lifecycle/advance wrapped % after-desc {}))
+          (is (= (into [] (keep :instance) after-desc) (component/instance @current)))
+          (is (= (into [] (keep :instance) before-desc) (component/instance first-component)))
+          (when (= before after)
+            (is (identical? first-component @current))
+            (is (identical? first-instance (component/instance @current))))
+          (finally
+            (lifecycle/delete wrapped @current {})))))))
+
+(defn- instance-tracking-lifecycle [events]
+  (let [next-id (atom 0)]
+    (reify lifecycle/Lifecycle
+      (create [_ desc _]
+        (let [id (swap! next-id inc)]
+          (swap! events conj [:create id])
+          (with-meta {:id id :instance (:instance desc) :revision (:revision desc)}
+            {`component/instance :instance})))
+      (advance [_ child desc _]
+        (swap! events conj [:advance (:id child)])
+        (assoc child :instance (:instance desc) :revision (:revision desc)))
+      (delete [_ child _]
+        (swap! events conj [:delete (:id child)])))))
+
+;; Nil instances do not unmount keyed components or consume visible positions;
+;; hidden updates and removal preserve unchanged exposed vectors.
+(deftest wrap-many-nil-ownership-test
+  (let [events (atom [])
+        wrapped (lifecycle/wrap-many (instance-tracking-lifecycle events))
+
+        desc
+        [{:fx/key :a :instance :a}
+         {:fx/key :b :instance nil}
+         {:fx/key :c :instance :c}]
+
+        current (volatile! (lifecycle/create wrapped desc {}))
+        first-component @current]
+    (try
+      (is (= [:a :c] (component/instance @current)))
+      (vswap! current #(lifecycle/advance wrapped % desc {}))
+      (is (identical? first-component @current))
+      (vswap! current #(lifecycle/advance wrapped % (assoc-in desc [1 :instance] :b) {}))
+      (is (= [:a :b :c] (component/instance @current)))
+      (vswap! current #(lifecycle/advance wrapped % desc {}))
+      (let [hidden-component @current
+            hidden-instance (component/instance @current)
+            changed (assoc-in desc [1 :revision] 1)]
+        (vswap! current #(lifecycle/advance wrapped % changed {}))
+        (is (not (identical? hidden-component @current)))
+        (is (identical? hidden-instance (component/instance @current)))
+        (reset! events [])
+        (vswap! current #(lifecycle/advance wrapped % [(nth changed 2) (nth changed 1) (nth changed 0)] {}))
+        (is (= [:advance :advance :advance] (mapv first @events)))
+        (is (= [3 2 1] (mapv second @events)))
+        (is (= [:c :a] (component/instance @current)))
+        (let [visible-instance (component/instance @current)]
+          (vswap! current #(lifecycle/advance wrapped % [(nth changed 2) (nth changed 0)] {}))
+          (is (identical? visible-instance (component/instance @current)))))
+      (finally
+        (lifecycle/delete wrapped @current {})))
+    (is (= {1 1, 2 1, 3 1}
+           (frequencies (into [] (keep (fn [[op id]] (when (= :delete op) id))) @events))))))
+
+;; Absent children still count toward duplicate, explicit-nil, and unkeyed key
+;; occurrences, so reordering does not recreate the wrong components.
+(deftest wrap-many-nil-key-occurrences-test
+  (let [events (atom [])
+        wrapped (lifecycle/wrap-many (instance-tracking-lifecycle events))
+
+        desc
+        [{:fx/key :duplicate :instance nil}
+         {:fx/key :duplicate :instance :b}
+         {:fx/key nil :instance nil}
+         {:instance :c}
+         {:fx/key nil :instance :a}
+         {:instance nil}]
+
+        current (volatile! (lifecycle/create wrapped desc {}))]
+    (try
+      (is (= [:b :c :a] (component/instance @current)))
+      (is (= (mapv #(vector :create %) (range 1 7)) @events))
+      (reset! events [])
+      (vswap! current #(lifecycle/advance wrapped %
+                                          [{:fx/key nil :instance nil}
+                                           {:instance :c}
+                                           {:fx/key :duplicate :instance :b}
+                                           {:fx/key :duplicate :instance nil}
+                                           {:instance nil}
+                                           {:fx/key nil :instance :a}]
+                                          {}))
+      (is (= [:c :b :a] (component/instance @current)))
+      (is (= (mapv #(vector :advance %) [3 4 1 2 6 5]) @events))
+      (finally
+        (lifecycle/delete wrapped @current {})))
+    (is (= (zipmap (range 1 7) (repeat 1))
+           (frequencies (into [] (keep (fn [[op id]] (when (= :delete op) id))) @events))))))
+
+;; Native child lists omit nil instances while retaining state, constraints,
+;; sibling controls, and subscriptions until their descriptions are removed.
+(deftest nil-instance-native-collections-test
+  (testing "VBox retains state and constraints across disappearing children"
+    (let [current (atom nil)
+          ^IRef watched (atom nil)
+          update-state (atom nil)
+
+          view
+          (fn optional-child [{:keys [visible state swap-state]}]
+            (reset! update-state swap-state)
+            (when visible {:fx/type fx.label/lifecycle :text (str state)}))
+
+          describe
+          (fn describe-children [visible]
+            {:fx/type fx.v-box/lifecycle
+             :children [nil
+                        {:fx/type fx/ext-watcher
+                         :fx/key :optional
+                         :ref watched
+                         :v-box/vgrow :always
+                         :desc {:fx/type fx/ext-state
+                                :initial-state 0
+                                :desc {:fx/type view :visible visible}}}
+                        {:fx/type fx.label/lifecycle :fx/key :fixed :text "Fixed"}]})
+
+          advance!
+          (fn advance-children! [desc]
+            (reset! current @(fx/on-fx-thread (fx/advance-component @current desc))))]
+      (try
+        (reset! current @(fx/on-fx-thread (fx/create-component (describe false))))
+        (let [^VBox box (fx/instance @current)
+              children (.getChildren box)
+              fixed (.get children 0)
+              updater @update-state]
+          (is (= [fixed] (vec children)))
+          (is (= 1 (count (.getWatches watched))))
+          (updater inc)
+          @(fx/run-later)
+          (advance! (describe true))
+          (is (= ["1" "Fixed"] (mapv #(.getText ^Label %) children)))
+          (is (= Priority/ALWAYS (VBox/getVgrow (.get children 0))))
+          (is (identical? fixed (.get children 1)))
+          (advance! (describe false))
+          (is (= [fixed] (vec children)))
+          (is (= 1 (count (.getWatches watched))))
+          (updater inc)
+          @(fx/run-later)
+          (advance! (describe true))
+          (is (= ["2" "Fixed"] (mapv #(.getText ^Label %) children)))
+          (is (identical? updater @update-state))
+          (is (identical? fixed (.get children 1)))
+          (advance! (assoc (describe false) :children
+                           [nil {:fx/type fx.label/lifecycle :fx/key :fixed :text "Fixed"}]))
+          (is (= [fixed] (vec children)))
+          (is (= {} (.getWatches watched)))
+          (advance! (assoc (describe false) :children [nil]))
+          (is (= [] (vec children)))
+          (advance! (describe true))
+          (is (= ["0" "Fixed"] (mapv #(.getText ^Label %) children))))
+        (finally
+          (when @current
+            @(fx/on-fx-thread (fx/delete-component @current)))))
+      (is (= {} (.getWatches watched)))))
+  (testing "TabPane filters instances produced by lifecycle/dynamics"
+    @(fx/on-fx-thread
+       (let [optional
+             (fn optional-tab [{:keys [visible]}]
+               (when visible {:fx/type fx.tab/lifecycle :text "Optional"}))
+
+             describe
+             (fn describe-tabs [visible]
+               {:fx/type fx.tab-pane/lifecycle
+                :tabs [nil
+                       {:fx/type optional :fx/key :optional :visible visible}
+                       {:fx/type fx.tab/lifecycle :fx/key :fixed :text "Fixed"}]})
+
+             current (volatile! (fx/create-component (describe false)))
+             ^TabPane tabs (fx/instance @current)
+             fixed (first (.getTabs tabs))]
+         (try
+           (is (= [fixed] (vec (.getTabs tabs))))
+           (vswap! current fx/advance-component (describe true))
+           (is (= ["Optional" "Fixed"] (mapv #(.getText ^Tab %) (.getTabs tabs))))
+           (is (identical? fixed (second (.getTabs tabs))))
+           (vswap! current fx/advance-component (describe false))
+           (is (= [fixed] (vec (.getTabs tabs))))
+           (finally
+             (fx/delete-component @current))))))
+  (testing "Ext-many exposes no nil instances"
+    (let [desc
+          {:fx/type fx/ext-many
+           :desc [nil
+                  {:fx/type fx/ext-instance-factory
+                   :create (fn absent-instance [] nil)}
+                  nil]}
+
+          current (volatile! (fx/create-component desc))]
+      (try
+        (is (= [] (fx/instance @current)))
+        (vswap! current fx/advance-component desc)
+        (is (= [] (fx/instance @current)))
+        (finally
+          (fx/delete-component @current))))))

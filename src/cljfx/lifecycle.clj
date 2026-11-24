@@ -27,11 +27,19 @@
 (defn annotate [lifecycle id]
   (vary-meta lifecycle assoc :cljfx/id id))
 
+(def scalar
+  (reify Lifecycle
+    (create [_ v _] v)
+    (advance [_ _ v _] v)
+    (delete [_ _ _])))
+
 (defn- desc->lifecycle [desc opts]
-  (let [type (:fx/type desc)
-        type->lifecycle (:fx.opt/type->lifecycle opts)]
-    (or (type->lifecycle type)
-        type)))
+  (if (nil? desc)
+    scalar
+    (let [type (:fx/type desc)
+          type->lifecycle (:fx.opt/type->lifecycle opts)]
+      (or (type->lifecycle type)
+          type))))
 
 (deftype DynamicComponent [lifecycle child]
   component/Component
@@ -154,12 +162,6 @@
              (let [dispose (bind instance prop-instance)]
                (vreset! state (if (fn? dispose) dispose true))))))))
     identity))
-
-(def scalar
-  (reify Lifecycle
-    (create [_ v _] v)
-    (advance [_ _ v _] v)
-    (delete [_ _ _])))
 
 (deftype MapEventHandlerComponent [v map-event-handler value]
   component/Component
@@ -337,10 +339,11 @@
                    key-value (desc->key desc)
                    key-index (long (or (.get key-value->counter key-value) 0))
                    key (MapEntry/create key-value key-index)
-                   child (create lifecycle (desc->child-desc desc) opts)]
+                   child (create lifecycle (desc->child-desc desc) opts)
+                   child-instance (component/instance child)]
                (.put key-value->counter key-value (unchecked-inc key-index))
                (recur (assoc! key->component key child)
-                      (conj! instance (component/instance child))
+                      (cond-> instance (some? child-instance) (conj! child-instance))
                       (conj! keys key)))
              (->ManyComponent (persistent! instance)
                               (persistent! key->component)
@@ -356,6 +359,7 @@
              old-key-count (count old-keys)
              ^HashMap key-value->counter (HashMap.)]
          (loop [index 0
+                instance-index 0
                 key->component nil
                 instance nil
                 keys nil]
@@ -371,33 +375,39 @@
                    new-child-instance (component/instance new-child)]
                (.put key-value->counter key-value (unchecked-inc key-index))
                (recur
-                (unchecked-inc index)
-                (if (identical? old-child new-child)
-                  key->component
-                  (assoc! (or key->component (transient old-key->component))
-                          key
-                          new-child))
-                (cond
-                  (some? instance)
-                  (conj! instance new-child-instance)
+                 (unchecked-inc index)
+                 (if (nil? new-child-instance)
+                   instance-index
+                   (unchecked-inc instance-index))
+                 (if (identical? old-child new-child)
+                   key->component
+                   (assoc! (or key->component (transient old-key->component))
+                     key
+                     new-child))
+                 (cond
+                   (nil? new-child-instance)
+                   instance
 
-                  (and (< index old-instance-count)
-                       (identical? (.nth old-instance index) new-child-instance))
-                  nil
+                   (some? instance)
+                   (conj! instance new-child-instance)
 
-                  :else
-                  (conj! (transient-vector-prefix old-instance index)
-                         new-child-instance))
-                (cond
-                  (some? keys)
-                  (conj! keys key)
+                   (and (< instance-index old-instance-count)
+                        (identical? (.nth old-instance instance-index) new-child-instance))
+                   nil
 
-                  (and (< index old-key-count)
-                       (= (.nth old-keys index) key))
-                  nil
+                   :else
+                   (conj! (transient-vector-prefix old-instance instance-index)
+                          new-child-instance))
+                 (cond
+                   (some? keys)
+                   (conj! keys key)
 
-                  :else
-                  (conj! (transient-vector-prefix old-keys index) key))))
+                   (and (< index old-key-count)
+                        (= (.nth old-keys index) key))
+                   nil
+
+                   :else
+                   (conj! (transient-vector-prefix old-keys index) key))))
              (let [keys (cond
                           (some? keys)
                           (persistent! keys)
@@ -424,11 +434,11 @@
                               (some? instance)
                               (persistent! instance)
 
-                              (= index old-instance-count)
+                              (= instance-index old-instance-count)
                               old-instance
 
                               :else
-                              (persistent! (transient-vector-prefix old-instance index)))]
+                              (persistent! (transient-vector-prefix old-instance instance-index)))]
                (if (and (nil? key->component)
                         (identical? old-instance instance)
                         (identical? old-keys keys))
@@ -474,96 +484,54 @@
     (transient {})
     ks)))
 
-(defn wrap-extra-props [lifecycle props-config]
-  (let [prop-keys (vec (keys props-config))]
-    (with-meta
-      [::extra-props lifecycle props-config]
-      {`create
-       (fn [_ desc opts]
-         (let [child-desc (reduce dissoc desc prop-keys)
-               child (create lifecycle child-desc opts)
-               instance (component/instance child)
-               prop-desc (fast-select-keys desc prop-keys)
-               props (reduce
-                       (fn [acc k]
-                         (assoc acc k (create (prop/lifecycle (prop/from props-config k))
-                                              (get prop-desc k)
-                                              opts)))
-                       prop-desc
-                       (keys prop-desc))]
-           (doseq [[k v] props]
-             (prop/assign! (prop/from props-config k) instance v))
-           (with-meta {:child child
-                       :props props}
-                      {`component/instance #(-> % :child component/instance)})))
-
-       `advance
-       (fn [_ component desc opts]
-         (let [child (:child component)
-               instance (component/instance child)
-               child-desc (reduce dissoc desc prop-keys)
-               new-child (advance lifecycle child child-desc opts)
-               new-instance (component/instance new-child)
-               with-child (assoc component :child new-child)
-               props-desc (fast-select-keys desc prop-keys)]
-           (if (identical? instance new-instance)
-             (let [props (:props with-child)]
-               (assoc with-child :props (advance-prop-map props props-desc props-config instance opts)))
-             (do
-               ;; TODO this is wrong, should re-create props
-               (doseq [[k v] props-desc]
-                 (prop/assign! (prop/from props-config k) new-instance v))
-               (assoc with-child :props props-desc)))))
-
-       `delete
-       (fn [_ component opts]
-         (doseq [[k v] (:props component)]
-           (delete (prop/lifecycle (prop/from props-config k)) v opts))
-         (delete lifecycle (:child component) opts))})))
-
 (defn- props-on [props-config instance]
   (reify Lifecycle
     (create [_ desc opts]
-      (reduce-kv
-        (fn [acc k v]
-          (let [prop (prop/from props-config k)
-                prop-value (create (prop/lifecycle prop) v opts)]
-            (prop/assign! prop instance prop-value)
-            (assoc acc k prop-value)))
-        desc
-        desc))
+      (when (some? instance)
+        (reduce-kv
+          (fn [acc k v]
+            (let [prop (prop/from props-config k)
+                  prop-value (create (prop/lifecycle prop) v opts)]
+              (prop/assign! prop instance prop-value)
+              (assoc acc k prop-value)))
+          desc
+          desc)))
     (advance [_ component desc opts]
-      (advance-prop-map component desc props-config instance opts))
+      (when (some? instance)
+        (advance-prop-map component desc props-config instance opts)))
     (delete [_ component opts]
       (doseq [[k v] component]
         (delete (prop/lifecycle (prop/from props-config k)) v opts)))))
 
+(defn- wrap-props [lifecycle props-config child-desc-fn props-desc-fn]
+  (reify Lifecycle
+    (create [_ desc opts]
+      (let [child (create lifecycle (child-desc-fn desc) opts)
+            props-lifecycle (props-on props-config (component/instance child))]
+        (with-meta {:child child
+                    :props-lifecycle props-lifecycle
+                    :props (create props-lifecycle (props-desc-fn desc) opts)}
+          {`component/instance #(-> % :child component/instance)})))
+    (advance [_ component desc opts]
+      (let [{:keys [child props props-lifecycle]} component
+            old-instance (component/instance child)
+            new-child (advance lifecycle child (child-desc-fn desc) opts)
+            new-instance (component/instance new-child)
+            with-child (assoc component :child new-child)
+            props-desc (props-desc-fn desc)]
+        (if (identical? old-instance new-instance)
+          (assoc with-child :props (advance props-lifecycle props props-desc opts))
+          (do
+            (delete props-lifecycle props opts)
+            (let [new-props-lifecycle (props-on props-config new-instance)]
+              (assoc with-child :props-lifecycle new-props-lifecycle
+                     :props (create new-props-lifecycle props-desc opts)))))))
+    (delete [_ {:keys [child props props-lifecycle]} opts]
+      (delete props-lifecycle props opts)
+      (delete lifecycle child opts))))
+
 (defn make-ext-with-props [lifecycle props-config]
-  (annotate (reify Lifecycle
-              (create [_ {child-desc :desc props-desc :props} opts]
-                (let [child (create lifecycle child-desc opts)
-                      instance (component/instance child)
-                      props-lifecycle (props-on props-config instance)]
-                  (with-meta {:child child
-                              :props-lifecycle props-lifecycle
-                              :props (create props-lifecycle props-desc opts)}
-                             {`component/instance #(-> % :child component/instance)})))
-              (advance [_ component {child-desc :desc props-desc :props} opts]
-                (let [{:keys [child props props-lifecycle]} component
-                      old-instance (component/instance child)
-                      new-child (advance lifecycle child child-desc opts)
-                      new-instance (component/instance new-child)
-                      with-child (assoc component :child new-child)]
-                  (if (identical? old-instance new-instance)
-                    (assoc with-child :props (advance props-lifecycle props props-desc opts))
-                    (do
-                      (delete props-lifecycle props opts)
-                      (let [new-props-lifecycle (props-on props-config new-instance)]
-                        (assoc with-child :props-lifecycle new-props-lifecycle
-                                          :props (create new-props-lifecycle props-desc opts)))))))
-              (delete [_ {:keys [child props props-lifecycle]} opts]
-                (delete props-lifecycle props opts)
-                (delete lifecycle child opts)))
+  (annotate (wrap-props lifecycle props-config :desc :props)
             'cljfx.api/make-ext-with-props))
 
 (defn wrap-on-delete [lifecycle f]
@@ -586,6 +554,14 @@
                 (advance lifecycle component (apply f desc args) opts))
      `delete (fn [_ component opts]
                (delete lifecycle component opts))}))
+
+(defn wrap-extra-props
+  "Adds configured extra props to nonnil child instances."
+  [lifecycle props-config]
+  (let [prop-keys (vec (keys props-config))]
+    (wrap-props lifecycle props-config
+                (fn strip-extra-props [desc] (reduce dissoc desc prop-keys))
+                (fn extract-extra-props [desc] (fast-select-keys desc prop-keys)))))
 
 (defn wrap-context-desc [lifecycle]
   (with-meta
@@ -841,12 +817,15 @@
   (some-> (:ref @state) (remove-watch state))
   (swap! state assoc :value ::deleted))
 
+(deftype WatcherComponent [state instance]
+  component/Component
+  (instance [_] instance))
+
 (defn- create-watcher [ref desc key opts child]
   (let [state (atom {:ref ref
                      :desc desc
                      :key key
-                     :opts opts}
-                    :meta {`component/instance #(component/instance (:component @%))})]
+                     :opts opts})]
     (when ref
       (add-watch ref state #(request-render state %4)))
     (let [value (when ref @ref)
@@ -857,7 +836,7 @@
           new-state (swap! state complete-rendering value new-child)]
       (when (contains? new-state :value)
         (platform/run-later (perform-render state))))
-    state))
+    (->WatcherComponent state (component/instance (:component @state)))))
 
 (def ext-watcher
   (annotate
@@ -865,25 +844,25 @@
       (create [_ {:keys [ref desc key] :or {key :value}} opts]
         (create-watcher ref desc key opts nil))
       (advance [_ component {:keys [ref desc key] :or {key :value}} opts]
-        (let [current-state @component
+        (let [^WatcherComponent component component
+              state (.-state component)
+              current-state @state
               current-ref (:ref current-state)]
           (if (= ref current-ref)
             (let [value (when ref @ref)
-                  old-component (:component @component)
-                  old-instance (component/instance old-component)
+                  old-component (:component current-state)
                   new-component (advance dynamic old-component (assoc desc key value) opts)
                   new-instance (component/instance new-component)]
-              ;; we report error here because new instance won't be picked up, since
-              ;; instance for old component and new component will stay the same, because
-              ;; the component is the same atom
-              (when-not (= old-instance new-instance)
-                (throw (ex-info "Instance replace forbidden" {:old old-instance :new new-instance})))
-              (doto component (swap! complete-advance desc key opts value new-component)))
-            (do (dispose-watcher component)
+              (swap! state complete-advance desc key opts value new-component)
+              (if (identical? (.-instance component) new-instance)
+                component
+                (->WatcherComponent state new-instance)))
+            (do (dispose-watcher state)
                 (create-watcher ref desc key opts (:component current-state))))))
       (delete [_ component opts]
-        (let [current-state @component]
-          (dispose-watcher component)
+        (let [state (.-state ^WatcherComponent component)
+              current-state @state]
+          (dispose-watcher state)
           (delete dynamic (:component current-state) opts))))
     'cljfx.api/ext-watcher))
 
