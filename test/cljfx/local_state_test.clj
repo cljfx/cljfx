@@ -112,26 +112,26 @@
              @refresh-events)))))
 
 (deftest reset-test
-  (binding [lifecycle/*in-progress?* false
-            *test-out* *out*]
-    (let [text-field (fn [{:keys [state]}]
-                       {:fx/type :text-field
-                        :text (str/join "," state)})
-          view (fn [{:keys [key]}]
-                 {:fx/type fx/ext-state
-                  :initial-state [key]
-                  :reset into
-                  :desc {:fx/type text-field}})
-          c (fx/create-component {:fx/type view :key :a})
-          ^TextField instance (fx/instance c)
-          _ (is (= ":a" (.getText instance)))
-          c (fx/advance-component c {:fx/type view :key :a})
-          _ (is (= ":a" (.getText instance)))
-          c (fx/advance-component c {:fx/type view :key :b})
-          _ (is (= ":a,:b" (.getText instance)))
-          c (fx/advance-component c {:fx/type view :key :b})
-          _ (is (= ":a,:b" (.getText instance)))
-          c (fx/advance-component c {:fx/type view :key :c})
-          _ (is (= ":a,:b,:c" (.getText instance)))
-          c (fx/advance-component c {:fx/type view :key :c})
-          _ (is (= ":a,:b,:c" (.getText instance)))])))
+  @(fx/on-fx-thread
+     (let [text-field (fn [{:keys [state]}]
+                        {:fx/type :text-field
+                         :text (str/join "," state)})
+           view (fn [{:keys [key]}]
+                  {:fx/type fx/ext-state
+                   :initial-state [key]
+                   :reset into
+                   :desc {:fx/type text-field}})
+           desc {:fx/type view :key :a}
+           component (volatile! (fx/create-component desc))
+           ^TextField instance (fx/instance @component)]
+       (try
+         (is (= ":a" (.getText instance)))
+         (doseq [[key expected] [[:a ":a"]
+                                 [:b ":a,:b"]
+                                 [:b ":a,:b"]
+                                 [:c ":a,:b,:c"]
+                                 [:c ":a,:b,:c"]]]
+           (vswap! component fx/advance-component (assoc desc :key key))
+           (is (= expected (.getText instance))))
+         (finally
+           (fx/delete-component @component))))))
