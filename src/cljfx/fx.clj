@@ -197,5 +197,6 @@
     cljfx.jdk.fx/keyword->lifecycle-delay))
 
 (defn keyword->lifecycle [kw]
-  (when-let [*delay (keyword->lifecycle-delay kw)]
-    @*delay))
+  (when (keyword? kw)
+    (when-let [*delay (keyword->lifecycle-delay kw)]
+      @*delay)))

@@ -13,8 +13,8 @@
             [cljfx.prop :as prop]
             [cljfx.context :as context]
             [clojure.set :as set])
-  (:import [clojure.lang IPersistentVector MapEntry RT]
-           [java.util HashMap Iterator]))
+  (:import [clojure.lang IHashEq IPersistentVector MapEntry Murmur3 RT Util]
+           [java.util HashMap IdentityHashMap Iterator]))
 
 (set! *warn-on-reflection* true)
 
@@ -71,17 +71,94 @@
 
 (def ^:dynamic *in-progress?* false)
 
-(def root
+(def ^:dynamic *request-render* nil)
+
+(defn- create-root [lifecycle desc opts]
+  (let [state
+        (atom {:desc desc
+               :opts opts
+               :revision 0
+               :rendered-revision 0
+               :queued false
+               :deleted false})]
+    (letfn [(enqueue-render []
+              (platform/run-later (perform-render)))
+            (request-render []
+              (let [[old new]
+                    (swap-vals! state
+                                (fn request-root-render [s]
+                                  (if (:deleted s)
+                                    s
+                                    (-> s
+                                        (update :revision inc)
+                                        (assoc :queued true)))))]
+                (when (and (not (:queued old)) (:queued new))
+                  (enqueue-render))))
+            (perform-render []
+              (let [{:keys [component desc opts revision rendered-revision deleted]}
+                    @state]
+                (when-not deleted
+                  (try
+                    (when (not= revision rendered-revision)
+                      (let [child
+                            (binding [*in-progress?* true
+                                      *request-render* request-render]
+                              (advance lifecycle component desc opts))]
+                        (vreset! (:instance @state) (component/instance child))
+                        (swap! state assoc :component child)))
+                    (catch Throwable e
+                      ((:fx.opt/error-handler opts) e))
+                    (finally
+                      (let [next-state
+                            (swap! state
+                                   (fn complete-root-render [s]
+                                     (assoc s
+                                       :rendered-revision revision
+                                       :queued (and (not (:deleted s))
+                                                    (not= revision (:revision s))))))]
+                        (when (:queued next-state)
+                          (enqueue-render))))))))]
+      (swap! state assoc :request-render request-render)
+      (let [child
+            (binding [*in-progress?* true
+                      *request-render* request-render]
+              (create lifecycle desc opts))
+
+            instance (volatile! (component/instance child))]
+        (swap! state assoc :component child :instance instance)
+        (with-meta {:state state :instance instance}
+          {`component/instance #(deref (:instance %))})))))
+
+(defn wrap-root [lifecycle]
   (reify Lifecycle
     (create [_ desc opts]
-      (binding [*in-progress?* true]
-        (create dynamic desc opts)))
-    (advance [_ component desc opts]
-      (binding [*in-progress?* true]
-        (advance dynamic component desc opts)))
-    (delete [_ component opts]
-      (binding [*in-progress?* true]
-        (delete dynamic component opts)))))
+      (create-root lifecycle desc opts))
+    (advance [_ {:keys [state] :as component} desc opts]
+      (let [{child :component :keys [revision request-render]} @state
+            old-instance (component/instance child)
+
+            new-child
+            (binding [*in-progress?* true
+                      *request-render* request-render]
+              (advance lifecycle child desc opts))
+
+            new-instance (component/instance new-child)
+
+            new-component
+            (if (identical? old-instance new-instance)
+              component
+              (assoc component :instance (volatile! new-instance)))]
+        (swap! state assoc
+               :desc desc :opts opts :component new-child
+               :instance (:instance new-component) :rendered-revision revision)
+        new-component))
+    (delete [_ {:keys [state]} opts]
+      (let [[old _] (swap-vals! state assoc :deleted true)]
+        (binding [*in-progress?* true
+                  *request-render* (:request-render old)]
+          (delete lifecycle (:component old) opts))))))
+
+(def root (wrap-root dynamic))
 
 (defn- call-dynamic-fn [desc]
   ((:fx/type desc) (dissoc desc :fx/type)))
@@ -286,31 +363,101 @@
       ret
       props)))
 
+(defn- cell-props-root [props-config]
+  (wrap-root
+    (reify Lifecycle
+      (create [_ {:keys [instance props-desc] :as desc} opts]
+        (with-meta
+          {:desc desc :props (advance-prop-map {} props-desc props-config instance opts)}
+          {`component/instance :props}))
+      (advance [_ {:keys [props] :as component}
+                {:keys [instance props-desc retained-props] :as desc} opts]
+        (let [props
+              (if (identical? desc (:desc component))
+                props
+                ;; The legacy ListCell's updateItem resets text and graphic itself.
+                (reduce-kv
+                  (fn [acc k prop-component]
+                    (if (contains? retained-props k)
+                      acc
+                      (do (delete (prop/lifecycle (prop/from props-config k)) prop-component opts)
+                          (dissoc acc k))))
+                  props
+                  props))]
+          (assoc component :desc desc
+                 :props (advance-prop-map props props-desc props-config instance opts))))
+      (delete [_ {:keys [props]} opts]
+        (doseq [[k v] props]
+          (delete (prop/lifecycle (prop/from props-config k)) v opts))))))
+
 (defn detached-prop-map [props-config]
-  (with-meta
-    [::detached-prop-map props-config]
-    {`create (fn [_ desc opts]
-               (with-meta
-                 {:desc desc
-                  :opts opts
-                  :value (if (fn? desc)
-                           (fn [props instance item empty]
-                             (let [props-desc (if empty {} (desc item))]
-                               (advance-prop-map props props-desc props-config instance opts)))
-                           desc)}
-                 {`component/instance :value}))
-     `advance (fn [this component desc opts]
-                (if (and (= desc (:desc component))
-                         (= opts (:opts component)))
-                  component
-                  (create this desc opts)))
-     `delete (fn [_ _ _])}))
+  (let [cell-root (cell-props-root props-config)]
+    (reify Lifecycle
+      (create [_ desc opts]
+        (let [cells (IdentityHashMap.)
+              disposed (volatile! false)]
+          (with-meta
+            {:desc desc
+             :opts opts
+             :cells cells
+             :disposed disposed
+             :value (if (fn? desc)
+                      (fn update-cell [props instance item empty]
+                        (if @disposed
+                          {}
+                          (let [cell (.get cells instance)
+                                cell-desc {:instance instance
+                                           :retained-props (set (keys props))
+                                           :props-desc (if empty {} (desc item))}]
+                            (if empty
+                              (do
+                                (when cell
+                                  (.remove cells instance)
+                                  (delete cell-root (advance cell-root cell cell-desc opts) opts))
+                                {})
+                              (let [new-cell (if cell
+                                               (advance cell-root cell cell-desc opts)
+                                               (create cell-root cell-desc opts))]
+                                (.put cells instance new-cell)
+                                (component/instance new-cell))))))
+                      desc)}
+            {`component/instance :value})))
+      (advance [this component desc opts]
+        (if (and (= desc (:desc component))
+                 (= opts (:opts component)))
+          component
+          (do (delete this component opts)
+              (create this desc opts))))
+      (delete [_ {:keys [^IdentityHashMap cells disposed opts]} _]
+        (vreset! disposed true)
+        (let [components (vec (.values cells))]
+          (.clear cells)
+          (doseq [cell components]
+            (delete cell-root cell opts)))))))
 
 (defn- fx-key-from-map [desc]
   (:fx/key desc ::no-key))
 
 (defn- strip-fx-key [desc]
   (dissoc desc :fx/key))
+
+(deftype ChildKey [value ^long occurrence]
+  IHashEq
+  (hasheq [_]
+    ;; Preserve the hash and trie traversal order of [value occurrence].
+    (Murmur3/mixCollHash
+     (unchecked-add-int
+      (unchecked-multiply-int 31 (unchecked-add-int 31 (Util/hasheq value)))
+      (Murmur3/hashLong occurrence))
+     2))
+  Object
+  (hashCode [this]
+    (.hasheq this))
+  (equals [_ other]
+    (and (instance? ChildKey other)
+         (let [^ChildKey other other]
+           (and (== occurrence (.-occurrence other))
+                (Util/equiv value (.-value other)))))))
 
 (deftype ManyComponent [instance key->component keys]
   component/Component
@@ -338,7 +485,7 @@
              (let [desc (.next it)
                    key-value (desc->key desc)
                    key-index (long (or (.get key-value->counter key-value) 0))
-                   key (MapEntry/create key-value key-index)
+                   key (ChildKey. key-value key-index)
                    child (create lifecycle (desc->child-desc desc) opts)
                    child-instance (component/instance child)]
                (.put key-value->counter key-value (unchecked-inc key-index))
@@ -367,7 +514,7 @@
              (let [desc (.next it)
                    key-value (desc->key desc)
                    key-index (long (or (.get key-value->counter key-value) 0))
-                   key (MapEntry/create key-value key-index)
+                   key (ChildKey. key-value key-index)
                    old-child (get old-key->component key ::no-key)
                    new-child (if (identical? ::no-key old-child)
                                (create lifecycle (desc->child-desc desc) opts)
@@ -473,17 +620,6 @@
                (log-fn `delete (:desc component))
                (delete lifecycle (:child component) opts))}))
 
-(defn- fast-select-keys [m ks]
-  (persistent!
-   (reduce
-    (fn [acc k]
-      (let [v (get m k ::no-key)]
-        (if (identical? v ::no-key)
-          acc
-          (assoc! acc k v))))
-    (transient {})
-    ks)))
-
 (defn- props-on [props-config instance]
   (reify Lifecycle
     (create [_ desc opts]
@@ -503,35 +639,46 @@
       (doseq [[k v] component]
         (delete (prop/lifecycle (prop/from props-config k)) v opts)))))
 
-(defn- wrap-props [lifecycle props-config child-desc-fn props-desc-fn]
+(deftype PropsComponent [child props-lifecycle props]
+  component/Component
+  (instance [_] (component/instance child)))
+
+;; A nil split forwards desc as-is and supplies an empty extra-prop map.
+(defn- wrap-props [lifecycle props-config split-desc]
   (reify Lifecycle
     (create [_ desc opts]
-      (let [child (create lifecycle (child-desc-fn desc) opts)
+      (let [^MapEntry split (split-desc desc)
+            child (create lifecycle (if split (.key split) desc) opts)
             props-lifecycle (props-on props-config (component/instance child))]
-        (with-meta {:child child
-                    :props-lifecycle props-lifecycle
-                    :props (create props-lifecycle (props-desc-fn desc) opts)}
-          {`component/instance #(-> % :child component/instance)})))
+        (->PropsComponent child props-lifecycle (create props-lifecycle (if split (.val split) {}) opts))))
     (advance [_ component desc opts]
-      (let [{:keys [child props props-lifecycle]} component
+      (let [^PropsComponent component component
+            child (.-child component)
+            props (.-props component)
+            props-lifecycle (.-props-lifecycle component)
             old-instance (component/instance child)
-            new-child (advance lifecycle child (child-desc-fn desc) opts)
+            ^MapEntry split (split-desc desc)
+            new-child (advance lifecycle child (if split (.key split) desc) opts)
             new-instance (component/instance new-child)
-            with-child (assoc component :child new-child)
-            props-desc (props-desc-fn desc)]
+            props-desc (if split (.val split) {})]
         (if (identical? old-instance new-instance)
-          (assoc with-child :props (advance props-lifecycle props props-desc opts))
+          (let [new-props (advance props-lifecycle props props-desc opts)]
+            (if (and (identical? child new-child) (identical? props new-props))
+              component
+              (->PropsComponent new-child props-lifecycle new-props)))
           (do
             (delete props-lifecycle props opts)
             (let [new-props-lifecycle (props-on props-config new-instance)]
-              (assoc with-child :props-lifecycle new-props-lifecycle
-                     :props (create new-props-lifecycle props-desc opts)))))))
-    (delete [_ {:keys [child props props-lifecycle]} opts]
-      (delete props-lifecycle props opts)
-      (delete lifecycle child opts))))
+              (->PropsComponent new-child new-props-lifecycle
+                                (create new-props-lifecycle props-desc opts)))))))
+    (delete [_ component opts]
+      (let [^PropsComponent component component]
+        (delete (.-props-lifecycle component) (.-props component) opts)
+        (delete lifecycle (.-child component) opts)))))
 
 (defn make-ext-with-props [lifecycle props-config]
-  (annotate (wrap-props lifecycle props-config :desc :props)
+  (annotate (wrap-props lifecycle props-config
+                        (fn split-detached-props [desc] (MapEntry/create (:desc desc) (:props desc))))
             'cljfx.api/make-ext-with-props))
 
 (defn wrap-on-delete [lifecycle f]
@@ -558,10 +705,23 @@
 (defn wrap-extra-props
   "Adds configured extra props to nonnil child instances."
   [lifecycle props-config]
-  (let [prop-keys (vec (keys props-config))]
+  (let [^IPersistentVector prop-keys (vec (keys props-config))
+        key-count (.count prop-keys)]
     (wrap-props lifecycle props-config
-                (fn strip-extra-props [desc] (reduce dissoc desc prop-keys))
-                (fn extract-extra-props [desc] (fast-select-keys desc prop-keys)))))
+                (fn split-extra-props [desc]
+                  (loop [i 0
+                         child-desc desc
+                         props-desc nil]
+                    (if (< i key-count)
+                      (let [k (.nth prop-keys i)
+                            v (get desc k ::no-key)]
+                        (if (identical? ::no-key v)
+                          (recur (unchecked-inc i) child-desc props-desc)
+                          (recur (unchecked-inc i)
+                                 (dissoc child-desc k)
+                                 (assoc! (or props-desc (transient {})) k v))))
+                      (when props-desc
+                        (MapEntry/create child-desc (persistent! props-desc)))))))))
 
 (defn wrap-context-desc [lifecycle]
   (with-meta
@@ -769,74 +929,31 @@
     (delete [_ component opts]
       (delete (:lifecycle component) (:child component) opts))))
 
-
-
-(defn- complete-rendering [old-state value new-component]
-  (-> old-state
-      (assoc :component new-component)
-      (cond-> (= value (:value old-state))
-        (dissoc :value))))
-
-(defn- complete-advance [old-state desc key opts value new-component]
-  (-> old-state
-      (assoc :desc desc :key key :opts opts)
-      (complete-rendering value new-component)))
-
-(defn- perform-render [state]
-  ;; advance is a mutating operation on DOM, can't retry => no swap!
-  ;; new request may arrive during advancing => we might enqueue another request
-  (let [current-state @state
-        ;; default to ::deleted so that advance can signal that there is no need
-        ;; to re-render by dissoc-ing the :value
-        value (:value current-state ::deleted)]
-    (when-not (identical? value ::deleted)
-      (let [{:keys [desc key opts component]} current-state
-            old-instance (component/instance component)
-            new-component (advance root component (assoc desc key value) opts)
-            new-instance (component/instance new-component)
-            _ (when-not (= old-instance new-instance)
-                (throw (ex-info "Instance replace forbidden"
-                                {:old old-instance :new new-instance})))
-            new-state (swap! state complete-rendering value new-component)]
-        (when (contains? new-state :value)
-          (platform/run-later (perform-render state)))))))
-
-(defn- set-new-value-if-not-deleted [state value]
-  (if (identical? ::deleted (:value state))
-    state
-    (assoc state :value value)))
-
-(defn- request-render [state value]
-  (let [[old new] (swap-vals! state set-new-value-if-not-deleted value)]
-    (when (and (not (contains? old :value))
-               (contains? new :value)
-               (contains? old :component))
-      (platform/run-later (perform-render state)))))
-
 (defn- dispose-watcher [state]
-  (some-> (:ref @state) (remove-watch state))
-  (swap! state assoc :value ::deleted))
+  (let [[old _] (swap-vals! state assoc :deleted true)]
+    (some-> (:ref old) (remove-watch state))))
 
 (deftype WatcherComponent [state instance]
   component/Component
   (instance [_] instance))
 
 (defn- create-watcher [ref desc key opts child]
-  (let [state (atom {:ref ref
-                     :desc desc
-                     :key key
-                     :opts opts})]
+  (let [request-render *request-render*
+        state (atom {:ref ref})]
     (when ref
-      (add-watch ref state #(request-render state %4)))
+      (add-watch ref state
+                 (fn request-watcher-render [_ _ _ _]
+                   (when-not (:deleted @state)
+                     (request-render)))))
     (let [value (when ref @ref)
           child-desc (assoc desc key value)
-          new-child (if child
-                      (advance dynamic child child-desc opts)
-                      (create dynamic child-desc opts))
-          new-state (swap! state complete-rendering value new-child)]
-      (when (contains? new-state :value)
-        (platform/run-later (perform-render state))))
-    (->WatcherComponent state (component/instance (:component @state)))))
+
+          new-child
+          (if child
+            (advance dynamic child child-desc opts)
+            (create dynamic child-desc opts))]
+      (swap! state assoc :component new-child)
+      (->WatcherComponent state (component/instance new-child)))))
 
 (def ext-watcher
   (annotate
@@ -853,7 +970,7 @@
                   old-component (:component current-state)
                   new-component (advance dynamic old-component (assoc desc key value) opts)
                   new-instance (component/instance new-component)]
-              (swap! state complete-advance desc key opts value new-component)
+              (swap! state assoc :component new-component)
               (if (identical? (.-instance component) new-instance)
                 component
                 (->WatcherComponent state new-instance)))

@@ -21,10 +21,16 @@
        m#
        (assoc m# k# ~v))))
 
+(defn default-error-handler [e]
+  (if (instance? Exception e)
+    (.printStackTrace ^Exception e)
+    (throw e)))
+
 (defn fill-opts [opts]
   (-> opts
       (provide :fx.opt/type->lifecycle fx-type->lifecycle)
-      (provide :fx.opt/map-event-handler map-event-handler)))
+      (provide :fx.opt/map-event-handler map-event-handler)
+      (provide :fx.opt/error-handler default-error-handler)))
 
 (defn fill-co-effects [co-effects *context]
   (provide co-effects :fx/context (event-handler/make-deref-co-effect *context)))

@@ -1,27 +1,74 @@
 (ns cljfx.fx.pagination
   "Part of a public API"
-  (:require [cljfx.composite :as composite]
+  (:require [cljfx.coerce :as coerce]
+            [cljfx.component :as component]
+            [cljfx.composite :as composite]
+            [cljfx.fx.control :as fx.control]
+            [cljfx.fx.stack-pane :as fx.stack-pane]
             [cljfx.lifecycle :as lifecycle]
-            [cljfx.coerce :as coerce]
-            [cljfx.fx.control :as fx.control])
-  (:import [javafx.scene.control Pagination]
-           [javafx.util Callback]
-           [javafx.scene AccessibleRole]))
+            [cljfx.platform :as platform])
+  (:import [javafx.beans.value ChangeListener]
+           [javafx.scene AccessibleRole Node]
+           [javafx.scene.control Pagination]
+           [javafx.util Callback]))
 
 (set! *warn-on-reflection* true)
 
-(defn- page-factory [x]
-  (cond
-    (instance? Callback x)
-    x
+(defn- create-page [desc opts pages]
+  (let [page (lifecycle/create lifecycle/root {:fx/type fx.stack-pane/lifecycle
+                                              :children [desc]} opts)
+        ^Node node (component/instance page)
+        parent (.parentProperty node)]
+    (letfn [(dispose-if-detached! []
+              (when (nil? (.getParent node))
+                (when-let [dispose! (get @pages node)]
+                  (vswap! pages dissoc node)
+                  (dispose!))))]
+      (let [listener (reify ChangeListener
+                       (changed [_ _ _ new-parent]
+                         (when (nil? new-parent)
+                           (platform/run-later (dispose-if-detached!)))))]
+        (.addListener parent listener)
+        (vswap! pages assoc node
+                (fn dispose-page! []
+                  (.removeListener parent listener)
+                  (lifecycle/delete lifecycle/root page opts)))
+        ;; The skin can probe for a page without attaching the returned node.
+        (platform/run-later (dispose-if-detached!))
+        node))))
 
-    (fn? x)
-    (reify Callback
-      (call [_ param]
-        (x param)))
+(def ^:private page-factory
+  (reify lifecycle/Lifecycle
+    (create [_ factory opts]
+      (let [pages (volatile! {})
+            callback
+            (cond
+              (instance? Callback factory)
+              factory
 
-    :else
-    (coerce/fail Callback x)))
+              (fn? factory)
+              (reify Callback
+                (call [_ index]
+                  (when @pages
+                    (let [desc (factory index)]
+                      (when (some? desc)
+                        (create-page desc opts pages))))))
+
+              :else
+              (coerce/fail Callback factory))]
+        (with-meta {:factory factory :opts opts :callback callback :pages pages}
+                   {`component/instance :callback})))
+    (advance [this component factory opts]
+      (if (and (= factory (:factory component))
+               (= opts (:opts component)))
+        component
+        (let [new-component (lifecycle/create this factory opts)]
+          (lifecycle/delete this component opts)
+          new-component)))
+    (delete [_ {:keys [pages]} _]
+      (let [disposers @pages]
+        (vreset! pages nil)
+        (run! (fn dispose-page! [f] (f)) (vals disposers))))))
 
 (def props
   (merge
@@ -36,8 +83,7 @@
       :on-current-page-index-changed [:property-change-listener lifecycle/change-listener]
       :max-page-indicator-count [:setter lifecycle/scalar :coerce int :default 10]
       :page-count [:setter lifecycle/scalar :coerce int :default Integer/MAX_VALUE]
-      :page-factory [:setter (lifecycle/wrap-factory lifecycle/dynamic)
-                     :coerce page-factory])))
+      :page-factory [:setter page-factory])))
 
 (def lifecycle
   (lifecycle/annotate

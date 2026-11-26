@@ -32,6 +32,10 @@
         props)
       props-desc)))
 
+(deftype CompositeComponent [props instance]
+  component/Component
+  (instance [_] instance))
+
 (defn- create-composite-component [this desc opts]
   (let [props-desc (desc->props-desc desc)
         props-config (:props this)
@@ -46,75 +50,80 @@
     (doseq [[k v] sorted-props
             :when (not (contains? arg-set k))]
       (prop/assign! (prop/from props-config k) instance v))
-    (with-meta {:props props :instance instance}
-               {`component/instance :instance})))
+    (->CompositeComponent props instance)))
 
-(defn- advance-composite-component [this component desc opts]
+(defn- advance-composite-component [this ^CompositeComponent component desc opts]
   (let [props-desc (desc->props-desc desc)
         props-config (:props this)
-        instance (component/instance component)]
-    (-> component
-        (update
-          :props
-          (fn [props]
-            (if-let [prop-order (:prop-order this)]
-              (reduce
-                (fn [acc k]
-                  (let [old-component (get props k ::no-key)
-                        desc (get props-desc k ::no-key)]
-                    (cond
-                      (not (identical? ::no-key desc))
-                      (if (identical? ::no-key old-component)
-                        (let [prop (prop/from props-config k)
-                              component (lifecycle/create (prop/lifecycle prop) desc opts)]
-                          (prop/assign! prop instance component)
-                          (assoc acc k component))
-                        (let [prop (prop/from props-config k)
-                              new-component (lifecycle/advance (prop/lifecycle prop)
-                                                               old-component
-                                                               desc
-                                                               opts)]
-                          (prop/replace! prop instance old-component new-component)
-                          (assoc acc k new-component)))
+        instance (.-instance component)
+        props (.-props component)
 
-                      (not (identical? ::no-key old-component))
-                      (let [prop (prop/from props-config k)]
-                        (prop/retract! prop instance old-component)
-                        (lifecycle/delete (prop/lifecycle prop) old-component opts)
-                        (dissoc acc k)))))
-                props
-                (sort-by #(get prop-order % 0) (prop-keys props props-desc)))
-              (let [ret (reduce-kv
-                          (fn [acc k desc]
-                            (let [old-component (get props k ::no-key)]
-                              (if (identical? ::no-key old-component)
-                                (let [prop (prop/from props-config k)
-                                      component (lifecycle/create (prop/lifecycle prop) desc opts)]
-                                  (prop/assign! prop instance component)
-                                  (assoc acc k component))
-                                (let [prop (prop/from props-config k)
-                                      new-component (lifecycle/advance (prop/lifecycle prop)
-                                                                       old-component
-                                                                       desc
-                                                                       opts)]
-                                  (prop/replace! prop instance old-component new-component)
-                                  (assoc acc k new-component)))))
-                          props
-                          props-desc)]
-                (reduce-kv
-                  (fn [acc k old-component]
-                    (if (contains? props-desc k)
-                      acc
-                      (let [prop (prop/from props-config k)]
-                        (prop/retract! prop instance old-component)
-                        (lifecycle/delete (prop/lifecycle prop) old-component opts)
-                        (dissoc acc k))))
-                  ret
-                  props))))))))
+        new-props
+        (if-let [prop-order (:prop-order this)]
+          (reduce
+            (fn [acc k]
+              (let [old-component (get props k ::no-key)
+                    desc (get props-desc k ::no-key)]
+                (cond
+                  (not (identical? ::no-key desc))
+                  (if (identical? ::no-key old-component)
+                    (let [prop (prop/from props-config k)
+                          component (lifecycle/create (prop/lifecycle prop) desc opts)]
+                      (prop/assign! prop instance component)
+                      (assoc acc k component))
+                    (let [prop (prop/from props-config k)
+                          new-component (lifecycle/advance (prop/lifecycle prop)
+                                                           old-component
+                                                           desc
+                                                           opts)]
+                      (prop/replace! prop instance old-component new-component)
+                      (if (identical? old-component new-component)
+                        acc
+                        (assoc acc k new-component))))
 
-(defn- delete-composite-component [this component opts]
+                  (not (identical? ::no-key old-component))
+                  (let [prop (prop/from props-config k)]
+                    (prop/retract! prop instance old-component)
+                    (lifecycle/delete (prop/lifecycle prop) old-component opts)
+                    (dissoc acc k)))))
+            props
+            (sort-by #(get prop-order % 0) (prop-keys props props-desc)))
+          (let [ret (reduce-kv
+                      (fn [acc k desc]
+                        (let [old-component (get props k ::no-key)]
+                          (if (identical? ::no-key old-component)
+                            (let [prop (prop/from props-config k)
+                                  component (lifecycle/create (prop/lifecycle prop) desc opts)]
+                              (prop/assign! prop instance component)
+                              (assoc acc k component))
+                            (let [prop (prop/from props-config k)
+                                  new-component (lifecycle/advance (prop/lifecycle prop)
+                                                                   old-component
+                                                                   desc
+                                                                   opts)]
+                              (prop/replace! prop instance old-component new-component)
+                              (if (identical? old-component new-component)
+                                acc
+                                (assoc acc k new-component))))))
+                      props
+                      props-desc)]
+            (reduce-kv
+              (fn [acc k old-component]
+                (if (contains? props-desc k)
+                  acc
+                  (let [prop (prop/from props-config k)]
+                    (prop/retract! prop instance old-component)
+                    (lifecycle/delete (prop/lifecycle prop) old-component opts)
+                    (dissoc acc k))))
+              ret
+              props)))]
+    (if (identical? props new-props)
+      component
+      (->CompositeComponent new-props instance))))
+
+(defn- delete-composite-component [this ^CompositeComponent component opts]
   (let [props-config (:props this)]
-    (doseq [[k v] (:props component)]
+    (doseq [[k v] (.-props component)]
       (lifecycle/delete (prop/lifecycle (prop/from props-config k)) v opts))))
 
 (defn lifecycle [m]

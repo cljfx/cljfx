@@ -411,9 +411,8 @@
           @(fx/on-fx-thread (fx/delete-component @current))))
       (is (= {} (.getWatches ref))))))
 
-;; Rejected local root replacements must not be committed; normal advancement
-;; can subsequently adopt the new instance using the last successful child.
-(deftest asynchronous-instance-replacement-remains-forbidden-test
+;; Root-scheduled updates adopt replacements and continue from the latest child.
+(deftest asynchronous-instance-replacement-test
   (let [first-instance (Object.)
         second-instance (Object.)
         ^IRef ref (atom first-instance)
@@ -435,9 +434,9 @@
       (reset! ref second-instance)
       @(fx/run-later)
       (is (= [first-instance] @advanced-from))
-      (is (identical? first-instance (fx/instance @current)))
+      (is (identical? second-instance (fx/instance @current)))
       (vreset! current @(fx/on-fx-thread (fx/advance-component @current desc)))
-      (is (= [first-instance first-instance] @advanced-from))
+      (is (= [first-instance second-instance] @advanced-from))
       (is (identical? second-instance (fx/instance @current)))
       (finally
         @(fx/on-fx-thread (fx/delete-component @current))))

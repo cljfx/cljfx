@@ -14,7 +14,8 @@
             [cljfx.test-helpers :refer :all]
             [clojure.test :refer :all]
             [testit.core :refer :all])
-  (:import [clojure.lang IRef]
+  (:import [clojure.lang IRef MapEntry]
+           [java.util HashMap]
            [javafx.beans.value ChangeListener]
            [javafx.geometry Insets Pos]
            [javafx.scene.control Label Tab TabPane TextField]
@@ -923,6 +924,27 @@
     (fact @events
           => [[:advance 1 {:payload "a"} {:payload "b"} nil]])))
 
+;; Internal child keys preserve Clojure equality, occurrence identity, and hash contracts.
+(deftest child-key-equality-and-hashing-test
+  (testing "Equivalent values produce interchangeable keys"
+    (doseq [[a b] [[nil nil] [false false] [:a :a] ["a" (str \a)]
+                   [(int 1) (long 1)] [1 1N] [1M 1.0M]
+                   [[1M] '(1.0M)] [{:n 1M} {:n 1.0M}] [#{1} #{1N}]]
+            occurrence [0 1 129]]
+      (let [a-key (lifecycle/->ChildKey a occurrence)
+            b-key (lifecycle/->ChildKey b occurrence)]
+        (is (= a-key b-key))
+        (is (= (hash a-key) (hash b-key)))
+        (is (= (.hashCode a-key) (.hashCode b-key)))
+        (is (= (hash (MapEntry/create a occurrence)) (hash a-key)))
+        (is (= :value (.get (doto (HashMap.) (.put a-key :value)) b-key))))))
+  (testing "Distinct values and occurrences remain distinct"
+    (doseq [[a b] [[nil false] [:a :b] ["Aa" "BB"] [1 1.0]]]
+      (is (not= (lifecycle/->ChildKey a 0) (lifecycle/->ChildKey b 0))))
+    (is (not= (lifecycle/->ChildKey :a 0) (lifecycle/->ChildKey :a 1)))
+    (is (not (.equals (lifecycle/->ChildKey nil 0) nil)))
+    (is (not (.equals (lifecycle/->ChildKey :a 0) [:a 0])))))
+
 (deftest wrap-many-preserves-clojure-equivalent-keys-test
   (let [events (atom [])
         lifecycle (lifecycle/wrap-many
@@ -1095,6 +1117,39 @@
                       (try
                         (fx/create-component {:fx/type view})
                         (catch Exception caught caught)))))))
+
+;; Stable extra-prop components are reused, while advanced state survives until cleanup.
+(deftest extra-props-component-state-test
+  (doseq [advance-state [false true]]
+    (testing (if advance-state "Updated prop state is retained" "Stable components are reused")
+      (let [advances (atom 0)
+            deleted (atom [])
+            target (Object.)
+            value-lifecycle
+            (reify lifecycle/Lifecycle
+              (create [_ _ _]
+                (with-meta {:generation 0} {`component/instance (constantly :value)}))
+              (advance [_ value _ _]
+                (swap! advances inc)
+                (if advance-state (update value :generation inc) value))
+              (delete [_ value _]
+                (swap! deleted conj (:generation value))))
+            wrapper
+            (lifecycle/make-ext-with-props
+             lifecycle/scalar
+             {:extra (prop/make (mutator/setter (fn ignore-extra! [_ _])) value-lifecycle)})
+            desc {:desc target :props {:extra :value}}
+            initial (lifecycle/create wrapper desc nil)
+            current (volatile! initial)]
+        (try
+          (dotimes [_ 2]
+            (vswap! current #(lifecycle/advance wrapper % desc nil)))
+          (is (= (not advance-state) (identical? initial @current)))
+          (is (identical? target (component/instance @current)))
+          (is (= 2 @advances))
+          (finally
+            (lifecycle/delete wrapper @current nil)))
+        (is (= [(if advance-state 2 0)] @deleted))))))
 
 ;; Extra-prop resources belong to a nonnil target, while the child component
 ;; survives target changes and absence in both wrapper APIs.

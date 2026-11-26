@@ -141,3 +141,44 @@
                {:op :retract!, :prop :a, :instance :obj, :coerced-value "nil", :value nil}})
     (fact (component/instance component)
           => :obj)))
+
+;; Concrete composites reuse stable components and retain advanced prop state.
+;; Cleanup must see the latest state even when descriptions remain equal.
+(deftest composite-component-state-test
+  (testing "Unchanged props reuse the component and native instance"
+    (let [definition
+          (composite/lifecycle {:ctor (fn make-instance [] (Object.))
+                               :args []
+                               :props {}})
+
+          initial (lifecycle/create definition {} {})
+          advanced (lifecycle/advance definition initial {} {})]
+      (is (identical? initial advanced))
+      (is (identical? (component/instance initial) (component/instance advanced)))
+      (lifecycle/delete definition advanced {})))
+  (testing "Equal descriptions still advance prop lifecycles and retain their latest state"
+    (let [deleted (atom [])
+
+          value-lifecycle
+          (reify lifecycle/Lifecycle
+            (create [_ desc _]
+              (with-meta {:generation 0 :value desc} {`component/instance :value}))
+            (advance [_ value desc _]
+              (assoc value :generation (inc (:generation value)) :value desc))
+            (delete [_ value _]
+              (swap! deleted conj (:generation value))))
+
+          definition
+          (composite/lifecycle
+            {:ctor (fn make-target [] (atom nil))
+             :args []
+             :props {:value (prop/make (mutator/setter reset!) value-lifecycle)}})
+
+          initial (lifecycle/create definition {:value false} {})
+          advanced (lifecycle/advance definition initial {:value false} {})
+          target (component/instance initial)]
+      (is (false? @target))
+      (is (identical? target (component/instance advanced)))
+      (is (not (identical? initial advanced)))
+      (lifecycle/delete definition advanced {})
+      (is (= [1] @deleted)))))

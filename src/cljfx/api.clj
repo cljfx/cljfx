@@ -115,7 +115,9 @@
     in descriptions to determine what lifecycle will be used for that description
   - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
     of change-listener, event-handler or any other callback-like prop. It receives that
-    map with `:fx/event` key containing appropriate event data"
+    map with `:fx/event` key containing appropriate event data
+  - `:fx.opt/error-handler` - a function receiving asynchronous state/ref render
+    failures; defaults to printing Exceptions and rethrowing other Throwables"
   ([desc]
    (create-component desc {}))
   ([desc opts]
@@ -131,7 +133,9 @@
     in descriptions to determine what lifecycle will be used for that description
   - `:fx.opt/map-event-handler` — a function that gets called when map is used in place
     of change-listener, event-handler or any other callback-like prop. It receives that
-    map with `:fx/event` key containing appropriate event data"
+    map with `:fx/event` key containing appropriate event data
+  - `:fx.opt/error-handler` - a function receiving asynchronous state/ref render
+    failures; defaults to printing Exceptions and rethrowing other Throwables"
   ([component desc]
    (advance-component component desc {}))
   ([component desc opts]
@@ -261,7 +265,7 @@
 
   Re-rendering will happen on JavaFX UI thread with the latest value from the IRef
   supplied to the description. It's safe to update the IRef from any thread as often as
-  needed. Ref-triggered re-renders must preserve the root JavaFX instance.
+  needed.
 
   Changing :ref preserves the child component and advances it with the new ref's value.
   Use ext-recreate-on-key-changed if changing the ref should recreate the child instead.
@@ -280,7 +284,6 @@
   Supported keys:
     :desc             required, the stateful component description that will receive 2
                       additional keys defined by `:key` and `:swap-key` props
-                      Local state updates must preserve the root instance.
     :initial-state    the initial local state of the component. Whenever the initial state
                       changes, the state will be discarded and recreated from scratch. The
                       child component, on the other hand, will not be discarded. Instead,
@@ -431,7 +434,10 @@
       :or {middleware identity
            opts {}
            error-handler renderer/default-error-handler}}]
-  (renderer/create middleware (defaults/fill-opts opts) error-handler))
+  (renderer/create middleware
+                   (defaults/fill-opts
+                     (defaults/provide opts :fx.opt/error-handler error-handler))
+                   error-handler))
 
 (defn mount-renderer
   "Use `*ref` to provide descriptions for supplied `renderer` function

@@ -1,6 +1,7 @@
 (ns cljfx.renderer
   "Part of a public API"
-  (:require [cljfx.lifecycle :as lifecycle]
+  (:require [cljfx.defaults :as defaults]
+            [cljfx.lifecycle :as lifecycle]
             [cljfx.platform :as platform]))
 
 (set! *warn-on-reflection* true)
@@ -64,18 +65,16 @@
     :else
     (lifecycle/advance lifecycle component desc opts)))
 
-(defn default-error-handler [e]
-  (if (instance? Exception e)
-    (.printStackTrace ^Exception e)
-    (throw e)))
+(def default-error-handler defaults/default-error-handler)
 
 (defn create
   ([middleware opts]
    (create middleware opts default-error-handler))
   ([middleware opts error-handler]
-   (let [lifecycle (middleware lifecycle/root)
+   (let [opts (defaults/provide opts :fx.opt/error-handler error-handler)
+         lifecycle (lifecycle/wrap-root (middleware lifecycle/dynamic))
          *renderer (atom {:component nil
-                          :error-handler error-handler
+                          :error-handler (:fx.opt/error-handler opts)
                           :render-fn #(render-component lifecycle %1 %2 opts)})]
      (fn render
        ([]
